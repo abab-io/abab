@@ -1,14 +1,14 @@
-# testrpc
-## install testrpc
+## testrpc
+### install testrpc
 npm install -g ethereumjs-testrpc
 ## run testrpc
 testrpc
 
-# truffle
-## install truffle
+## truffle
+### install truffle
 npm install -g truffle
 
-## run truffle
+### run truffle
 truffle compile
 truffle migrate
 truffle test
