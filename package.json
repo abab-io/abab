@@ -25,10 +25,25 @@
   },
   "homepage": "https://github.com/bodgan-medvedev/abab#readme",
   "dependencies": {
+    "body-parser": "^1.17.2",
+    "chokidar": "^1.7.0",
+    "compression": "^1.7.0",
+    "cookie-parser": "^1.4.3",
+    "cookies": "^0.7.0",
+    "country-list": "^1.1.0",
     "ethereumjs-tx": "^1.3.3",
+    "express": "^4.15.3",
+    "express-session": "^1.15.3",
+    "helmet": "^3.6.1",
+    "jade": "^1.11.0",
     "keythereum": "^1.0.1",
     "lodash": "^4.17.4",
+    "mongoose": "^4.11.3",
     "nconf": "^0.8.4",
-    "web3": "^0.19.1"
+    "portfinder": "^1.0.13",
+    "random-node": "^1.0.3",
+    "tabgeo": "^0.1.0",
+    "web3": "^0.19.1",
+    "winston": "^2.3.1"
   }
 }

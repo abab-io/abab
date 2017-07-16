@@ -2,7 +2,7 @@
  * Created by bogdanmedvedev on 29.06.16.
  */
 var countries = require('country-list')();
-var getCountryCode = require('tabgeo')(_path_root + 'application/geoip/tabgeo_country_v4.dat');
+var getCountryCode = require('tabgeo')(_path_root + 'app/modules/geoip/tabgeo_country_v4.dat');
 module.exports = function (ip) {
     if (typeof ip !== 'string')
         return {success: false, error: 'error typeof stringIP:' + ip};

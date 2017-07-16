@@ -1,16 +1,16 @@
 "use strict";
-var config = require('../../config.json');
-var request = require('../core/request.js');
+var config = require('../config');
+var request = require('../request');
 var async = require("async");
 var crypto = require('crypto');
 var querystring = require('querystring');
-var db = require('../core/db.js');
-var clients = require('../model/clients.js');
+var db = require('../db');
 var path = require('path');
+var fs = require('fs');
 
 var API;
-// if (config.useRedisForCluster)
-//     var redis = require('redis').createClient(config.redis.port, config.redis.host);
+if (config.get('redis.status'))
+    var redis = require('redis').createClient(config.get('redis.port'), config.get('redis.host'));
 
 function ethplorer(name,address, get, post, callback) {
     let data_get = ''; // user_id=500150&
@@ -43,6 +43,7 @@ function ethplorer(name,address, get, post, callback) {
     }
 });
 }
+var controller={};
 API = {
     on(name, _public, cb, docs){
         if (typeof _public == 'function') {
@@ -157,4 +158,14 @@ API = {
     },
     cache: {}
 };
+
+fs.readdir('./app/api', function(err, items) {
+    console.log(items);
+
+    for (var i=0; i<items.length; i++) {
+        console.log(items[i]);
+        require('../../api/'+items[i])(API,redis);
+    }
+});
+module.exports.controller = controller;
 module.exports.API = API;

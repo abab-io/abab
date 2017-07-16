@@ -10,7 +10,9 @@ var random = require('../random');
 var portfinder = require('portfinder');
 
 config.set('project_name', 'Abab.io', true, true);
+config.set('domain', 'abab.io', true, true);
 config.set('database:mongodb_url', 'mongodb://abab_user{4:PasswordAbab@127.0.0.1:28018/abab_db', true, true);
+config.set('server:url:path', '/', true, true);
 
 portfinder.getPorts(3, {port: 8000}, function (err, port) {
     if (err) console.error(err);
@@ -18,6 +20,10 @@ portfinder.getPorts(3, {port: 8000}, function (err, port) {
     config.set('server:https:port', port[1] || 0, true, true);
     config.set('server:ws:port', port[2] || 0, true, true);
 });
+
+config.set('redis.status', false, true, true);
+config.set('redis.host', '127.0.0.1', true, true);
+config.set('redis.post', '0000', true, true);
 config.set('application:mail:service', 'gmail.com', true, true);
 config.set('application:mail:username', 'example@gmail.com', true, true);
 config.set('application:mail:password', 'myPassword123', true, true);
