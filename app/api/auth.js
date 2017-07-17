@@ -4,7 +4,7 @@ const web3 = new Web3();
 web3.setProvider(new web3.providers.HttpProvider('http://127.0.0.1:8545'));
 const keythereum = require("keythereum");
 module.exports = (API, redis) => {
-    API.on('auth_email', (user, param, callback) => {
+    API.on('auth_email', true, (user, param, callback) => {
         if (!param.email)
             return callback && callback(null, {
                     error: 'email param undefined',
@@ -16,14 +16,14 @@ module.exports = (API, redis) => {
                     success: false
                 });
 
-            return callback && callback(null, {
-                    error: 'method in developing',
-                    success: false
-                });
+        return callback && callback(null, {
+                error: 'method in developing',
+                success: false
+            });
 
     }, {
         title: 'Login user for email',
-        description: 'Login user for email method send verify message to "email" from smtp',
+        description: 'Login user for email method send verify message to "email" from smtp smtp',
         param: [
             {
                 name: 'email',

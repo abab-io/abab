@@ -1,14 +1,21 @@
-var mongoose = require('mongoose');
 var config = require('../config');
-mongoose.connect(config.get('database.mongodb_url'));
-var db = mongoose.connection;
+var mongoose = require('mongoose');
+var mongo_db = mongoose.createConnection(config.get('database:mongodb_url'), {
+    useMongoClient: true,
+    /* other options */
+});
+var db;
+mongo_db.then(function (db_) {
+    db = db_;
+    db.on('error', function (err) {
+        console.error('Connection error [Mongo DB]:', err.message);
+    });
+    db.once('open', function callback() {
+        console.log("Connection to MongoDB... success");
+    });
+});
 
-db.on('error', function (err) {
-    console.error('Connection error [Mongo DB]:', err.message);
-});
-db.once('open', function callback() {
-    console.log("Connection to MongoDB... success");
-});
+
 var Schema = mongoose.Schema;
 var logsAPI_model = new Schema({
 

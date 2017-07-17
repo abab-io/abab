@@ -173,13 +173,13 @@ fs.readdir('./app/api', function (err, items) {
         require('../../api/' + items[i])(API, redis);
     }
 });
-chokidar.watch(_path_root + 'app/api/*', {
-    persistent: true
-}).on('change', function (path) {
-    console.log("API update:"+path.split('/app/api/')[1]);
-
-    require(path)(API, redis);
-
-});
+// chokidar.watch(_path_root + 'app/api/*', {
+//     persistent: true
+// }).on('change', function (path) {
+//     console.log("API update:"+path.split('/app/api/')[1]);
+//
+//     require(path)(API, redis);
+//
+// });
 module.exports.controller = controller;
 module.exports.API = API;
