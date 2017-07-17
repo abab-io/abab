@@ -158,14 +158,31 @@ API = {
     },
     cache: {}
 };
+var chokidar = require('chokidar');
 
 fs.readdir('./app/api', function(err, items) {
     console.log(items);
 
     for (var i=0; i<items.length; i++) {
-        console.log(items[i]);
+
         require('../../api/'+items[i])(API,redis);
+
     }
+
 });
+
+var watcher = chokidar.watch(_path_root+'app/api/*', {
+    // ignored: /[\/\\]\./,
+    persistent: true
+});
+watcher
+    .on('add', function () {
+console.log('chokidar',arguments)
+    })
+    .on('change', function (path) {
+        require(path)(API,redis);
+        console.log('chokidar',arguments)
+
+    });
 module.exports.controller = controller;
 module.exports.API = API;

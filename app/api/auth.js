@@ -45,4 +45,5 @@ module.exports = (API, redis) => {
             {name: 'latency_ms', type: "int(11)", title: 'Request processing time in ms', default: '122'}
         ]
     });
+
 };
