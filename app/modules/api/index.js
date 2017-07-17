@@ -12,7 +12,7 @@ var API;
 if (config.get('redis.status'))
     var redis = require('redis').createClient(config.get('redis.port'), config.get('redis.host'));
 
-function ethplorer(name,address, get, post, callback) {
+function ethplorer(name, address, get, post, callback) {
     let data_get = ''; // user_id=500150&
     let data_post = ''; // user_id=500150&
     for (let i in get) {
@@ -27,7 +27,7 @@ function ethplorer(name,address, get, post, callback) {
         rejectUnauthorized: false,
         host: 'api.ethplorer.io',
         port: 443,
-        path: '/' + name + '/'+address+'?' + data_get,
+        path: '/' + name + '/' + address + '?' + data_get,
         method: 'POST',
         formData: data_post,
         headers: {
@@ -36,14 +36,14 @@ function ethplorer(name,address, get, post, callback) {
     };
     request.getJSON(option, (statusCode, response) => {
         if (statusCode == 200 && Object.prototype.isPrototypeOf(response)) {
-        callback && callback(null, response);
-    } else {
-        console.error('response', Object.prototype.isPrototypeOf(response), response);
-        callback && callback('Error ethplorer API [' + '/en/api/' + ']. ( https://' + option.host + option.path + '?' + option.formData + ' ) Response code: ' + statusCode, null);
-    }
-});
+            callback && callback(null, response);
+        } else {
+            console.error('response', Object.prototype.isPrototypeOf(response), response);
+            callback && callback('Error ethplorer API [' + '/en/api/' + ']. ( https://' + option.host + option.path + '?' + option.formData + ' ) Response code: ' + statusCode, null);
+        }
+    });
 }
-var controller={};
+var controller = {};
 API = {
     on(name, _public, cb, docs){
         if (typeof _public == 'function') {
@@ -62,7 +62,14 @@ API = {
 
             docs.code = cb.toString();
             setTimeout(function () {
-                API.docs.push(docs);
+                let add = true;
+                for (let index in API.docs) {
+                    if (API.docs[index].method === docs.method) {
+                        API.docs[index] = docs;
+                        add = false;
+                    }
+                }
+                if (add) API.docs.push(docs);
             }, 1)
         }
     },
@@ -81,7 +88,7 @@ API = {
                 if (err) {
                     console.error('API->emit(name, user, param, cb, type)->controller[name]->err:', err)
                 }
-                if(!json) {
+                if (!json) {
                     json = {error: 'server error 500'};
                 }
                 json.latency_ms = (new Date()).getTime() - initTimestamp;
@@ -154,35 +161,25 @@ API = {
 
     },
     proxy: {
-        ethplorer:ethplorer
+        ethplorer: ethplorer
     },
     cache: {}
 };
 var chokidar = require('chokidar');
 
-fs.readdir('./app/api', function(err, items) {
-    console.log(items);
-
-    for (var i=0; i<items.length; i++) {
-
-        require('../../api/'+items[i])(API,redis);
-
+fs.readdir('./app/api', function (err, items) {
+    for (var i = 0; i < items.length; i++) {
+        console.log("API start:"+items[i]);
+        require('../../api/' + items[i])(API, redis);
     }
-
 });
-
-var watcher = chokidar.watch(_path_root+'app/api/*', {
-    // ignored: /[\/\\]\./,
+chokidar.watch(_path_root + 'app/api/*', {
     persistent: true
-});
-watcher
-    .on('add', function () {
-console.log('chokidar',arguments)
-    })
-    .on('change', function (path) {
-        require(path)(API,redis);
-        console.log('chokidar',arguments)
+}).on('change', function (path) {
+    console.log("API update:"+path.split('/app/api/')[1]);
 
-    });
+    require(path)(API, redis);
+
+});
 module.exports.controller = controller;
 module.exports.API = API;

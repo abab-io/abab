@@ -23,7 +23,7 @@ module.exports = (API, redis) => {
 
     }, {
         title: 'Login user for email',
-        description: 'Login user for email',
+        description: 'Login user for email method send verify message to "email" from smtp',
         param: [
             {
                 name: 'email',
@@ -45,5 +45,4 @@ module.exports = (API, redis) => {
             {name: 'latency_ms', type: "int(11)", title: 'Request processing time in ms', default: '122'}
         ]
     });
-
 };
