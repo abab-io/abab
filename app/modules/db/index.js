@@ -55,7 +55,53 @@ var logsAPI_model = new Schema({
     }
 });
 
+var users = new Schema({
+
+    email: {
+        type: String,
+        default: null,
+        index: true
+    },
+    phone: {
+        type: String,
+        default: null,
+        index: true
+    },
+    name: {
+        type: String,
+        default: null
+    },
+    surname: {
+        type: String,
+        default: null
+    },
+    birthday:{
+        type: String,
+        default: null
+    },
+    address:{
+        type: String,
+        default: null
+    },
+    last_ip:{
+        type: String,
+        default: null
+    },
+    settings:{
+        type: Schema.Types.Mixed,
+    },
+    create_at: {
+        type: Date,
+        default: Date.now
+    },
+    update_at: {
+        type: Date,
+        default: Date.now
+    }
+});
+
 exports.logsAPI = mongoose.model("logsAPI", logsAPI_model);
+exports.users = mongoose.model("users", users);
 
 exports.Schema = Schema;
 exports.mongoose = mongoose;
