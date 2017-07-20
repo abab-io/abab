@@ -8,12 +8,12 @@ const transporter = nodemailer.createTransport({
         pass: 'Abab777Abab'
     }
 });
-function send(to, subject,text, html, cb) {
+function send(to, subject, text, html, cb) {
 
     transporter.sendMail({
         from: '"Abab.io" <Abab@abab.io>',
         to: to,
-        subject:subject,
+        subject: subject,
         text: text,
         html: html
     }, (error, info) => {

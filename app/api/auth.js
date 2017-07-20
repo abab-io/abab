@@ -79,7 +79,10 @@ module.exports = (API, redis) => {
                 settings: {},
                 activate: false
             }).save().then(function (document) {
-                mail.send(param.email,'Activate you account Abab.io','Hi '+document.email+', You have successfully created an Abab.io account. To complete the process, activate your account. https://abab.io/api/v1/?method=public_activate_email&email='+document.email+'&hash='+document.activate_hash+' If you have any questions about this email, contact us. https://abab.io/support Regards, The Abab team','Activate you account Abab.io','Hi '+document.email+', You have successfully created an Abab.io account. To complete the process, activate your account. https://abab.io/api/v1/?method=public_activate_email&email='+document.email+'&hash='+document.activate_hash+' If you have any questions about this email, contact us. https://abab.io/support Regards, The Abab team');
+                mail.send(param.email,
+                    'Activate you account Abab.io',
+                    'Hi ' + document.email + ', You have successfully created an Abab.io account. To complete the process, activate your account. https://abab.io/api/v1/?method=public_activate_email&email=' + document.email + '&hash=' + document.activate_hash + ' If you have any questions about this email, contact us. https://abab.io/support Regards, The Abab team',
+                    'Hi ' + document.email + ', You have successfully created an Abab.io account. To complete the process, activate your account. https://abab.io/api/v1/?method=public_activate_email&email=' + document.email + '&hash=' + document.activate_hash + ' If you have any questions about this email, contact us. https://abab.io/support Regards, The Abab team');
                 return callback && callback(null, {
                         user: document,
                         success: true
