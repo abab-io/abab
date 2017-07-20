@@ -40,6 +40,7 @@
     "lodash": "^4.17.4",
     "mongoose": "^4.11.3",
     "nconf": "^0.8.4",
+    "password-hash": "^1.2.2",
     "portfinder": "^1.0.13",
     "random-node": "^1.0.3",
     "tabgeo": "^0.1.0",

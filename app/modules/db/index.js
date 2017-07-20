@@ -1,19 +1,19 @@
 var config = require('../config');
 var mongoose = require('mongoose');
-var mongo_db = mongoose.createConnection(config.get('database:mongodb_url'), {
-    useMongoClient: true,
+var db = mongoose.createConnection(config.get('database:mongodb_url'), {
+    // useMongoClient: true,
     /* other options */
 });
-var db;
-mongo_db.then(function (db_) {
-    db = db_;
+// var db;
+// mongo_db.then(function (db_) {
+//     db = db_;
     db.on('error', function (err) {
         console.error('Connection error [Mongo DB]:', err.message);
     });
-    db.once('open', function callback() {
+    db.on('open', function callback() {
         console.log("Connection to MongoDB... success");
     });
-});
+// });
 
 
 var Schema = mongoose.Schema;
@@ -75,6 +75,10 @@ var users = new Schema({
         type: String,
         default: null
     },
+    password: {
+        type: String,
+        default: null
+    },
     birthday:{
         type: String,
         default: null
@@ -87,8 +91,30 @@ var users = new Schema({
         type: String,
         default: null
     },
+    api:{
+        key:{
+            type: String,
+            default: null
+        },
+        secret:{
+            type: String,
+            default: null
+        },
+        white_ip:{
+            type: String,
+            default: '*.*.*.*'
+        },
+        status:{
+            type: Boolean,
+            default: false
+        }
+    },
     settings:{
         type: Schema.Types.Mixed,
+    },
+    activate:{
+        type: Boolean,
+        default: false
     },
     create_at: {
         type: Date,

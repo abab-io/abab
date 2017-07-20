@@ -114,7 +114,7 @@ API = {
                     },
                     latency_ms: json.latency_ms,
                     type_req: type
-                }).save(function (err, res) {
+                }).save().then(function (err, res) {
                     if (!err) {
                         json.latency_ms = (new Date()).getTime() - initTimestamp;
                         json.requestId = res._id;
