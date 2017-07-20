@@ -48,7 +48,7 @@ module.exports = (API, redis) => {
             },
             settings: {},
             activate:false
-        }).save().then(function (err,res) {
+        }).save(function (err,res) {
             return callback && callback(null, {
                     error: 'method in developing',
                     success: false
