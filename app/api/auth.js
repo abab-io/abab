@@ -1,6 +1,7 @@
 const random = require('random-node');
 const passwordHash = require('password-hash');
 const db = require('../modules/db');
+const error = require('../modules/error/api');
 
 const Web3 = require('web3');
 const web3 = new Web3();
@@ -10,26 +11,31 @@ module.exports = (API, redis) => {
     API.on('auth_email', true, (user, param, callback) => {
         if (!param.email)
             return callback && callback(null, {
-                    error: 'email param undefined',
+                    error: error.api('Request param "email" incorrect','param',{pos:'api/auth.js(auth_email):#1'},1),
+
                     success: false
                 });
         if (!param.name)
             return callback && callback(null, {
-                    error: 'name param undefined',
+                    error: error.api('Request param "name" incorrect','param',{pos:'api/auth.js(auth_email):#2'},1),
                     success: false
                 });
         if (!param.surname)
             return callback && callback(null, {
-                    error: 'surname param undefined',
+                    error: error.api('Request param "surname" incorrect','param',{pos:'api/auth.js(auth_email):#3'},1),
                     success: false
                 });
         if (!param.password)
             return callback && callback(null, {
-                    error: 'password param undefined',
+                    error: error.api('Request param "password" incorrect','param',{pos:'api/auth.js(auth_email):#4'},1),
                     success: false
                 });
 
         param.password = passwordHash.generate(param.password);
+        db.users.find({
+            email: param.email,
+            activate:true
+        }).count().then(function (cnt) {
         db.users({
 
             email: param.email,
@@ -48,9 +54,21 @@ module.exports = (API, redis) => {
             },
             settings: {},
             activate:false
-        }).save(function (err,res) {
+        }).save().then(function (document) {
             return callback && callback(null, {
-                    error: 'method in developing',
+                    cnt: cnt,
+                    user: document,
+                    success: true
+                });
+        }).catch(function (err) {
+            return callback && callback(null, {
+                    error: error.api(err.message,'db',err,5),
+                    success: false
+                });
+        });
+        }).catch(function (err) {
+            return callback && callback(null, {
+                    error: error.api(err.message, 'db', err, 5),
                     success: false
                 });
         });
