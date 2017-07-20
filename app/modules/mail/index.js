@@ -11,7 +11,7 @@ const transporter = nodemailer.createTransport({
 function send(to, subject, text, html, cb) {
 
     transporter.sendMail({
-        from: '"Abab.io" <Abab@abab.io>',
+        from: '"Abab@abab.io" <Abab@abab.io>',
         to: to,
         subject: subject,
         text: text,

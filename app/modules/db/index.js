@@ -66,6 +66,10 @@ var schemas = {
             type: String,
             default: null
         },
+        activate_hash: {
+            type: String,
+            default: null
+        },
         password: {
             type: String,
             default: null
@@ -116,7 +120,7 @@ var schemas = {
             default: Date.now
         }
     }),
-    wallets : new Schema({
+    wallets: new Schema({
 
         user: {
             type: Schema.Types.ObjectId,
@@ -159,21 +163,21 @@ var schemas = {
             type: Schema.Types.Mixed,
             default: {},
         },
-        wallet:{
+        wallet: {
             type: String,
             default: '0x',
         },
-        callback_url:{
+        callback_url: {
             type: String,
             default: null,
         },
-        nonce:{
-            type:Number,
-            default:1
+        nonce: {
+            type: Number,
+            default: 1
         },
-        status:{
-            type:Number,
-            default:0 //0- send tx to geth , 1 - wait confirm, 2 -confirm
+        status: {
+            type: Number,
+            default: 0 //0- send tx to geth , 1 - wait confirm, 2 -confirm
         },
         create_at: {
             type: Date,
@@ -193,8 +197,8 @@ mongo_db.then(function (db_) {
         console.error('Connection error [Mongo DB]:', err.message);
     });
 
-    for(let name in schemas){
-        if(schemas.hasOwnProperty(name)){
+    for (let name in schemas) {
+        if (schemas.hasOwnProperty(name)) {
             module.exports[name] = db.model(name, schemas[name]);
 
         }
