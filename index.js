@@ -6,6 +6,7 @@ global._path_root = __dirname + '/';
 
 const config = require('./app/modules/config');
 const db = require('./app/modules/db');
+const mail = require('./app/modules/mail');
 
 db.open.then(function () {
     console.log('\n*******************************************************');
