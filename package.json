@@ -44,6 +44,7 @@
     "password-hash": "^1.2.2",
     "portfinder": "^1.0.13",
     "random-node": "^1.0.3",
+    "shelljs": "^0.7.8",
     "tabgeo": "^0.1.0",
     "web3": "^0.19.1",
     "winston": "^2.3.1"
