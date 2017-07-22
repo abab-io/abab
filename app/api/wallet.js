@@ -1,41 +1,64 @@
 const random = require('random-node');
 const db = require('../modules/db');
 const error = require('../modules/error/api');
+const config = require('../modules/config');
 const sol_config = require('../../config.sol');
 
 const Web3 = require('web3');
 const web3 = new Web3();
-web3.setProvider(new web3.providers.HttpProvider('http://127.0.0.1:8545'));
+web3.setProvider(new web3.providers.HttpProvider(config.get('geth:host')));
 const keythereum = require("keythereum");
 const Tx = require('ethereumjs-tx');
 const _ = require('lodash');
 const SolidityFunction = require('web3/lib/web3/function');
 module.exports = (API, redis) => {
+    let solidityFunction = new SolidityFunction('', _.find(sol_config._abi, {name: 'GetRoomsCount'}), '0x283684994b56861DabBfF1eE012dA9BcabAb6c62');
+    var hash = web3.sha3("Some string to be hashed");
+    console.log(hash); // "0xed973b234cf2238052c9ac87072c71bcf33abc1bbd721018e0cca448ef79b379"
+
+    var hashOfHash = web3.toHex("Some string to be hashed");
+    console.log(hashOfHash);
+    API.on('test_smartContract', true, (user, param, callback) => {
+
+        callback && callback(null, {ok: 1});
+    }, {
+        title: 'Demo function',
+        description: 'Demo function',
+        param: [],
+        response: []
+    });
     API.on('transfer_coin', (user, param, callback) => {
         if (!param.from)return callback && callback(null, {
-                error: 'param from undefined',
+                error: error.api('Request param "from" incorrect', 'param', {
+                    pos: 'api/auth.js(transfer_coin):#1',
+                    param: param
+                }, 0),
                 success: false,
-                code: 500,
-                status: 'error'
+
             });
         if (!param.to)return callback && callback(null, {
-                error: 'param to undefined',
-                success: false,
-                code: 500,
-                status: 'error'
+                error: error.api('Request param "to" incorrect', 'param', {
+                    pos: 'api/auth.js(transfer_coin):#2',
+                    param: param
+                }, 0),
+                success: false
+
             });
 
         if (!param.amount)return callback && callback(null, {
-                error: 'param amount undefined',
-                success: false,
-                code: 500,
-                status: 'error'
+                error: error.api('Request param "amount" incorrect', 'param', {
+                    pos: 'api/auth.js(transfer_coin):#3',
+                    param: param
+                }, 0),
+                success: false
             });
         if (isNaN(+param.amount)) {
             callback && callback(null,
                 {
-                    error: "amount in Nan",
-                    error_obj: {'param': 'amount', value: param.amount},
+                    error: error.api('Request param "amount" incorrect', 'param', {
+                        pos: 'api/auth.js(transfer_coin):#4',
+                        param: param
+                    }, 0),
                     success: false
                 });
         }
@@ -47,8 +70,10 @@ module.exports = (API, redis) => {
             if (!response_s) {
                 callback && callback(null,
                     {
-                        error: "error wallets not found",
-                        error_obj: err,
+                        error: error.api('wallets not found', 'param', {
+                            pos: 'api/auth.js(transfer_coin):#1',
+                            param: param
+                        }, 0),
                         success: false
                     });
                 return false;
@@ -56,16 +81,16 @@ module.exports = (API, redis) => {
 
             db.tx.find({
                 "wallet": response_s.wallet.address,
-                "currency": 'DBC',
-            }).then(function (err, res) {
+                "currency": sol_config._symbol,
+            }).then(function (res) {
                 let nonce = web3.eth.getTransactionCount(response_s.wallet.address);
                 for (let k in res) {
                     if (res.hasOwnProperty(k) && nonce < res[k].nonce)
                         nonce = res[k].nonce;
                 }
                 let privateKey = new Buffer(response_s.wallet.PrivateKey, 'hex');
-                let solidityFunction = new SolidityFunction('', _.find(abi, {name: 'transfer'}), '');
-                let payloadData = solidityFunction.toPayload([param.to, (+param.amount * _contract_fixed)]).data;
+                let solidityFunction = new SolidityFunction('', _.find(sol_config._abi, {name: 'transfer'}), '');
+                let payloadData = solidityFunction.toPayload([param.to, (+param.amount * sol_config._contract_fixed)]).data;
                 let gasPrice = web3.eth.gasPrice;
                 let gasPriceHex = web3.toHex(21000000000);
                 let gasLimitHex = web3.toHex(80000);
@@ -74,7 +99,7 @@ module.exports = (API, redis) => {
                     nonce: nonceHex,
                     gasPrice: gasPriceHex,
                     gasLimit: gasLimitHex,
-                    to: _address,
+                    to: sol_config._address,
                     from: response_s.wallet.address,
                     value: '0x00',
                     data: payloadData
@@ -90,8 +115,7 @@ module.exports = (API, redis) => {
                         console.log('Error sendRawTransaction:', err);
                         callback && callback(null,
                             {
-                                error: "Error Web3 please try latter",
-                                error_obj: err,
+                                error: error.api('Error send TX', 'web3', err, 0),
                                 success: false
                             });
                     }
@@ -103,7 +127,7 @@ module.exports = (API, redis) => {
                             });
                         new db.tx({
                             user_id: user.webtransfer_id,
-                            currency: 'ABABCoin',
+                            currency: sol_config._symbol,
                             tx: {
                                 to: param.to,
                                 from: response_s.wallet.address,

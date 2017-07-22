@@ -20,6 +20,7 @@ module.exports = function (app,express) {
     var config_local = {
         api_path: '/api/v1/',
         domain: config.get('domain'),
+        project_name: config.get('project_name'),
         shema: 'http://'
     };
     app.use('/api/v1/', function (req, res) {

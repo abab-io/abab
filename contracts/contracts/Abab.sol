@@ -20,7 +20,6 @@ contract Abab {
 	mapping (address => Room[]) public rooms;
 
 	function UpsertRoom(uint _roomIndex, uint160 _roomDescriptionHash)
-    public constant 
 	returns (uint roomIndex)
 	{
 	    if(_roomIndex>=rooms[msg.sender].length)

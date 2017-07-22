@@ -27,7 +27,7 @@ html
             .container-fluid
                 .navbar-header
                     a.navbar-brand.show.navbar-link(href='#')
-                        | !{config.domain} -
+                        | !{config.project_name} -
                         = ' '
                         span API
                     button.navbar-toggle.collapsed(data-toggle='collapse', data-target='#navbar-collapse')
@@ -53,7 +53,7 @@ html
 
                         p.hero-subtitle.fadeInDown.animated(data-animate='fadeInDown', data-delay='1200')  Set of ready-made procedures, functions
                             br
-                            |  For service !{config.domain}
+                            |  For service !{config.project_name}
 
         #auth.container.service-bg
             .row
@@ -277,7 +277,7 @@ html
                             i.fa.fa-envelope.footer-contacts-icon
                             p
                                 a(href='#', target='_blank') developers@!{config.domain}
-                    p.company-name  API developed by the team  !{config.domain} © 2015
+                    p.company-name  API developed by the team  !{config.project_name} © 2015
 
                 .clearfix.visible-sm-block
                 .col-md-7.footer-about
