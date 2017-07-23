@@ -51,7 +51,7 @@ var _q = async.queue(function (options, onResult) {
         setTimeout(function () {
             if (options.failed != 1) {
                 options.failed = 1;
-                counter.inc();
+
                 _q.push(options, (http_code, resonseJson) => {
                     if (resonseJson != null) {
 
@@ -66,7 +66,7 @@ var _q = async.queue(function (options, onResult) {
 
 var logs_getJson = false;
 module.exports.getJSON = function (options, onResult) {
-    counter.inc();
+
     if (logs_getJson) console.log('getJSON', options.path);
     _q.push(options, (http_code, resonseJson) => {
         onResult && onResult(http_code, resonseJson);
