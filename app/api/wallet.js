@@ -394,13 +394,9 @@ module.exports = (API, redis) => {
                                 });
                         }
                         else {
-                            callback && callback(null,
-                                {
-                                    txHash: hash,
-                                    success: true
-                                });
+
                             new db.tx({
-                                user_id: user.webtransfer_id,
+                                user: db.mongoose.Types.ObjectId(user._id),
                                 currency: sol_config._symbol,
                                 tx: {
                                     to: param.to,
@@ -411,7 +407,19 @@ module.exports = (API, redis) => {
                                 wallet: response_s.wallet.address,
                                 callback_url: param.callback_url,
                                 status: 1
-                            }).save();
+                            }).save().then(function (res) {
+                                callback && callback(null,
+                                    {
+                                        result:res,
+                                        success: true
+                                    });
+                            }).catch(function (err) {
+                                return callback && callback(null, {
+                                        error: error.api(err.message, 'db', err, 3),
+                                        success: false
+                                    });
+
+                            });
                         }
                     });
             }).catch(function (err) {
