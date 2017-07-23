@@ -38,6 +38,7 @@
     "jade": "^1.11.0",
     "keythereum": "^1.0.1",
     "lodash": "^4.17.4",
+    "md5": "^2.2.1",
     "mongoose": "^4.11.3",
     "nconf": "^0.8.4",
     "nodemailer": "^4.0.1",

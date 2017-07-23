@@ -29,7 +29,7 @@ module.exports = function (app,express) {
         var param = Object.assign({}, req.body, req.query);
         if (param.method) {
 
-            if (param.api_key === "597236bd4f0c16129a8af55f") {
+            if (typeof param.api_key === 'string') {
 
                 db.users.findOne({
                     "api.status": true,
