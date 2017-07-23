@@ -14,31 +14,44 @@ const util = require('ethereumjs-util');
 const _ = require('lodash');
 const SolidityFunction = require('web3/lib/web3/function');
 module.exports = (API, redis) => {
-    API.on('requestFunctionContract', true, (user, param, callback) => {
+    API.on('requestFunctionContract', (user, param, callback) => {
+
         if (!param.from)return callback && callback(null, {
                 error: error.api('Request param "from" incorrect', 'param', {
-                    pos: 'api/auth.js(transfer_coin):#1',
+                    pos: 'api/wallet.js(requestFunctionContract):#1',
                     param: param
                 }, 0),
                 success: false,
 
             });
-        if (!param.to)return callback && callback(null, {
-                error: error.api('Request param "to" incorrect', 'param', {
-                    pos: 'api/auth.js(transfer_coin):#2',
+        if (!param.function)return callback && callback(null, {
+                error: error.api('Request param "function" incorrect', 'param', {
+                    pos: 'api/wallet.js(requestFunctionContract):#2',
                     param: param
                 }, 0),
-                success: false
+                success: false,
+
+            });
+        if (!param.param)return callback && callback(null, {
+                error: error.api('Request param "param" incorrect', 'param', {
+                    pos: 'api/wallet.js(requestFunctionContract):#3',
+                    param: param
+                }, 0),
+                success: false,
 
             });
 
-        if (!param.amount)return callback && callback(null, {
-                error: error.api('Request param "amount" incorrect', 'param', {
-                    pos: 'api/auth.js(transfer_coin):#3',
+        if (!web3.isAddress(param.from))return callback && callback(null, {
+                error: error.api('Request param "from" is not valid Address', 'param', {
+                    pos: 'api/wallet.js(requestFunctionContract):#4',
                     param: param
                 }, 0),
                 success: false
             });
+
+
+
+
         db.wallets.findOne({
             "user": db.mongoose.Types.ObjectId(user._id),
             "wallet.address": param.from,
@@ -47,7 +60,7 @@ module.exports = (API, redis) => {
                 callback && callback(null,
                     {
                         error: error.api('wallets not found', 'param', {
-                            pos: 'api/auth.js(transfer_coin):#1',
+                            pos: 'api/wallet.js(transfer_coin):#5',
                             param: param
                         }, 0),
                         success: false
@@ -61,7 +74,7 @@ module.exports = (API, redis) => {
             }).then(function (res) {
                 let nonce = web3.eth.getTransactionCount(response_s.wallet.address);
                 for (let k in res) {
-                    if (res.hasOwnProperty(k) && nonce < res[k].nonce && +((+new Date().getTime()) - 1000 * 60 * 10) < +res[k].create_at.getTime())
+                    if (res.hasOwnProperty(k) && nonce < res[k].nonce && +((+new Date().getTime()) - 1000 * 60 ) < +res[k].create_at.getTime())
                         nonce = res[k].nonce;
                 }
                 let privateKey = new Buffer(response_s.wallet.PrivateKey, 'hex');
@@ -78,7 +91,9 @@ module.exports = (API, redis) => {
                     to: sol_config._address,
                     from: response_s.wallet.address,
                     value: '0x00',
-                    data: payloadData
+                    data: payloadData,
+                    chainId: 1
+
                 });
 
                 tx.sign(privateKey);
@@ -136,20 +151,20 @@ module.exports = (API, redis) => {
             name: 'from',
             type: "string",
             title: 'address',
-            necessarily: false,
+            necessarily: true,
             default: '0x'
         }, {
             name: 'function',
             type: "string",
             title: 'name function',
-            necessarily: false,
+            necessarily: true,
             default: ''
         }, {
             name: 'param',
             type: "array",
-            title: 'param function contract',
-            necessarily: false,
-            default: '[]'
+            title: 'param function contract ',
+            necessarily: true,
+            default: ''
         }, {
             name: 'callback_url',
             type: "string",

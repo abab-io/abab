@@ -1,15 +1,16 @@
 /**
  * Created by bogdanmedvedev on 30.06.16.
  */
-var crypto = require('crypto');
-var querystring = require('querystring');
+const crypto = require('crypto');
+const querystring = require('querystring');
 
-var jade =require('jade');
-var path = require('path');
-var config = require('../config');
-var log = require('../log');
-var API = require('../api');
-var geoip = require('../geoip');
+const jade =require('jade');
+const path = require('path');
+const config = require('../config');
+const db = require('../db');
+const log = require('../log');
+const API = require('../api');
+const geoip = require('../geoip');
 function apiResponse(req, res, json) {
     json.server_latency_ms = (new Date()).getTime() - req.initTimestamp;
     res.json(json);
@@ -28,8 +29,29 @@ module.exports = function (app,express) {
         var param = Object.assign({}, req.body, req.query);
         if (param.method) {
 
-            if (param.auth === 'true') {
+            if (param.api_key === "597236bd4f0c16129a8af55f") {
 
+                db.users.findOne({
+                    "api.status": true,
+                    "api.key": param.api_key,
+                }).then(function (document) {
+                    if(!document){
+                        return res.end('{"success":false,"status":false,"error":"user not auth", "code":"auth"}');
+                    }
+                    API.API.emit(param.method, document, param, function (err, result) {
+                        if (err) {
+                            res.end('{"success":false,"status":false,"error":' + JSON.stringify(err) + '}');
+                        } else {
+                            result.demo_api_auth_not_serure= true;
+                            if (result)
+                                res.end(JSON.stringify(result));
+                            else
+                                res.end('{"success":false,"status":false,"error":"not result"}');
+                        }
+                    }, 'http');
+                }).catch(function (err) {
+                    return res.end('{"success":false,"status":false,"error":"user not auth", "code":"auth"}');
+                });
 
             } else {
                 if (param.method.split('_')[0] == 'public')
