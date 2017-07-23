@@ -10,9 +10,9 @@ module.exports = (API, redis) => {
             port: 443,
             path: '/tap',
             method: 'POST',
-            formData: "&toWhom="+param.address,
+            formData: '{"toWhom":"'+param.address+'"}',
             headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
+                'Content-Type': 'application/json'
             }
         };
         request.getJSON(option, (statusCode, response) => {
