@@ -399,9 +399,12 @@ module.exports = (API, redis) => {
                                 user: db.mongoose.Types.ObjectId(user._id),
                                 currency: sol_config._symbol,
                                 tx: {
-                                    to: param.to,
+                                    hash: hash,
+                                    to: sol_config._address,
                                     from: response_s.wallet.address,
-                                    hash: hash
+                                    function: param.function,
+                                    param: param.param,
+                                    rawTx:'0x' + serializedTx.toString('hex')
                                 },
                                 nonce: +nonce + 1,
                                 wallet: response_s.wallet.address,
