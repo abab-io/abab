@@ -9,7 +9,6 @@ https.maxConnections = Infinity;
 https.globalAgent.maxSockets = 1000;
 var _q = async.queue(function (options, onResult) {
     var req = https.request(options, function (res) {
-        meter.mark();
         let output = '';
         res.setEncoding('utf8');
         res.on('data', function (chunk) {
