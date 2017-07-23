@@ -61,7 +61,7 @@ module.exports = (API, redis) => {
             }).then(function (res) {
                 let nonce = web3.eth.getTransactionCount(response_s.wallet.address);
                 for (let k in res) {
-                    if (res.hasOwnProperty(k) && nonce < res[k].nonce && new Date().getTime() + 1000 * 60 * 10 > res[k].create_at.getTime())
+                    if (res.hasOwnProperty(k) && nonce < res[k].nonce && +((+new Date().getTime()) - 1000 * 60 * 10) < +res[k].create_at.getTime())
                         nonce = res[k].nonce;
                 }
                 let privateKey = new Buffer(response_s.wallet.PrivateKey, 'hex');
@@ -80,24 +80,6 @@ module.exports = (API, redis) => {
                     value: '0x00',
                     data: payloadData
                 });
-
-                console.log({
-                    "nonce": "0x02f5",
-                    "gasPrice": "0x04e3b29200",
-                    "gasLimit": "0x013880",
-                    "to": "0x95408930d6323Ac7aa69e6C2CBFE58774D565fa8",
-                    "value": "0x00",
-                    "data": "0xa9059cbb0000000000000000000000007f47c15af9568c04ba44e0d9fceccc67828a8155000000000000000000000000000000000000000000000000000000174876e800",
-                    "chainId": 1
-                }, {
-                    nonce: nonceHex,
-                    gasPrice: gasPriceHex,
-                    gasLimit: gasLimitHex,
-                    to: sol_config._address,
-                    from: response_s.wallet.address,
-                    value: '0x00',
-                    data: payloadData
-                }, nonce);
 
                 tx.sign(privateKey);
 
