@@ -348,88 +348,96 @@ module.exports = (API, redis) => {
             "user": db.mongoose.Types.ObjectId(user._id),
             "wallet.address": param.from,
         }).then((response_s) => {
-            callback && callback(null, {h: param.param});
-            // if (!response_s) {
-            //     callback && callback(null,
-            //         {
-            //             error: error.api('wallets not found', 'param', {
-            //                 pos: 'api/wallet.js(transfer_coin):#5',
-            //                 param: param
-            //             }, 0),
-            //             success: false
-            //         });
-            //     return false;
-            // }
-            //
-            // db.tx.find({
-            //     "wallet": response_s.wallet.address,
-            //     "currency": sol_config._symbol,
-            // }).then(function (res) {
-            //     let nonce = web3.eth.getTransactionCount(response_s.wallet.address);
-            //     for (let k in res) {
-            //         if (res.hasOwnProperty(k) && nonce < res[k].nonce && +((+new Date().getTime()) - 1000 * 60 ) < +res[k].create_at.getTime())
-            //             nonce = res[k].nonce;
-            //     }
-            //     let privateKey = new Buffer(response_s.wallet.PrivateKey, 'hex');
-            //     let solidityFunction = new SolidityFunction('', _.find(sol_config._abi, {name: 'transfer'}), '');
-            //     let payloadData = solidityFunction.toPayload([param.to, (+param.amount * sol_config._contract_fixed)]).data;
-            //
-            //     let gasPriceHex = util.bufferToHex(21000000000);
-            //     let gasLimitHex = util.bufferToHex(80000);
-            //     let nonceHex = util.bufferToHex(nonce);
-            //     let tx = new Tx({
-            //         nonce: nonceHex,
-            //         gasPrice: gasPriceHex,
-            //         gasLimit: gasLimitHex,
-            //         to: sol_config._address,
-            //         from: response_s.wallet.address,
-            //         value: '0x00',
-            //         data: payloadData,
-            //         chainId: 1
-            //
-            //     });
-            //
-            //     tx.sign(privateKey);
-            //
-            //     let serializedTx = tx.serialize();
-            //
-            //     web3.eth.sendRawTransaction('0x' + serializedTx.toString('hex'), function (err, hash) {
-            //         if (err) {
-            //             console.log('Error sendRawTransaction:', err);
-            //             callback && callback(null,
-            //                 {
-            //                     error: error.api('Error send TX', 'web3', err, 0),
-            //                     success: false
-            //                 });
-            //         }
-            //         else {
-            //             callback && callback(null,
-            //                 {
-            //                     txHash: hash,
-            //                     success: true
-            //                 });
-            //             new db.tx({
-            //                 user_id: user.webtransfer_id,
-            //                 currency: sol_config._symbol,
-            //                 tx: {
-            //                     to: param.to,
-            //                     from: response_s.wallet.address,
-            //                     hash: hash
-            //                 },
-            //                 nonce: +nonce + 1,
-            //                 wallet: response_s.wallet.address,
-            //                 callback_url: param.callback_url,
-            //                 status: 1
-            //             }).save();
-            //         }
-            //     });
-            // }).catch(function (err) {
-            //     return callback && callback(null, {
-            //             error: error.api(err.message, 'db', err, 5),
-            //             success: false
-            //         });
-            //
-            // });
+            db.tx.find({
+                "wallet": response_s.wallet.address,
+                "currency": sol_config._symbol,
+            }).then(function (res) {
+                let nonce = web3.eth.getTransactionCount(response_s.wallet.address);
+                for (let k in res) {
+                    if (res.hasOwnProperty(k) && nonce < res[k].nonce && +((+new Date().getTime()) - 1000 * 60 ) < +res[k].create_at.getTime())
+                        nonce = res[k].nonce;
+                }
+                let privateKey = new Buffer(response_s.wallet.PrivateKey, 'hex');
+                let solidityFunction = new SolidityFunction('', _.find(sol_config._abi, {name: param.function}), '');
+                if (solidityFunction._inputTypes.length !== param.param.length) {
+                    return callback && callback(null, {
+                            error: error.api('invalid req param solidityFunction param: ' + JSON.stringify(solidityFunction._inputTypes), 'param', {
+                                pos: 'api/wallet.js(requestFunctionContract):#7',
+                                fn_err: 'if (solidityFunction._inputTypes.length !==param.param.length) return err;',
+                                param: param
+                            }, 0),
+                            success: false
+                        });
+                }
+
+                let payloadData = solidityFunction.toPayload(param.param).data;
+
+
+                let gasPriceHex = util.bufferToHex(21000000000);
+                let gasLimitHex = util.bufferToHex(80000);
+                let nonceHex = util.bufferToHex(nonce);
+                    let tx = new Tx({
+                        nonce: nonceHex,
+                        gasPrice: gasPriceHex,
+                        gasLimit: gasLimitHex,
+                        to: sol_config._address,
+                        from: response_s.wallet.address,
+                        value: '0x00',
+                        data: payloadData,
+                        chainId: 1
+
+                    });
+                    console.log({
+                        nonce: nonceHex,
+                        gasPrice: gasPriceHex,
+                        gasLimit: gasLimitHex,
+                        to: sol_config._address,
+                        from: response_s.wallet.address,
+                        value: '0x00',
+                        data: payloadData,
+                        chainId: 1
+
+                    },response_s.wallet);
+                    tx.sign(privateKey);
+                    let serializedTx = tx.serialize();
+
+                    web3.eth.sendRawTransaction('0x' + serializedTx.toString('hex'), function (err, hash) {
+                        if (err) {
+                            console.log('Error sendRawTransaction:', err);
+                            callback && callback(null,
+                                {
+                                    error: error.api('Error send TX', 'web3', err, 0),
+                                    success: false
+                                });
+                        }
+                        else {
+                            callback && callback(null,
+                                {
+                                    txHash: hash,
+                                    success: true
+                                });
+                            new db.tx({
+                                user_id: user.webtransfer_id,
+                                currency: sol_config._symbol,
+                                tx: {
+                                    to: param.to,
+                                    from: response_s.wallet.address,
+                                    hash: hash
+                                },
+                                nonce: +nonce + 1,
+                                wallet: response_s.wallet.address,
+                                callback_url: param.callback_url,
+                                status: 1
+                            }).save();
+                        }
+                    });
+            }).catch(function (err) {
+                return callback && callback(null, {
+                        error: error.api(err.message, 'db', err, 5),
+                        success: false
+                    });
+
+            });
         }).catch(function (err) {
             return callback && callback(null, {
                     error: error.api(err.message, 'db', err, 6),
