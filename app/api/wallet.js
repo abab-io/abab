@@ -17,7 +17,7 @@ const _ = require('lodash');
 const SolidityFunction = require('web3/lib/web3/function');
 module.exports = (API, redis) => {
     var rateETHUSD = 0;
-    API.on('wallet_coin', (user, param, callback) => {
+    API.on('wallet', (user, param, callback) => {
         param.type = 'ETH';
         if (!web3.isConnected()) {
             return callback && callback(null, {
@@ -193,13 +193,7 @@ module.exports = (API, redis) => {
                         "wallet.address": response_s.wallet.address,
                         "active": true,
                     }, update).then((res) => {
-                        if (err) {
-                            return callback && callback(null, {
-                                    error: 'DB error:' + err.name,
-                                    err: err,
-                                    success: false
-                                })
-                        }
+
                         let result_data = {
                             user: res.user,
                             active: res.active,
@@ -384,20 +378,9 @@ module.exports = (API, redis) => {
                         from: response_s.wallet.address,
                         value: '0x00',
                         data: payloadData,
-                        chainId: 1
+                        chainId: 3 // 3 == testnet ropsten ,1 == original
 
                     });
-                    console.log({
-                        nonce: nonceHex,
-                        gasPrice: gasPriceHex,
-                        gasLimit: gasLimitHex,
-                        to: sol_config._address,
-                        from: response_s.wallet.address,
-                        value: '0x00',
-                        data: payloadData,
-                        chainId: 1
-
-                    },response_s.wallet);
                     tx.sign(privateKey);
                     let serializedTx = tx.serialize();
 
