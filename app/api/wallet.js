@@ -60,17 +60,17 @@ module.exports = (API, redis) => {
                 "currency": sol_config._symbol,
             }).then(function (res) {
                 let nonce = web3.eth.getTransactionCount(response_s.wallet.address);
-                // for (let k in res) {
-                //     if (res.hasOwnProperty(k) && nonce < res[k].nonce)
-                //         nonce = res[k].nonce;
-                // }
+                for (let k in res) {
+                    if (res.hasOwnProperty(k) && nonce < res[k].nonce && new Date().getTime() + 1000 * 60 * 10 > res[k].create_at.getTime())
+                        nonce = res[k].nonce;
+                }
                 let privateKey = new Buffer(response_s.wallet.PrivateKey, 'hex');
                 let solidityFunction = new SolidityFunction('', _.find(sol_config._abi, {name: 'transfer'}), '');
                 let payloadData = solidityFunction.toPayload([param.to, (+param.amount * sol_config._contract_fixed)]).data;
-                let gasPrice = web3.eth.gasPrice;
-                let gasPriceHex = web3.toHex(21000000000);
-                let gasLimitHex = web3.toHex(80000);
-                let nonceHex = web3.toHex(nonce);
+
+                let gasPriceHex = util.bufferToHex(21000000000);
+                let gasLimitHex = util.bufferToHex(80000);
+                let nonceHex = util.bufferToHex(nonce);
                 let tx = new Tx({
                     nonce: nonceHex,
                     gasPrice: gasPriceHex,
@@ -89,7 +89,7 @@ module.exports = (API, redis) => {
                     "value": "0x00",
                     "data": "0xa9059cbb0000000000000000000000007f47c15af9568c04ba44e0d9fceccc67828a8155000000000000000000000000000000000000000000000000000000174876e800",
                     "chainId": 1
-                },{
+                }, {
                     nonce: nonceHex,
                     gasPrice: gasPriceHex,
                     gasLimit: gasLimitHex,
@@ -97,7 +97,7 @@ module.exports = (API, redis) => {
                     from: response_s.wallet.address,
                     value: '0x00',
                     data: payloadData
-                },nonce);
+                }, nonce);
 
                 tx.sign(privateKey);
 
