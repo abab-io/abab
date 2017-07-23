@@ -3,7 +3,7 @@ var request = require('../modules/request');
 
 module.exports = (API, redis) => {
 
-    API.on('get_testnet_eth', (user, param, callback) => {
+    API.on('get_testnet_eth', true,(user, param, callback) => {
         let option = {
             rejectUnauthorized: false,
             host: 'ropsten.faucet.b9lab.com',
