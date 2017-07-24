@@ -187,6 +187,71 @@ var schemas = {
             type: Date,
             default: Date.now
         }
+    }),
+    rooms: new Schema({
+
+        user: {
+            type: Schema.Types.ObjectId,
+            ref: 'users'
+        },
+        title: {
+            type: String,
+            default: '',
+        },
+        description: {
+            type: String,
+            default: '',
+        },
+        photo: {
+            type: Array,
+            default: [],
+        },
+        wallet: {
+            type: String,
+            default: '0x',
+        },
+        dateRanges: {
+            type: Array,
+            default: [], //Date ranges when you can book example: unix
+        },
+        address: {
+            country:  {
+                type: String,
+                default: null,
+            },
+            state:  {
+                type: String,
+                default: null,
+            },
+            city:  {
+                type: String,
+                default: null,
+            },
+            street:  {
+                type: String,
+                default: null,
+            },
+            address:  {
+                type: String,
+                default: null,
+            },
+        },
+        location: {
+            type: Array,
+            default: [],
+        },
+        status: {
+            type: Number,
+            default: 0 //0 - draft , 1 - wait confirm, 2 - send to blockchain, 3 -success publick
+        },
+        create_at: {
+            type: Date,
+            default: Date.now
+        },
+        update_at: {
+            type: Date,
+            default: Date.now
+        }
     })
 };
 
