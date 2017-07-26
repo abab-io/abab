@@ -19,14 +19,22 @@ contract Abab {
 	
 	mapping (address => Room[]) public rooms;
 
+	event NewRoom    (address indexed from, uint roomIndex, uint160 _roomDescriptionHash);
+	event UpdateRoom (address indexed from, uint roomIndex, uint160 _newRoomDescriptionHash);
+	event DeleteRoom (address indexed from, uint roomIndex);	
+	
 	function UpsertRoom(uint _roomIndex, uint160 _roomDescriptionHash)
     public
 	returns (uint roomIndex)
 	{
-	    if(_roomIndex>=rooms[msg.sender].length)
-			return rooms[msg.sender].push(Room(_roomDescriptionHash, 0))-1;
+	    if(_roomIndex>=rooms[msg.sender].length) {
+			var newRoomIndex = rooms[msg.sender].push(Room(_roomDescriptionHash, 0))-1;
+			NewRoom(msg.sender, newRoomIndex, _roomDescriptionHash);
+			return newRoomIndex;
+		}
 		
 		rooms[msg.sender][_roomIndex].roomDescriptionHash = _roomDescriptionHash;
+		UpdateRoom(msg.sender, _roomIndex, _roomDescriptionHash);
 		return _roomIndex;
 	}
 
