@@ -1,6 +1,11 @@
 pragma solidity ^0.4.11;
 
-contract Abab {
+import "./zeppelin-solidity/Ownable.sol";
+
+contract Abab is Ownable {
+	uint constant maxUInt = 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
+	uint constant error   = maxUInt;
+
 	// TODO compare gas price for diffrent roomID types	
 	struct  Schedule {
 		uint from;
@@ -8,8 +13,42 @@ contract Abab {
 		uint dayPrice;
 		uint weekPrice;
 		uint monthPrice;
+		uint currency;  // see Currencies array
+    }
+    
+    string[] Currencies = ["AbabCoin", "ETH", "BTC", "USD", "RUR"];
+    
+    function GetCurrencyByIndex(uint i)
+    public constant
+    returns(string currencyName)
+    { 
+        return Currencies[i]; 
     }
 
+    function GetCurrencyIndexByName(string name)
+    public constant
+    returns(uint index)
+    {
+        for(uint i = 0;i<Currencies.length;++i)
+            if (sha3(Currencies[i]) == sha3(name))  // https://ethereum.stackexchange.com/questions/4559/operator-not-compatible-with-type-string-storage-ref-and-literal-string
+                return i;
+        return error;
+    }
+    
+    event NewCurrency(string name, uint index);
+    
+    function AddCurrency(string name)
+    public onlyOwner
+    returns(uint index)
+    {
+        index = GetCurrencyIndexByName(name);
+        if (index == error) {
+            index = Currencies.push(name) - 1;
+            NewCurrency(name, index);
+        }
+        return index;
+    }
+    
     struct Room {
         uint160 roomDescriptionHash;
 		address partner;
@@ -69,10 +108,10 @@ contract Abab {
 	event UpdateSchedule (address indexed host, uint roomIndex, uint from);
 	event DeleteSchedule (address indexed host, uint roomIndex, uint from);	
 	
-	function UpsertSchedule(uint _roomIndex, uint _from, uint _to, uint _dayPrice, uint _weekPrice, uint _monthPrice) 
+	function UpsertSchedule(uint _roomIndex, uint _from, uint _to, uint _dayPrice, uint _weekPrice, uint _monthPrice, uint _currency)
 	public
 	{
-	    var schedule = Schedule(_from, _to, _dayPrice, _weekPrice, _monthPrice);
+	    var schedule = Schedule(_from, _to, _dayPrice, _weekPrice, _monthPrice, _currency);
 	    
         var room = rooms[msg.sender][_roomIndex];
         var schedulesLength = room.schedulesLength;
@@ -91,8 +130,6 @@ contract Abab {
         room.schedulesLength = schedulesLength + 1;
         NewSchedule(msg.sender, _roomIndex, _from);
 	}
-	
-	uint constant maxUInt = 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
 	
 	function GetScheduleIndex(uint _roomIndex, uint _from)
     public constant 
@@ -121,32 +158,6 @@ contract Abab {
 	    var s = rooms[msg.sender][_roomIndex].schedules[_index];
 	    return (s.from, s.to, s.dayPrice, s.weekPrice, s.monthPrice);
 	}
-	
-	function test() 
-	public
-	returns(uint from) 
-	{
-	    UpsertRoom(0,0,0,0);
-
-        uint _roomIndex = 0;
-        uint _from = 1;
-        uint _to = 1;
-        uint _dayPrice = 1;
-        uint _weekPrice = 1;
-        uint _monthPrice = 1;
-
-	    var schedule = Schedule(_from, _to, _dayPrice, _weekPrice, _monthPrice);
-	    
-        var room = rooms[msg.sender][_roomIndex];
-
-		room.schedules[0] = schedule;
-        room.schedulesLength++;
-
-
-	   // return rooms[msg.sender][0].schedules[0].from = 1;
-	    return rooms[msg.sender][0].schedules[0].from;
-	}
-	
 	
 	function RemoveSchedule(uint _roomIndex, uint _from)
 	public
