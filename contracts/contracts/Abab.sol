@@ -62,19 +62,33 @@ contract Abab is Ownable {
 	event NewRoom    (address indexed host, uint roomIndex, uint160 _roomDescriptionHash);
 	event UpdateRoom (address indexed host, uint roomIndex, uint160 _newRoomDescriptionHash);
 	event DeleteRoom (address indexed host, uint roomIndex);	
-	
-	function UpsertRoom(uint _roomIndex, uint160 _roomDescriptionHash, address partner, uint partnerPPM)
+
+	function UpsertRoomFromHost(uint _roomIndex, uint160 _roomDescriptionHash, address partner, uint partnerPPM)
     public
 	returns (uint roomIndex)
 	{
-	    if(_roomIndex>=rooms[msg.sender].length) {
-			var newRoomIndex = rooms[msg.sender].push(Room(_roomDescriptionHash, partner, partnerPPM, 0))-1;
+	    return UpsertRoom(_roomIndex, _roomDescriptionHash, msg.sender, partner, partnerPPM);
+	}
+
+	function UpsertRoomFromPartner(uint _roomIndex, uint160 _roomDescriptionHash, address host, uint partnerPPM)
+    public
+	returns (uint roomIndex)
+	{
+	    return UpsertRoom(_roomIndex, _roomDescriptionHash, host, msg.sender, partnerPPM);
+	}
+	
+	function UpsertRoom(uint _roomIndex, uint160 _roomDescriptionHash, address host, address partner, uint partnerPPM)
+    public
+	returns (uint roomIndex)
+	{
+	    if(_roomIndex>=rooms[host].length) {
+			var newRoomIndex = rooms[host].push(Room(_roomDescriptionHash, partner, partnerPPM, 0))-1;
 			NewRoom(msg.sender, newRoomIndex, _roomDescriptionHash);
 			return newRoomIndex;
 		}
 		
-		rooms[msg.sender][_roomIndex].roomDescriptionHash = _roomDescriptionHash;
-		UpdateRoom(msg.sender, _roomIndex, _roomDescriptionHash);
+		rooms[host][_roomIndex].roomDescriptionHash = _roomDescriptionHash;
+		UpdateRoom(host, _roomIndex, _roomDescriptionHash);
 		return _roomIndex;
 	}
 
