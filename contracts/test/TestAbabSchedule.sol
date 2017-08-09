@@ -59,29 +59,29 @@ contract TestAbabSchedule {
   }
 
   function testRemoveSchedule() {
-    // Abab abab = Abab(DeployedAddresses.Abab());
+    Abab abab = Abab(DeployedAddresses.Abab());
 
-    // abab.UpsertRoomFromHost(0,0,0,0,0,0);
+    abab.UpsertRoomFromHost(0,0,0,0,0,0);
 
-    // var length = abab.GetSchedulesLength(0);
-    // for(uint i = length-1; i>=0; --i)
-      // abab.RemoveSchedule(0, i);
+    var length = abab.GetSchedulesLength(0);
+    for(uint i = length-1; i>=0; --i)
+      abab.RemoveSchedule(0, i);
 
-    // for(i = 0;i<10;++i)
-      // abab.UpsertSchedule(0, i, i, i, i, i, 0);
+    for(i = 0;i<10;++i)
+      abab.UpsertSchedule(0, i, i, i, i, i, 0);
 
-    // abab.RemoveSchedule(0, 0);
-    // abab.RemoveSchedule(0, 4);
-    // abab.RemoveSchedule(0, 9);
+    abab.RemoveSchedule(0, 0);
+    abab.RemoveSchedule(0, 4);
+    abab.RemoveSchedule(0, 9);
 
-    // var (from0,to0,dayPrice0,weekPrice0,monthPrice0) = abab.GetScheduleByIndex(0, 0);
-    // var (from2,to2,dayPrice2,weekPrice2,monthPrice2) = abab.GetScheduleByIndex(0, 2);
-    // var (from3,to3,dayPrice3,weekPrice3,monthPrice3) = abab.GetScheduleByIndex(0, 3);
-    // var (from6,to6,dayPrice6,weekPrice6,monthPrice6) = abab.GetScheduleByIndex(0, 6);
+    var (from0,to0,dayPrice0,weekPrice0,monthPrice0) = abab.GetScheduleByIndex(0, 0);
+    var (from2,to2,dayPrice2,weekPrice2,monthPrice2) = abab.GetScheduleByIndex(0, 2);
+    var (from3,to3,dayPrice3,weekPrice3,monthPrice3) = abab.GetScheduleByIndex(0, 3);
+    var (from6,to6,dayPrice6,weekPrice6,monthPrice6) = abab.GetScheduleByIndex(0, 6);
 
-    // Assert.equal( from0 , 1, "0");
-    // Assert.equal( from2 , 3, "2");
-    // Assert.equal( from3 , 4, "3");
-    // Assert.equal( from6 , 8, "6");
+    Assert.equal( from0 , 1, "0");
+    Assert.equal( from2 , 3, "2");
+    Assert.equal( from3 , 4, "3");
+    Assert.equal( from6 , 8, "6");
   }
 }

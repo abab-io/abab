@@ -137,11 +137,11 @@ contract Abab is Ownable {
     DeleteRoom(msg.sender, _roomIndex);
   }
 
-  event NewSchedule    (address indexed host, uint roomIndex, uint from);
-  event UpdateSchedule (address indexed host, uint roomIndex, uint from);
-  event DeleteSchedule (address indexed host, uint roomIndex, uint from);  
+  event NewSchedule    (address indexed host, uint roomIndex, uint scheduleIndex);
+  event UpdateSchedule (address indexed host, uint roomIndex, uint scheduleIndex);
+  event DeleteSchedule (address indexed host, uint roomIndex, uint scheduleIndex);  
   
-  function UpsertSchedule(uint _roomIndex, uint _from, uint _to, uint _dayPrice, uint _weekPrice, uint _monthPrice, uint _currency)
+  function UpsertSchedule(uint _roomIndex, uint scheduleIndex, uint _from, uint _to, uint _dayPrice, uint _weekPrice, uint _monthPrice, uint _currency)
   public
   {
       var schedule = Schedule(_from, _to, _dayPrice, _weekPrice, _monthPrice, _currency);
@@ -154,7 +154,7 @@ contract Abab is Ownable {
           if(room.schedules[i].from == _from) {
               // update
               room.schedules[i] = schedule;
-              UpdateSchedule (msg.sender, _roomIndex, _from);
+              UpdateSchedule (msg.sender, _roomIndex, i);
               return;
           }
 
