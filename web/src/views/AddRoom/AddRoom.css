@@ -1,0 +1,123 @@
+
+.pageContainer_phex{padding-left:24px!important;padding-right:24px!important;max-width:1080px!important;padding-top:24px!important;padding-bottom:24px!important;}
+@media (max-width: 1127px){
+    .pageContainer_phex{maxwidth:none!important;}
+}
+@media (min-width: 1128px){
+    .pageContainer_phex {
+        margin: 0 auto!important;
+        position: relative!important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+}
+@media (min-width: 744px){
+    .pageContainer_phex{padding-top:48px!important;padding-bottom:48px!important;}
+}
+
+@media (max-width: 767px){
+    .pageContainer_phex {
+        padding-left: 24px!important;
+        padding-right: 24px!important;
+        max-width: 1080px!important;
+        padding-top: 24px!important;
+        padding-bottom: 24px!important;
+        padding: 0 !important;
+    }
+}
+@media screen and (max-width: 991px){
+
+
+.pageContainer_phex {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+}
+.pageContainer_phex {
+    border-top: 0 solid #DBDBDB;
+}
+
+
+
+.pageContainer_phex.pdls {
+    padding-left: 13px !important;
+    padding-right: 13px !important;
+}
+
+.pageContainer_phex.pdls .row_lv:last-child {
+    padding-bottom: 23px;
+}
+
+.pageContainer_phex.pdls .text_alt_area {
+    margin-top: 35px !important;
+}
+
+.pageContainer_phex {
+    border-top: 0px solid #DBDBDB;
+    margin-top: 69px !important;
+
+}
+
+.nblsv {
+    margin-top: 0px;
+    max-width: 1110px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+
+
+
+.before-inp {
+    position: relative;
+}
+.before-inp2 {
+    position: relative;
+}
+input.form-inp {
+    padding: 7px;
+    width: 100%;
+    max-width: 300px;
+    border-radius: 4px;
+    border: 1px solid #e0dddd;
+    margin-bottom: 12px;
+    letter-spacing: -1px;
+    font-family: arial;
+    margin-top: 1px;
+}
+p.inpt-p {
+    font-weight: bold;
+    color: #ECA700;
+    margin-bottom: 0;
+}
+.before-inp:before {
+    content: '% в сутки';
+    position: absolute;
+    margin-left: 22px;
+    margin-top: 7px;
+}
+
+.before-inp2:before {
+    content: '$';
+    position: absolute;
+    margin-left: 30px;
+    margin-top: 7px;
+}
+
+.dvs {
+    margin-left: 5px;
+    border-radius: 110px;
+    border: 1px solid;
+    width: 20px;
+    display: inline-block;
+    height: 20px;
+    text-align: center;
+    line-height: 18px;
+    cursor: pointer;
+}
+
+.dvs:hover{
+    opacity: 0.8;
+}
