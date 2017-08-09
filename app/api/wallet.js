@@ -15,6 +15,30 @@ const md5 = require('md5');
 
 const _ = require('lodash');
 const SolidityFunction = require('web3/lib/web3/function');
+if (web3.isConnected()) {
+    config.set('geth:lastBlockNumber', 1376000);
+
+    console.log("web3 connected!");
+    var contract = web3.eth.contract(sol_config._abi).at(sol_config._address);
+
+    var events = contract.allEvents({fromBlock: config.get('geth:lastBlockNumber'), toBlock: 'latest'});
+    events.watch(function (error, result) {
+        if(result) {
+            console.log('------ NEW EVENT -----');
+            console.log('EVENT', result);
+            console.log('transactionHash', result.transactionHash);
+            console.log('event', result.event);
+            console.log('args', result.args);
+            console.log('roomIndex', +result.args.roomIndex);
+            console.log('_roomDescriptionHash', web3.fromDecimal(result.args._roomDescriptionHash));
+            console.log('_roomDescriptionHash', result.args._roomDescriptionHash);
+            console.log('=======================');
+
+            config.set('geth:lastBlockNumber', result.blockNumber);
+        }
+    });
+
+}
 module.exports = (API, redis) => {
     var rateETHUSD = 0;
     API.on('wallet', (user, param, callback) => {
@@ -29,7 +53,6 @@ module.exports = (API, redis) => {
                     success: false
                 });
         }
-        var contract = web3.eth.contract(sol_config._abi).at(sol_config._address);
         if (param.update) {
             db.wallets.update({
                 "user": db.mongoose.Types.ObjectId(user._id),
@@ -282,7 +305,7 @@ module.exports = (API, redis) => {
     });
     API.on('requestFunctionContract', (user, param, callback) => {
 
-        if (!param.from && typeof param.from !== 'string')return callback && callback(null, {
+        if (!param.from || typeof param.from !== 'string')return callback && callback(null, {
                 error: error.api('Request param "from" incorrect', 'param', {
                     pos: 'api/wallet.js(requestFunctionContract):#1',
                     param: param
@@ -290,7 +313,7 @@ module.exports = (API, redis) => {
                 success: false,
 
             });
-        if (!param.function && typeof param.function !== 'string')return callback && callback(null, {
+        if (!param.function || typeof param.function !== 'string')return callback && callback(null, {
                 error: error.api('Request param "function" incorrect', 'param', {
                     pos: 'api/wallet.js(requestFunctionContract):#2',
                     param: param
@@ -298,7 +321,7 @@ module.exports = (API, redis) => {
                 success: false,
 
             });
-        if (!param.param && typeof param.param !== 'string')return callback && callback(null, {
+        if (!param.param || typeof param.param !== 'string')return callback && callback(null, {
                 error: error.api('Request param "param" incorrect', 'param', {
                     pos: 'api/wallet.js(requestFunctionContract):#3',
                     param: param
@@ -336,7 +359,6 @@ module.exports = (API, redis) => {
                     success: false
                 });
         }
-
         param.param = param.param.split(',');
         db.wallets.findOne({
             "user": db.mongoose.Types.ObjectId(user._id),
@@ -368,63 +390,63 @@ module.exports = (API, redis) => {
 
 
                 let gasPriceHex = util.bufferToHex(21000000000);
-                let gasLimitHex = util.bufferToHex(80000);
+                let gasLimitHex = util.bufferToHex(400000);
                 let nonceHex = util.bufferToHex(nonce);
-                    let tx = new Tx({
-                        nonce: nonceHex,
-                        gasPrice: gasPriceHex,
-                        gasLimit: gasLimitHex,
-                        to: sol_config._address,
-                        from: response_s.wallet.address,
-                        value: '0x00',
-                        data: payloadData,
-                        chainId: 3 // 3 == testnet ropsten ,1 == original
+                let tx = new Tx({
+                    nonce: nonceHex,
+                    gasPrice: gasPriceHex,
+                    gasLimit: gasLimitHex,
+                    to: sol_config._address,
+                    from: response_s.wallet.address,
+                    value: '0x00',
+                    data: payloadData,
+                    chainId: 3 // 3 == testnet ropsten ,1 == original
 
-                    });
-                    tx.sign(privateKey);
-                    let serializedTx = tx.serialize();
+                });
+                tx.sign(privateKey);
+                let serializedTx = tx.serialize();
 
-                    web3.eth.sendRawTransaction('0x' + serializedTx.toString('hex'), function (err, hash) {
-                        if (err) {
-                            console.log('Error sendRawTransaction:', err);
+                web3.eth.sendRawTransaction('0x' + serializedTx.toString('hex'), function (err, hash) {
+                    if (err) {
+                        console.log('Error sendRawTransaction:', err);
+                        callback && callback(null,
+                            {
+                                error: error.api('Error send TX', 'web3', err, 0),
+                                success: false
+                            });
+                    }
+                    else {
+
+                        new db.tx({
+                            user: db.mongoose.Types.ObjectId(user._id),
+                            currency: sol_config._symbol,
+                            tx: {
+                                hash: hash,
+                                to: sol_config._address,
+                                from: response_s.wallet.address,
+                                function: param.function,
+                                param: param.param,
+                                rawTx: '0x' + serializedTx.toString('hex')
+                            },
+                            nonce: +nonce + 1,
+                            wallet: response_s.wallet.address,
+                            callback_url: param.callback_url,
+                            status: 1
+                        }).save().then(function (res) {
                             callback && callback(null,
                                 {
-                                    error: error.api('Error send TX', 'web3', err, 0),
+                                    result: res,
+                                    success: true
+                                });
+                        }).catch(function (err) {
+                            return callback && callback(null, {
+                                    error: error.api(err.message, 'db', err, 3),
                                     success: false
                                 });
-                        }
-                        else {
 
-                            new db.tx({
-                                user: db.mongoose.Types.ObjectId(user._id),
-                                currency: sol_config._symbol,
-                                tx: {
-                                    hash: hash,
-                                    to: sol_config._address,
-                                    from: response_s.wallet.address,
-                                    function: param.function,
-                                    param: param.param,
-                                    rawTx:'0x' + serializedTx.toString('hex')
-                                },
-                                nonce: +nonce + 1,
-                                wallet: response_s.wallet.address,
-                                callback_url: param.callback_url,
-                                status: 1
-                            }).save().then(function (res) {
-                                callback && callback(null,
-                                    {
-                                        result:res,
-                                        success: true
-                                    });
-                            }).catch(function (err) {
-                                return callback && callback(null, {
-                                        error: error.api(err.message, 'db', err, 3),
-                                        success: false
-                                    });
-
-                            });
-                        }
-                    });
+                        });
+                    }
+                });
             }).catch(function (err) {
                 return callback && callback(null, {
                         error: error.api(err.message, 'db', err, 5),
