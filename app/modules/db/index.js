@@ -189,14 +189,17 @@ var schemas = {
         }
     }),
     rooms: new Schema({
-
-        user: {
-            type: Schema.Types.ObjectId,
-            ref: 'users'
-        },
         title: {
             type: String,
             default: '',
+        },
+        _index: {
+            type: Number,
+            default: null,
+        },
+        _hash: {
+            type: String,
+            default: null,
         },
         description: {
             type: String,
@@ -207,6 +210,10 @@ var schemas = {
             default: [],
         },
         wallet: {
+            type: String,
+            default: '0x',
+        },
+        txHash: {
             type: String,
             default: '0x',
         },
@@ -246,7 +253,7 @@ var schemas = {
         },
         create_at: {
             type: Date,
-            default: Date.now
+            default: Date.now //filter this param p2p
         },
         update_at: {
             type: Date,

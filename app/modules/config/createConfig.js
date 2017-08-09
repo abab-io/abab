@@ -13,6 +13,7 @@ config.set('project_name', 'Abab.io', true, true);
 config.set('domain', 'abab.io', true, true);
 config.set('database:mongodb_url', 'mongodb://abab_user{4:PasswordAbab@127.0.0.1:28018/abab_db', true, true);
 config.set('geth:host', 'http://52.178.151.150:8545', true, true);
+config.set('geth:lastBlockNumber', 1376000, true, true);
 config.set('server:url:path', '/', true, true);
 
 portfinder.getPorts(3, {port: 8000}, function (err, port) {

@@ -4,7 +4,7 @@
 const crypto = require('crypto');
 const querystring = require('querystring');
 
-const jade =require('jade');
+const jade = require('jade');
 const path = require('path');
 const config = require('../config');
 const db = require('../db');
@@ -15,7 +15,9 @@ function apiResponse(req, res, json) {
     json.server_latency_ms = (new Date()).getTime() - req.initTimestamp;
     res.json(json);
 }
-module.exports = function (app,express) {
+const error = require('../error/api');
+
+module.exports = function (app, express) {
 
 
     var config_local = {
@@ -35,22 +37,39 @@ module.exports = function (app,express) {
                     "api.status": true,
                     "api.key": param.api_key,
                 }).then(function (document) {
-                    if(!document){
-                        return res.end('{"success":false,"status":false,"error":"user not auth", "code":"auth"}');
+                    if (!document) {
+                        return res.end && res.end(JSON.stringify({
+                                error: error.api('user not auth', 'auth', {pos: 'express/api.js:42'}, 0),
+                                success: false
+                            }));
+
                     }
                     API.API.emit(param.method, document, param, function (err, result) {
                         if (err) {
-                            res.end('{"success":false,"status":false,"error":' + JSON.stringify(err) + '}');
+                            return res.end && res.end(JSON.stringify({
+                                    error: error.api('API call error', 'api', {err: err}, 0),
+                                    success: false
+                                }));
                         } else {
-                            result.demo_api_auth_not_serure= true;
+                            result.demo_api_auth_not_serure = true;
                             if (result)
                                 res.end(JSON.stringify(result));
                             else
-                                res.end('{"success":false,"status":false,"error":"not result"}');
+                                return res.end && res.end(JSON.stringify({
+                                        error: error.api('API result of null', 'api', {param: param}, 10),
+                                        success: false
+                                    }));
                         }
                     }, 'http');
                 }).catch(function (err) {
-                    return res.end('{"success":false,"status":false,"error":"user not auth", "code":"auth"}');
+                    return res.end && res.end(JSON.stringify({
+                            error: error.api('Server error', 'api', {
+                                err: err,
+                                code: 'call this method error',
+                                param: param
+                            }, 10),
+                            success: false
+                        }));
                 });
 
             } else {
@@ -66,7 +85,7 @@ module.exports = function (app,express) {
                         }
                     }, 'http');
                 else {
-                    res.end('{"success":false,"status":false,"error":"user not auth", "code":"auth"}');
+                    res.end('{"success":false,"status":false,"error":"user not auth", "code":"auth","n":3}');
 
                 }
             }
@@ -81,7 +100,7 @@ module.exports = function (app,express) {
 
     app.get('/api/docs/', function (req, res) {
         res.set('Content-Type', 'text/html');
-        res.end(jade.renderFile(path.join(_path_root,  '_API' + '/home.jade'), {
+        res.end(jade.renderFile(path.join(_path_root, '_API' + '/home.jade'), {
             methods: {all: API.API.docs},
             config: config_local,
             admin: false
