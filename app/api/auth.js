@@ -6,7 +6,7 @@ const error = require('../modules/error/api');
 
 module.exports = (API, redis) => {
     API.on('registration_email', true, (user, param, callback) => {
-        if (!param.email)
+        if (!param.email && typeof param.email !== 'string')
             return callback && callback(null, {
                     error: error.api('Request param "email" incorrect', 'param', {
                         pos: 'api/auth.js(registration_email):#1',
@@ -15,7 +15,7 @@ module.exports = (API, redis) => {
 
                     success: false
                 });
-        if (!param.name)
+        if (!param.name && typeof param.name !== 'string')
             return callback && callback(null, {
                     error: error.api('Request param "name" incorrect', 'param', {
                         pos: 'api/auth.js(registration_email):#2',
@@ -23,7 +23,7 @@ module.exports = (API, redis) => {
                     }, 0),
                     success: false
                 });
-        if (!param.surname)
+        if (!param.surname && typeof param.surname !== 'string')
             return callback && callback(null, {
                     error: error.api('Request param "surname" incorrect', 'param', {
                         pos: 'api/auth.js(registration_email):#3',
@@ -31,7 +31,7 @@ module.exports = (API, redis) => {
                     }, 0),
                     success: false
                 });
-        if (!param.password)
+        if (!param.password && typeof param.password !== 'string')
             return callback && callback(null, {
                     error: error.api('Request param "password" incorrect', 'param', {
                         pos: 'api/auth.js(registration_email):#4',
