@@ -573,13 +573,13 @@
             <div class="section-block">
 
                 <h2>Календар бронирования и цен</h2>
-
+                {{#rangesDate}}
                 <div class="buttons-nl area-nbs">
                     <div class="fll">
                         <div class="flks">
-                            13.08.17 - 20.09.17
+                            {{startDate}} - {{endDate}}
                             <span>
-                        90$ - день / 85$ - неделя / 80$ - месяц
+                        {{priceDay}}$ - день / {{+(priceDay/ 100 * (100 -discountWeek)).toFixed(2)}}$ - неделя /  {{+(priceDay/ 100 * (100 -discountMonth)).toFixed(2)}}$ - месяц
                         </span>
                         </div>
                     </div>
@@ -588,6 +588,7 @@
                         <a class="btn-area" href="#" style="width: 49%;display: inline-block">Удалить</a>
                     </div>
                 </div>
+                {{/}}
 
                 <div class="buttons-nl area-nbs" style="padding: 15px 20px 0;border-top: 1px solid #eeb11f;">
                     <div class="fll">
@@ -992,13 +993,10 @@
                     <section>
                         <div>
                             <div>
-                                <form action="#" method="post" onsubmit="return false;">
+                                <form action="#" method="post" id='add-date-form' onsubmit="return false;">
 
                                     <div>
-                                        <div style="margin-bottom: 16px;">
-                                            <input type="hidden" name="from" value="email_login"></div>
-                                        <div style="margin-bottom: 16px;">
-                                            <input type="hidden" name="airlock_id" value=""></div>
+
                                         <div style="margin-bottom: 16px;">
                                             <div class="inspectletIgnore">
                                                 <div class="container_mods">
@@ -1020,37 +1018,42 @@
                                                             </button>
                                                         </div>
                                                     </div>
+                                                    <p class="no-colotr-p">Выбрано: {{intervalDate}} ночь(ей)</p>
+
                                                 </div>
                                             </div>
                                         </div>
                                         <div style="margin-bottom: 16px;">
                                             <h4>Цена в сутки</h4>
                                             <div class="before-inp2">
-                                                <input class="form-inp" maxlength="4" placeholder="0" value="0" type="number">
+                                                <input class="form-inp" maxlength="4" placeholder="0" value="{{priceDay}}" type="number">
                                             </div>
                                             <p class="no-colotr-p">Базовой ценой является цена за ночь по умолчанию.</p>
 
                                         </div>
-                                        <div style="margin-bottom: 16px;">
+
+                                        <div style="margin-bottom: 16px;{{#if intervalDate < 7}}display:none;{{/if}}">
                                             <h4>Скидка на неделю</h4>
                                             <div class="before-inp">
-                                                <input class="form-inp" maxlength="2" placeholder="0" value="0" type="number">
+                                                <input class="form-inp" maxlength="2" placeholder="0" value="{{discountWeek}}" type="number">
                                             </div>
                                             <p class="inpt-p">Совет: 20% <span class="dvs" data-toggle="tooltip" data-placement="top" title="" data-original-title="Скидки за неделю будут применяться ко всем бронированиям от 7 до 27 ночей.">?</span></p>
-                                            <p class="no-colotr-p">Цена за неделю со скидкой 0%: 700$ (100$ в сутки)</p>
+                                            <p class="no-colotr-p">Цена за неделю со скидкой {{discountWeek}}%: {{+(priceDay / 100 * (100- discountWeek ) *7).toFixed(2)}}$ ({{+(priceDay / 100 * (100- discountWeek )).toFixed(2)}}$ за 1 ночь)</p>
 
                                         </div>
-                                        <div style="margin-bottom: 16px;">
+
+                                        <div style="margin-bottom: 16px;{{#if intervalDate < 30}}display:none;{{/if}}">
                                             <h4>Скидка на месяц</h4>
                                             <div class="before-inp">
-                                                <input class="form-inp" maxlength="2" placeholder="0" value="0" type="number">
+                                                <input class="form-inp" maxlength="2" placeholder="0" value="{{discountMonth}}" type="number">
                                             </div>
                                             <p class="inpt-p">Совет: 45% <span class="dvs" data-toggle="tooltip" data-placement="top" title="" data-original-title="Скидка за месяц будет применяться ко всем бронированиям от 30 ночей.">?</span></p>
-                                            <p class="no-colotr-p">Цена за неделю со скидкой 0%: 3000$ (100$ в сутки)</p>
+                                            <p class="no-colotr-p">Цена за месяц со скидкой {{discountMonth}}%: {{+(priceDay / 100 * (100- discountMonth ) *30).toFixed(2)}}$ ({{+(priceDay / 100 * (100- discountMonth )).toFixed(2)}}$ за 1 ночь)</p>
                                         </div>
 
+
                                         <div style="margin-bottom: 16px;">
-                                            <button type="button" class="button_mods" aria-busy="false">
+                                            <button type="button" class="button_mods" aria-busy="false" data-dismiss="modal" aria-hidden="true" on-click="addDate">
                           <span class="text_cvk">
                             <span>Добавить</span>
                           </span>

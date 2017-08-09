@@ -46,54 +46,18 @@ window.onpopstate = function (event) {
 // }
 //
 
+init_daterangepicker('#config-demo');
 
-updateConfig();
-
-function updateConfig() {
-    var options = {};
-
-
-
-    options.ranges = {
-        '7 Days': [moment(),moment().subtract(-6, 'days').format('DD.MM.YY')],
-        '15 Days': [moment(),moment().subtract(-14, 'days'), moment()],
-        'This Month': [moment(), moment().endOf('month')],
-        '1 Month': [moment(),moment().subtract(-1, 'month')]
-    };
-
-    $('#rtl-wrap').show();
-    options.locale = {
-        direction: $('#rtl').is(':checked') ? 'rtl' : 'ltr',
-        format: 'DD.MM.YY',
-        separator: ' - ',
-        applyLabel: 'Apply',
-        cancelLabel: 'Cancel',
-        fromLabel: 'From',
-        toLabel: 'To',
-        customRangeLabel: 'Custom',
-        daysOfWeek: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
-        monthNames: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-        firstDay: 1
-    };
-
-
-    $('#config-text').val("$('#demo').daterangepicker(" + JSON.stringify(options, null, '    ') + ", function(start, end, label) {\n  console.log(\"New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')\");\n});");
-
-    $('#config-demo').daterangepicker(options, function (start, end, label) {
-        console.log('New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')');
-    });
-
-}
-function init_daterangepicker(selector) {
+function init_daterangepicker(selector,callback) {
     var options = {};
 
 
     options.ranges = {
-        '7 Days': [moment(),moment().subtract(-6, 'days').format('DD.MM.YY')],
-        '15 Days': [moment(),moment().subtract(-14, 'days'), moment()],
+        '7 Days': [moment(), moment().subtract(-7, 'days').format('DD.MM.YY')],
+        '15 Days': [moment(), moment().subtract(-15, 'days'), moment()],
         'This Month': [moment(), moment().endOf('month')],
-        '1 Month': [moment(),moment().subtract(-1, 'month')],
-        '6 Month': [moment(),moment().subtract(-6, 'month')],
+        '1 Month': [moment(), moment().subtract(-1, 'month')],
+        '6 Month': [moment(), moment().subtract(-6, 'month')],
         'Year': [moment(), moment().subtract(-1, 'year')]
     };
 
@@ -112,11 +76,13 @@ function init_daterangepicker(selector) {
         firstDay: 1
     };
 
-
+    options.minDate = moment();
     // $('#config-text').val("$('#demo').daterangepicker(" + JSON.stringify(options, null, '    ') + ", function(start, end, label) {\n  console.log(\"New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')\");\n});");
 
     $(selector).daterangepicker(options, function (start, end, label) {
-        console.log('New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')');
+
+        callback && callback(start,end,+moment(end).diff(moment(start),'days'));
+        console.log('New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' , count_days: '+moment(end).diff(moment(start),'days')+'(predefined range: ' + label + ')');
     });
 
 }
