@@ -14,49 +14,49 @@ contract Abab is Ownable {
     uint weekPrice;
     uint monthPrice;
     uint currency;  // see Currencies array
-    }
-    
-    string[] Currencies = ["AbabCoin", "ETH", "BTC", "USD", "RUR"];
-    
-    function GetCurrencyByIndex(uint i)
-    public constant
-    returns(string currencyName)
-    { 
-        return Currencies[i]; 
-    }
+  }
 
-    function GetCurrencyIndexByName(string name)
-    public constant
-    returns(uint index)
-    {
-        for(uint i = 0;i<Currencies.length;++i)
-            if (sha3(Currencies[i]) == sha3(name))  // https://ethereum.stackexchange.com/questions/4559/operator-not-compatible-with-type-string-storage-ref-and-literal-string
-                return i;
-        return error;
+  string[] Currencies = ["AbabCoin", "ETH", "BTC", "USD", "RUR"];
+
+  function GetCurrencyByIndex(uint i)
+  public constant
+  returns(string currencyName)
+  {
+    return Currencies[i]; 
+  }
+
+  function GetCurrencyIndexByName(string name)
+  public constant
+  returns(uint index)
+  {
+    for(uint i = 0;i<Currencies.length;++i)
+      if (sha3(Currencies[i]) == sha3(name))  // https://ethereum.stackexchange.com/questions/4559/operator-not-compatible-with-type-string-storage-ref-and-literal-string
+        return i;
+    return error;
+  }
+
+  event NewCurrency(string name, uint index);
+
+  function AddCurrency(string name)
+  public onlyOwner
+  returns(uint index)
+  {
+    index = GetCurrencyIndexByName(name);
+    if (index == error) {
+      index = Currencies.push(name) - 1;
+      NewCurrency(name, index);
     }
-    
-    event NewCurrency(string name, uint index);
-    
-    function AddCurrency(string name)
-    public onlyOwner
-    returns(uint index)
-    {
-        index = GetCurrencyIndexByName(name);
-        if (index == error) {
-            index = Currencies.push(name) - 1;
-            NewCurrency(name, index);
-        }
-        return index;
-    }
-    
-    struct Room {
-        uint160 roomDescriptionHash;
+    return index;
+  }
+
+  struct Room {
+    uint160 roomDescriptionHash;
     address partner;
     uint    partnerPPM;
-        uint    schedulesLength;
-        mapping(uint => Schedule) schedules;
-    }
-  
+    uint    schedulesLength;
+    mapping(uint => Schedule) schedules;
+  }
+
   mapping (address => Room[]) public rooms;  
 
   event NewRoom    (address indexed host, uint roomIndex, uint160 _roomDescriptionHash);
@@ -86,9 +86,9 @@ contract Abab is Ownable {
   public
   returns (uint roomIndex)
   {
-      return UpsertRoom(_roomIndex, _roomDescriptionHash, host, msg.sender, partnerPPM, minNightCount, TimeForBooking);
+    return UpsertRoom(_roomIndex, _roomDescriptionHash, host, msg.sender, partnerPPM, minNightCount, TimeForBooking);
   }
-  
+
   function UpsertRoom(
     uint _roomIndex, 
     uint160 _roomDescriptionHash,
@@ -112,68 +112,86 @@ contract Abab is Ownable {
   }
 
   function GetRoomsCount()
-    public constant
-  returns (uint count){
+  public constant
+  returns (uint count)
+  {
     return rooms[msg.sender].length;
   }
-  
+
   function GetDescriptionHash(uint _roomIndex)
     public constant
   returns (uint160 DescriptionHash) 
   {
     return rooms[msg.sender][_roomIndex].roomDescriptionHash;
   }
-
-  function RemoveRoom(uint _roomIndex) 
+  
+  function RemoveRoomFromPartner(address _host, uint _roomIndex)
   public
   {
-    if (_roomIndex >= rooms[msg.sender].length) return;
+    if (_roomIndex >= rooms[_host].length)
+      return;
+    if((rooms[_host][_roomIndex].partner != msg.sender) && (_host != msg.sender) )
+      return;
+      
+    for (uint i = _roomIndex; i<rooms[_host].length-1; ++i)
+      rooms[_host][i] = rooms[_host][i+1];
 
-        for (uint i = _roomIndex; i<rooms[msg.sender].length-1; i++)
-            rooms[msg.sender][i] = rooms[msg.sender][i+1];
-        
-        rooms[msg.sender].length--;
-    
-    DeleteRoom(msg.sender, _roomIndex);
+    --rooms[_host].length;
+
+    DeleteRoom(_host, _roomIndex);
+  }
+
+  function RemoveRoom(uint _roomIndex)
+  public
+  {
+    RemoveRoomFromPartner(msg.sender, _roomIndex);
   }
 
   event NewSchedule    (address indexed host, uint roomIndex, uint scheduleIndex);
   event UpdateSchedule (address indexed host, uint roomIndex, uint scheduleIndex);
   event DeleteSchedule (address indexed host, uint roomIndex, uint scheduleIndex);  
-  
-  function UpsertSchedule(uint _roomIndex, uint scheduleIndex, uint _from, uint _to, uint _dayPrice, uint _weekPrice, uint _monthPrice, uint _currency)
+
+  function UpsertScheduleFromPartner(address _host, uint _roomIndex, uint _scheduleIndex, uint _from, uint _to, uint _dayPrice, uint _weekPrice, uint _monthPrice, uint _currency)
   public
   {
-      var schedule = Schedule(_from, _to, _dayPrice, _weekPrice, _monthPrice, _currency);
-      
-        var room = rooms[msg.sender][_roomIndex];
-        var schedulesLength = room.schedulesLength;
+    if (_roomIndex >= rooms[_host].length)
+      return;
+    if((rooms[_host][_roomIndex].partner != msg.sender) && (_host != msg.sender) )
+      return;
 
-      //exist?
-      for(uint i=0;i<schedulesLength;++i)
-          if(room.schedules[i].from == _from) {
-              // update
-              room.schedules[i] = schedule;
-              UpdateSchedule (msg.sender, _roomIndex, i);
-              return;
-          }
+    var schedule = Schedule(_from, _to, _dayPrice, _weekPrice, _monthPrice, _currency);
 
-        //insert
-    room.schedules[schedulesLength] = schedule;
-        room.schedulesLength = schedulesLength + 1;
-        NewSchedule(msg.sender, _roomIndex, _from);
+    var room = rooms[_host][_roomIndex];
+    var schedulesLength = room.schedulesLength;
+
+    if(_scheduleIndex<schedulesLength) {
+      // update
+      room.schedules[_scheduleIndex] = schedule;
+      UpdateSchedule (_host, _roomIndex, _scheduleIndex);
+    } else {
+      //insert
+      room.schedules[schedulesLength] = schedule;
+      NewSchedule(_host, _roomIndex, schedulesLength);
+      room.schedulesLength = schedulesLength + 1;
+    }
   }
-  
+
+  function UpsertSchedule(uint _roomIndex, uint _scheduleIndex, uint _from, uint _to, uint _dayPrice, uint _weekPrice, uint _monthPrice, uint _currency)
+  public
+  {
+    UpsertScheduleFromPartner(msg.sender, _roomIndex, _scheduleIndex, _from, _to, _dayPrice, _weekPrice, _monthPrice, _currency);
+  }
+
   function GetScheduleIndex(uint _roomIndex, uint _from)
     public constant 
     returns (uint index) 
   {
-        for(uint i=0; i<rooms[msg.sender][_roomIndex].schedulesLength; ++i)
-            if(rooms[msg.sender][_roomIndex].schedules[i].from == _from) 
-                return i;
-        return maxUInt;
+    for(uint i=0; i<rooms[msg.sender][_roomIndex].schedulesLength; ++i)
+      if(rooms[msg.sender][_roomIndex].schedules[i].from == _from) 
+        return i;
+    return maxUInt;
   }
-  
+
   function GetSchedulesLength(uint _roomIndex) 
   public constant 
   returns(uint length) 
@@ -191,23 +209,19 @@ contract Abab is Ownable {
       var s = rooms[msg.sender][_roomIndex].schedules[_index];
       return (s.from, s.to, s.dayPrice, s.weekPrice, s.monthPrice);
   }
-  
-  function RemoveSchedule(uint _roomIndex, uint _from)
+
+  function RemoveSchedule(uint _roomIndex, uint _scheduleIndex)
   public
   {
-      var length = rooms[msg.sender][_roomIndex].schedulesLength;
-      uint index = maxUInt;
-      for(uint i=0; i<length; ++i)
-          if(rooms[msg.sender][_roomIndex].schedules[i].from == _from) 
-              index = i;
-      
-      if (index == maxUInt) return; // not found
-      
-      length = length-1;
-        for (; index<length; index++)
-            rooms[msg.sender][_roomIndex].schedules[index] = rooms[msg.sender][_roomIndex].schedules[index+1];
-        
-        rooms[msg.sender][_roomIndex].schedulesLength = length;
-      DeleteSchedule(msg.sender,_roomIndex, _from);
+    if(_scheduleIndex>=rooms[msg.sender][_roomIndex].schedulesLength)
+      return;
+
+    var length = rooms[msg.sender][_roomIndex].schedulesLength - 1;
+
+    for (uint i = _scheduleIndex; i<length; ++i)
+      rooms[msg.sender][_roomIndex].schedules[i] = rooms[msg.sender][_roomIndex].schedules[i+1];
+
+    rooms[msg.sender][_roomIndex].schedulesLength = length;
+    DeleteSchedule(msg.sender,_roomIndex, _scheduleIndex);
   }
 }
