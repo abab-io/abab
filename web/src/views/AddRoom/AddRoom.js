@@ -6,6 +6,11 @@ var reactiveAddRoom = Ractive.extend({
 ractiveComponent['reactive-AddRoomApp'].on('submitRoom', function () {
     console.log($('#AddRoom').serializeArray());
 });
+ractiveComponent['reactive-AddRoomApp'].on('removeDate', function (i,index) {
+    var arrDates = ractiveComponent['reactive-AddRoomApp'].get('rangesDate');
+    arrDates.splice(index,1);
+    ractiveComponent['reactive-AddRoomApp'].set('rangesDate', arrDates);
+});
 ractiveComponent['reactive-AddRoomApp'].on('addDate', function () {
 
     var arrDates = ractiveComponent['reactive-AddRoomApp'].get('rangesDate');
