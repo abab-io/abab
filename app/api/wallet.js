@@ -16,7 +16,7 @@ const md5 = require('md5');
 const _ = require('lodash');
 const SolidityFunction = require('web3/lib/web3/function');
 if (web3.isConnected()) {
-    config.set('geth:lastBlockNumber', 1376000);
+    // config.set('geth:lastBlockNumber', 1376000);
 
     console.log("web3 connected!");
     var contract = web3.eth.contract(sol_config._abi).at(sol_config._address);

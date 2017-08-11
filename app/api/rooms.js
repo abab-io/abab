@@ -273,6 +273,7 @@ module.exports = (API, redis) => {
                                                 'address',
                                                 'location',
                                                 'status',
+                                                'txHash',
                                                 'update_at',
                                             ]),
                                             document: document,

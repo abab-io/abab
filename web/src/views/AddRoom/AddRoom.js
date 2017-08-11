@@ -17,6 +17,8 @@ ractiveComponent['reactive-AddRoomApp'].on('submitRoom', function () {
     var dateRanges = ractiveComponent['reactive-AddRoomApp'].get('rangesDate');
     delete dateRanges._ractive;
     form_obj.dateRanges = dateRanges;
+    form_obj.wallet = '0xa1b1d9551211755165a677c5e9d4b1041f4b5fd6';
+
 
     console.log(form_obj);
     swal({
@@ -39,16 +41,44 @@ ractiveComponent['reactive-AddRoomApp'].on('submitRoom', function () {
     });
     swal.showLoading();
     API('UpsertRoom', form_obj, false, function (resAPI) {
-        // console.log(resAPI)
+        console.log(resAPI);
+        swal({
+            title: ('Отправка транзакции...'),
+            closeOnConfirm: false,
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            showConfirmButton: true,
+            showCancelButton: false,
+            showLoaderOnConfirm: true,
+            text: _chat_e('Может занять несколько секунд'),
+            preConfirm: function () {
+                return new Promise(function (resolve, reject) {
+                    // here should be AJAX request
+                    setTimeout(function () {
+                        resolve();
+                    }, 30000);
+                });
+            },
+        });
+        swal.showLoading();
         swal({
             title: 'Подтверждение',
             type: 'question',
             confirmButtonText: 'Да',
             cancelButtonText: 'Нет',
             showCancelButton: true,
-            text: "Отправить обект в SmartContract (Abab.io)? ",
+            text: "Отправить обект [" + resAPI.room._id + "]в SmartContract (Abab.io)? ",
             showLoaderOnConfirm: true,
             preConfirm: function () {
+                API('UpsertRoom', {_id:resAPI.room._id,status:2}, false, function (resAPI) {
+                    swal({
+                        title: 'Отправленно',
+                        type: 'success',
+                        confirmButtonText: 'Okay',
+                        showCancelButton: false,
+                        html: "<div style='position: initial; width: 100%; vertical-align: bottom;text-overflow: ellipsis;overflow: hidden;'>Ropsten Ethereum TxHash: <a href='https://ropsten.etherscan.io/tx/" + resAPI.room.txHash + "' target='_blank' title='" + resAPI.room.txHash + "'>" + resAPI.room.txHash + "</a></div>",
+                    });
+                }, true);
 
             }
         });
