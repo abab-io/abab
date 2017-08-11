@@ -19,9 +19,6 @@ ractiveComponent['reactive-AddRoomApp'].on('submitRoom', function () {
     form_obj.dateRanges = dateRanges;
 
     console.log(form_obj);
-    API('UpsertRoom', {}, false, function () {
-
-    }, true);
     swal({
         title: ('Обработка данных...'),
         closeOnConfirm: false,
@@ -41,7 +38,8 @@ ractiveComponent['reactive-AddRoomApp'].on('submitRoom', function () {
         },
     });
     swal.showLoading();
-    setTimeout(function () {
+    API('UpsertRoom', form_obj, false, function (resAPI) {
+        // console.log(resAPI)
         swal({
             title: 'Подтверждение',
             type: 'question',
@@ -51,10 +49,10 @@ ractiveComponent['reactive-AddRoomApp'].on('submitRoom', function () {
             text: "Отправить обект в SmartContract (Abab.io)? ",
             showLoaderOnConfirm: true,
             preConfirm: function () {
+
             }
         });
-
-    }, 3000);
+    }, true);
 
 });
 $('.timeInput').timepicker({'timeFormat': 'H:i'});

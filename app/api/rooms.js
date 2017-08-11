@@ -61,6 +61,7 @@ module.exports = (API, redis) => {
                     success: false
                 });
         }
+
         if (param.description && typeof param.description !== 'string') {
             return callback && callback(null, {
                     error: error.api('Request param "description" incorrect', 'param', {
@@ -106,6 +107,7 @@ module.exports = (API, redis) => {
                     success: false
                 });
         }
+
         if (!param._id && !param._index) {
             new db.rooms({
 
@@ -113,6 +115,18 @@ module.exports = (API, redis) => {
                 description: param.description,
                 photo: param.photo,
                 wallet: param.wallet,
+                bathroom: param.bathroom,
+                bathroom_count: param.bathroom_count,
+                bed_count: param.bed_count,
+                bedroom_count: param.bedroom_count,
+                children_count: param.children_count,
+                limit_time_min: param.limit_time_min,
+                limit_time_max: param.limit_time_max,
+                people_count: param.people_count,
+                startTimeCheckIn: param.startTimeCheckIn,
+                startTimeCheckOut: param.startTimeCheckOut,
+                endTimeCheckIn: param.endTimeCheckIn,
+                endTimeCheckOut: param.endTimeCheckOut,
                 dateRanges: param.dateRanges,
                 address: {
                     country: param.address_country,
@@ -120,6 +134,7 @@ module.exports = (API, redis) => {
                     city: param.address_city,
                     street: param.address_street,
                     address: param.address_address,
+                    index: param.address_index,
                 },
                 facilities:param.facilities,
                 location: [param.location_latitude, param.location_longitude],

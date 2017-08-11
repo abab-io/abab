@@ -189,10 +189,30 @@ var schemas = {
         }
     }),
     rooms: new Schema({
-        title: {
-            type: String,
-            default: '',
-        },
+        // bathroom
+        // bathroom_count
+        // bed_count
+        // bedroom_count
+        // children_count
+        // dateRanges
+        // endTimeCheckIn
+        // endTimeCheckOut
+        // facilities
+        // limit_time_max
+        // limit_time_min
+        // people_count
+        // startTimeCheckIn
+        // startTimeCheckOut
+        // title
+        // description
+        // address_country
+        // address_state
+        // address_city
+        // address_street
+        // address_address
+        // address_index
+        // location_latitude
+        // location_longitude
         _index: {
             type: Number,
             default: null,
@@ -201,11 +221,67 @@ var schemas = {
             type: String,
             default: null,
         },
+        title: {
+            type: String,
+            default: '',
+        },
+        limit_time_min: {
+            type: String,
+            default: '',
+        },
+        limit_time_max: {
+            type: String,
+            default: '',
+        },
+        people_count: {
+            type: String,
+            default: '',
+        },
+        startTimeCheckIn: {
+            type: String,
+            default: '',
+        },
+        startTimeCheckOut: {
+            type: String,
+            default: '',
+        },
+        endTimeCheckIn: {
+            type: String,
+            default: '',
+        },
+        endTimeCheckOut: {
+            type: String,
+            default: '',
+        },
+        children_count: {
+            type: String,
+            default: '',
+        },
+        bedroom_count: {
+            type: String,
+            default: '',
+        },
+        bed_count: {
+            type: String,
+            default: '',
+        },
+        bathroom_count: {
+            type: String,
+            default: '',
+        },
+        bathroom: {
+            type: String,
+            default: '',
+        },
         description: {
             type: String,
             default: '',
         },
         photo: {
+            type: Array,
+            default: [],
+        },
+        facilities: {
             type: Array,
             default: [],
         },
@@ -239,6 +315,10 @@ var schemas = {
                 default: null,
             },
             address:  {
+                type: String,
+                default: null,
+            },
+            index:  {
                 type: String,
                 default: null,
             },
