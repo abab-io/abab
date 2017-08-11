@@ -63,7 +63,6 @@ contract TestAbabSchedule {
 
     abab.UpsertRoomFromHost(0,0,0,0,0,0);
 
-    var length = abab.GetSchedulesLength(0);
     while(abab.GetSchedulesLength(0)>0)
       abab.RemoveSchedule(0, abab.GetSchedulesLength(0)-1);
 
@@ -85,5 +84,21 @@ contract TestAbabSchedule {
     
     (from,to,dayPrice,weekPrice,monthPrice) = abab.GetScheduleByIndex(0, 6);
     Assert.equal( from , 8, "6");
+  }
+
+  function testSaveScheduleAfterRoomUpdate() {
+    Abab abab = Abab(DeployedAddresses.Abab());
+
+    abab.UpsertRoomFromHost(0,0,0,0,0,0);
+
+    while(abab.GetSchedulesLength(0)>0)
+      abab.RemoveSchedule(0, abab.GetSchedulesLength(0)-1);
+
+    abab.UpsertSchedule(0, 111, 111, 111, 111, 111, 111, 0);
+    abab.UpsertSchedule(0, 222, 222, 222, 222, 222, 222, 0);
+    
+    Assert.equal( abab.GetSchedulesLength(0) , 2, "check length before update room");
+    abab.UpsertRoomFromHost(0,0,0,0,0,0);
+    Assert.equal( abab.GetSchedulesLength(0) , 2, "check length after update room");
   }
 }
