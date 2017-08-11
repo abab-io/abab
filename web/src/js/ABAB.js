@@ -403,14 +403,14 @@ function start() {
         }
         if (ncoonect && ncoonect.close) ncoonect.close();
         if (countConn > 1) {
-            // ncoonect = noty({
-            //     text: _chat_e('Impossible to establish connection. Check connection to the Internet'),
-            //     type: 'error',
-            //     theme: 'metroui',
-            //     layout: 'top',
-            //     timeout: deleyConnect[countConn] - 100,
-            //     progressBar: true
-            // });
+            ncoonect = noty({
+                text: _chat_e('Impossible to establish connection. Check connection to the Internet'),
+                type: 'error',
+                theme: 'metroui',
+                layout: 'top',
+                timeout: deleyConnect[countConn] - 100,
+                progressBar: true
+            });
         }
         clearTimeout(auth_timeout);
         console.log('[WSS] Close Connection. Code:' + event.code + ' Reason:' + event.reason);
@@ -441,7 +441,7 @@ function start() {
         console.log("[WSS] Error " + error.message);
     };
 }
-start();
+// start();
 
 if (config_lang[localStorage.getItem('lang')])
     $.getScript("lang/" + config_lang[localStorage.getItem('lang')] + ".js", function () {

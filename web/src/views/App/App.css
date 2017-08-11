@@ -1872,7 +1872,9 @@ span.icon_slk input {
     overflow: hidden !important;
     height: 100% !important;
 }
-
+.pointer{
+    cursor:pointer;
+}
 
 .fll-l {
     float: left;
