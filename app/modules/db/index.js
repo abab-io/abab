@@ -189,30 +189,7 @@ var schemas = {
         }
     }),
     rooms: new Schema({
-        // bathroom
-        // bathroom_count
-        // bed_count
-        // bedroom_count
-        // children_count
-        // dateRanges
-        // endTimeCheckIn
-        // endTimeCheckOut
-        // facilities
-        // limit_time_max
-        // limit_time_min
-        // people_count
-        // startTimeCheckIn
-        // startTimeCheckOut
-        // title
-        // description
-        // address_country
-        // address_state
-        // address_city
-        // address_street
-        // address_address
-        // address_index
-        // location_latitude
-        // location_longitude
+
         _index: {
             type: Number,
             default: null,

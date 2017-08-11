@@ -142,12 +142,38 @@ module.exports = (API, redis) => {
                 status: param.status //0 - draft , 1 - wait confirm, 2 - send to blockchain, 3 -success public
             }).save().then(function (document) {
 
-
+                // bathroom
+                // bathroom_count
+                // bed_count
+                // bedroom_count
+                // children_count
+                // dateRanges
+                // endTimeCheckIn
+                // endTimeCheckOut
+                // facilities
+                // limit_time_max
+                // limit_time_min
+                // people_count
+                // startTimeCheckIn
+                // startTimeCheckOut
                 return callback && callback(null, {
                         room: filterObject(document._doc, [
                             '_id',
                             '_index',
                             '_hash',
+                            'bathroom',
+                            'bathroom_count',
+                            'bed_count',
+                            'bedroom_count',
+                            'children_count',
+                            'endTimeCheckIn',
+                            'endTimeCheckOut',
+                            'startTimeCheckIn',
+                            'startTimeCheckOut',
+                            'facilities',
+                            'people_count',
+                            'limit_time_min',
+                            'limit_time_max',
                             'title',
                             'description',
                             'photo',
@@ -182,10 +208,22 @@ module.exports = (API, redis) => {
                         let _document = filterObject(document._doc, [
                             '_id',
                             'title',
+                            'bathroom',
+                            'bathroom_count',
+                            'bed_count',
+                            'bedroom_count',
+                            'children_count',
+                            'endTimeCheckIn',
+                            'endTimeCheckOut',
+                            'startTimeCheckIn',
+                            'startTimeCheckOut',
+                            'facilities',
+                            'people_count',
+                            'limit_time_min',
+                            'limit_time_max',
                             'description',
                             'photo',
                             'wallet',
-                            'dateRanges',
                             'address',
                             'location',
                             'update_at',
@@ -195,8 +233,8 @@ module.exports = (API, redis) => {
                             console.log('AWS_1', arguments);
                             API.emit('requestFunctionContract', user, {
                                 from: document.wallet,
-                                function: 'UpsertRoom',
-                                param: "999999999," + _hash + ",0x0,0"
+                                function: 'UpsertRoomFromHost',
+                                param: "999999999," + _hash + ",0x0,0,1,0"
                             }, function (err, res) {
                                 if (res.success === false) {
                                     return callback && callback(null, res);
@@ -215,6 +253,19 @@ module.exports = (API, redis) => {
                                                 '_index',
                                                 '_hash',
                                                 'title',
+                                                'bathroom',
+                                                'bathroom_count',
+                                                'bed_count',
+                                                'bedroom_count',
+                                                'children_count',
+                                                'endTimeCheckIn',
+                                                'endTimeCheckOut',
+                                                'startTimeCheckIn',
+                                                'startTimeCheckOut',
+                                                'facilities',
+                                                'people_count',
+                                                'limit_time_min',
+                                                'limit_time_max',
                                                 'description',
                                                 'photo',
                                                 'wallet',
