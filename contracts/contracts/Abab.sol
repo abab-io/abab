@@ -18,11 +18,13 @@ contract Abab is Ownable,Claimable,StandardToken {
   }
 
   struct  BookingRecord {
+    address guest;
     uint from;
     uint to;
-    uint dayPrice;
+    uint totalCost;
     uint currency;
-    uint ababCoinDayPrice;
+    uint ababCoinTotalCost;
+    uint status; //TODO change type to enum or short  //status 0-new; 1-appruve ; 2 - cancel ; 3 - complete
   }
 
   struct Room {
@@ -263,40 +265,122 @@ contract Abab is Ownable,Claimable,StandardToken {
     DeleteSchedule(msg.sender,_roomIndex, _scheduleIndex);
   }
 
-  event NewBooking    (address indexed host, uint roomIndex, uint from, uint to, uint status);
-  event UpdateBooking (address indexed host, uint roomIndex, uint from, uint to, uint status);
-
-  //TODO check доступно ли бронирование
+  event NewBooking    (address indexed host, uint roomIndex, uint bookingIndex);
+  event UpdateBooking (address indexed host, uint roomIndex, uint bookingIndex);
   
-  function CanBooking(address _host, uint _roomIndex, uint _from, uint _to)
+  function Timestamp2Daystamp(uint timestamp)
+  public constant
+  returns(uint result)
+  {
+    return timestamp/1 days;
+  }
+  
+  function GetBlockDayStamp()
+  public
+  returns(uint result)
+  {
+    return Timestamp2Daystamp(now);
+  }
+  
+  function DateIsFree(address _host, uint _roomIndex, uint _from, uint _to)
   public constant
   returns(bool result)
   {
     var room = rooms[_host][_roomIndex];
-    var schedulesLength = rooms[msg.sender][_roomIndex].schedulesLength;
-    var bookingLength   = rooms[msg.sender][_roomIndex].bookingLength;
 
     //check, that this date don't booking
+    var bookingLength   = rooms[msg.sender][_roomIndex].bookingLength;
+    uint i = room.schedulesLength;
+    while(i>0){
+      --i;
+      var booking_i = room.booking[i];
+      if (booking_i.to > GetBlockDayStamp()) 
+          return true; 
+      if (!(
+        ((booking_i.to < _to) && (booking_i.from < _from)) 
+        ||
+        ((booking_i.to > _to) && (booking_i.from > _from)) 
+      )) return false;
+    }
+    return true; 
+  }
+
+  function CalcTotalCost(address _host, uint _roomIndex, uint _from, uint _to)
+  public constant
+  returns(uint result)
+  {
+    if(!DateIsFree(_host, _roomIndex, _from, _to)) return 0;
+
+    var room = rooms[_host][_roomIndex];
+
+    //check, that this date don't booking
+    var schedulesLength = rooms[msg.sender][_roomIndex].schedulesLength;
+
+    var needFrom = _from;
+    var daysCount = _to-_from;
+    uint totalCost = 0;
+
     uint i = schedulesLength;
     while(i>0){
       --i;
-      if(room.booking[i].to>now) return true; //TODO now надо переделать в количество дней с 1 августа 2017го
-      if (!(
-        ((room.booking[i].to > _to) && (room.booking[i].from > _from)) 
-        ||
-        ((room.booking[i].to < _to) && (room.booking[i].from < _from)) 
-      )) return false;
+      var schedules_i = room.schedules[i];
+      if ((schedules_i.from<=needFrom) && (schedules_i.to>=needFrom)) {
+        uint price = daysCount>=30 ? schedules_i.monthPrice : daysCount>=7 ? schedules_i.weekPrice : schedules_i.dayPrice;
+        totalCost += price*(schedules_i.to-needFrom);
+        needFrom = schedules_i.to + 1;
+
+        if(needFrom>_to) break;
+      }
     }
-    return true;
+    return totalCost;
   }
 
   function Booking(address _host, uint _roomIndex, uint _from, uint _to)
   public
+  returns(bool result)
   {
-    if (CanBooking (_host, _roomIndex, _from, _to) ) return;
+    if (_from<=GetBlockDayStamp()) return false;
+    
+    var room = rooms[_host][_roomIndex];
+    uint totalCost = CalcTotalCost(_host, _roomIndex, _from, _to);
+    if(totalCost>0){
+      uint _bookingIndex = room.bookingLength;
+      room.booking[ _bookingIndex ] = BookingRecord(msg.sender, _from, _to, totalCost, 0, totalCost, 0);
+      room.bookingLength = _bookingIndex + 1;
+      NewBooking(_host, _roomIndex, _bookingIndex); // TODO расчёт в AbabCoin
+    }
+  }
+  
+  function AppruveBooking(address _host, uint _roomIndex, uint _bookingIndex)
+  public
+  {
+    if (_roomIndex >= rooms[_host].length)
+      return;
+    var room = rooms[_host][_roomIndex];
+    if((room.partner != msg.sender) && (_host != msg.sender) )
+      return;
+    
+    if (room.booking[_bookingIndex].status == 0 ){
+      room.booking[_bookingIndex].status = 1;
+      UpdateBooking(_host, _roomIndex, _bookingIndex);
+    }
+  }
+
+  function CancelBooking(address _host, uint _roomIndex, uint _bookingIndex)
+  public
+  {
+    if (_roomIndex >= rooms[_host].length)
+      return;
+    var room = rooms[_host][_roomIndex];
+    if((room.partner != msg.sender) && (_host != msg.sender) && (room.booking[_bookingIndex].guest != msg.sender) )
+      return;
+    
+    if ((room.booking[_bookingIndex].status == 0) || (room.booking[_bookingIndex].status == 1)){
+      room.booking[_bookingIndex].status = 1;
+      UpdateBooking(_host, _roomIndex, _bookingIndex);
+    }
   }
 }
-
 
 
 
