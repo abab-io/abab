@@ -351,7 +351,7 @@ contract Abab is Ownable,Claimable,StandardToken {
     }
   }
   
-  function AppruveBooking(address _host, uint _roomIndex, uint _bookingIndex)
+  function ApproveBooking(address _host, uint _roomIndex, uint _bookingIndex)
   public
   {
     if (_roomIndex >= rooms[_host].length)
