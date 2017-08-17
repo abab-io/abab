@@ -7,9 +7,18 @@ const aws = require('../modules/aws-amazon-s3');
 const crypto = require('crypto');
 
 module.exports = (API, redis) => {
-    API.on('GetRooms',true, (user, param, callback) => {
-
-         db.rooms.find().then(function (documents) {
+    API.on('GetRooms', true, (user, param, callback) => {
+        let findPram = {};
+        if (param.find && typeof param.find === 'object') findPram = param.find;
+        try {
+            if (findPram._id) findPram._id = db.mongoose.Types.ObjectId(findPram._id);
+        } catch (e) {
+            return callback && callback(null, {
+                    error: error.api('param.find._id is not valid', 'param', e, 0),
+                    success: false
+                });
+        }
+        db.rooms.find(findPram).then(function (documents) {
 
 
             return callback && callback(null, {
@@ -136,7 +145,7 @@ module.exports = (API, redis) => {
                     address: param.address_address,
                     index: param.address_index,
                 },
-                facilities:param.facilities,
+                facilities: param.facilities,
                 location: [param.location_latitude, param.location_longitude],
                 txHash: null,
                 status: param.status //0 - draft , 1 - wait confirm, 2 - send to blockchain, 3 -success public

@@ -123,7 +123,8 @@ function init() {
                         template: template,
                         data: {
                             _e: _chat_e,
-
+                            blockchain_url:'https://ropsten.etherscan.io/',
+                            fileUrl:'https://s3-us-west-2.amazonaws.com/abab-p2p/rooms_image/',
                             _path_src: _path_src
                         },
                         oninit: function oninit() {
@@ -134,7 +135,7 @@ function init() {
                         oncomplete: function oncomplete() {
 
                             Ractive.require(_path_chat + src + '/' + fileName + '.js?ver=' + _ver).then(function () {
-
+console.log( cls);
                                 Ractive.components[name] = window[cls].extend({
                                     template: template
                                 });

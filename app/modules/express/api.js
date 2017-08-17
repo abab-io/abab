@@ -5,6 +5,7 @@ const crypto = require('crypto');
 const querystring = require('querystring');
 
 const jade = require('jade');
+const fs = require('fs');
 const path = require('path');
 const config = require('../config');
 const db = require('../db');
@@ -17,6 +18,10 @@ function apiResponse(req, res, json) {
 }
 const error = require('../error/api');
 
+var multer = require('multer');
+var s3 = require('../aws-amazon-s3');
+
+var busboy = require('connect-busboy');
 module.exports = function (app, express) {
 
 
@@ -26,6 +31,50 @@ module.exports = function (app, express) {
         project_name: config.get('project_name'),
         shema: 'http://'
     };
+
+    app.delete('/api/v1/upload_image_s3/', function (req, res) {
+    });
+    app.post('/api/v1/upload_image_s3/', multer({storage: multer.memoryStorage()}).single('file'), function (req, res) {
+
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        // res.setEncoding('utf8');
+        console.log('/api/v1/s3/upload/image/');
+
+        let array_mimetype = req.file.mimetype.split('/');
+        if (array_mimetype[0] !== 'image') {
+            return res.end && res.end(JSON.stringify({
+                    error: error.api('File is not format png,jpg,jpeg,git', 'param', {param: param}, 10),
+                    success: false
+                }));
+        }
+        if (req.file.size > 5 * 1024 * 1024) {
+            return res.end && res.end(JSON.stringify({
+                    error: error.api('File big size > 5mb', 'param', {}, 0),
+                    success: false
+                }));
+        }
+        let sha1_for_file = crypto.createHash('sha1').update(req.file.buffer).digest('hex');
+        req.file.sha1 = sha1_for_file;
+        s3.upload_img(req.file, req.file.buffer, sha1_for_file + '.jpeg' , function (err, result_s3) {
+            if (err)
+                return res.end && res.end(JSON.stringify({
+                        error: error.api('File big size > 5mb', 'param', {}, 0),
+                        success: false
+                    }));
+            return res.end && res.end(JSON.stringify({
+                    "files": [{
+                        "url": result_s3.url,
+                        "deleteType":"DELETE",
+                        "deleteUrl": "/api/v1/delete_image_s3/?hash=" + result_s3.file.sha1,
+                        "name": result_s3.file.filename,
+                        "sha1":  result_s3.file.sha1,
+                        "size": result_s3.file.size,
+                        "thumbnailUrl": result_s3.url,
+                        "type": result_s3.file.mimetype
+                    }]
+                }));
+        });
+    });
     app.use('/api/v1/', function (req, res) {
         res.setHeader('Access-Control-Allow-Origin', '*');
         var param = Object.assign({}, req.body, req.query);
@@ -106,4 +155,5 @@ module.exports = function (app, express) {
             admin: false
         }));
     });
-};
+}
+;

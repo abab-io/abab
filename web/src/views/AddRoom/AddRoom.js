@@ -3,6 +3,8 @@ var reactiveAddRoom = Ractive.extend({
         console.log('reactiveAddRoom oninit');
     }
 });
+ractiveComponent['reactive-AddRoomApp'].set('photos', []);
+
 ractiveComponent['reactive-AddRoomApp'].on('submitRoom', function () {
     var formarr = $('#AddRoom').serializeArray();
     var form_obj = {};
@@ -15,8 +17,10 @@ ractiveComponent['reactive-AddRoomApp'].on('submitRoom', function () {
             form_obj[formarr[i].name] = formarr[i].value
     }
     var dateRanges = ractiveComponent['reactive-AddRoomApp'].get('rangesDate');
+    var photos = ractiveComponent['reactive-AddRoomApp'].get('photos');
     delete dateRanges._ractive;
     form_obj.dateRanges = dateRanges;
+    form_obj.photo = photos;
     form_obj.wallet = '0xa1b1d9551211755165a677c5e9d4b1041f4b5fd6';
 
 
@@ -70,7 +74,15 @@ ractiveComponent['reactive-AddRoomApp'].on('submitRoom', function () {
             text: "Отправить обект [" + resAPI.room._id + "]в SmartContract (Abab.io)? ",
             showLoaderOnConfirm: true,
             preConfirm: function () {
-                API('UpsertRoom', {_id:resAPI.room._id,status:2}, false, function (resAPI) {
+                API('UpsertRoom', {_id: resAPI.room._id, status: 2}, false, function (resAPI) {
+                    console.log(resAPI);
+                    if (!resAPI || !resAPI.room || !resAPI.room.txHash)
+                        swal({
+                            title: 'Ошибка',
+                            type: 'Error',
+                            confirmButtonText: 'Ok',
+                            showCancelButton: false
+                        });
                     swal({
                         title: 'Отправленно',
                         type: 'success',
@@ -85,7 +97,6 @@ ractiveComponent['reactive-AddRoomApp'].on('submitRoom', function () {
     }, true);
 
 });
-$('.timeInput').timepicker({'timeFormat': 'H:i'});
 ractiveComponent['reactive-AddRoomApp'].on('removeDate', function (i, index) {
     var arrDates = ractiveComponent['reactive-AddRoomApp'].get('rangesDate');
     arrDates.splice(index, 1);
@@ -121,24 +132,39 @@ init_daterangepicker('#period-input-date', function (start, end, days) {
     ractiveComponent['reactive-AddRoomApp'].set('startDate', start.format('DD.MM.YY'));
     ractiveComponent['reactive-AddRoomApp'].set('endDate', end.format('DD.MM.YY'));
 });
+
 $('[data-toggle="tooltip"]').tooltip();
 $("#fileuploader").uploadFile({
-    url: "#111",
-    fileName: "myfile",
+    url: "/api/v1/upload_image_s3/",
+    type: "POST",
+    fileName: "file",
     allowedTypes: 'jpg,png,jpeg',
     uploadStr: 'Добавить фото',
     acceptFiles: 'image/*',
     showPreview: true,
     previewHeight: "120px",
     previewWidth: "120px",
-    autoSubmit: false,
+    autoSubmit: true,
     showAbort: false,
     returnType: 'json',
-    showDone: false,
+    // showDone: false,
     showFileCounter: false,
-    showError: false,
-    showStatusAfterSuccess: false,
-    onSelect: function (files) {
-        console.log('onSelect', files);
+    multiple: true,
+    showDelete: true,
+    showProgress: true,
+    onSuccess:function (files,res) {
+        var arrPhoto = ractiveComponent['reactive-AddRoomApp'].get('photos');
+        arrPhoto.push(res.files[0].sha1);
+        delete arrPhoto._ractive;
+
+        ractiveComponent['reactive-AddRoomApp'].set('photos', arrPhoto);
+
+        console.log(files,res.files[0].sha1)
+
     }
+    // showError: false,
+    // showStatusAfterSuccess: false,
+
 });
+
+$('.timeInput').timepicker({'timeFormat': 'H:i'});

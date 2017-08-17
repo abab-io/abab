@@ -235,6 +235,10 @@ function updatePlugins() {
 var ABAB = {
     event: {},
     page: null,
+    pageObj: {
+        tab_page:null,
+        page:null,
+    },
     on: function (event, fn) {
         ABAB.event[event] = fn;
     },
@@ -251,6 +255,8 @@ var ABAB = {
             , tabPage);
         if (page_param[1]) tabPage = page_param[1];
         if (page_param[2]) tabPage = page_param[1];
+        ABAB.pageObj.page = page;
+        ABAB.pageObj.tab_page = tabPage;
         ractiveComponent.rootApp.set('pageActive', 'contentApplication');
         if ('Rooms' == page) {
             if (!tabPage) tabPage = 'all';
@@ -286,6 +292,7 @@ var ABAB = {
                 afterlast: function (name) {
 
                     if (name) name = name + 'App';
+                    ABAB.page = name;
                     ABAB.page = name;
                     if (ractiveComponent && ABAB.page && ractiveComponent[ABAB.page] && !ractiveComponent[ABAB.page].fragment.rendered) {
                         ractiveComponent[ABAB.page].render();

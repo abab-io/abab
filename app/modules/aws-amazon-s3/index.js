@@ -41,53 +41,30 @@ var AWS = require('aws-sdk');
 
 // For dev purposes only
 AWS.config.update({accessKeyId: config.get('aws-s3.key'), secretAccessKey: config.get('aws-s3.secret')});
-module.exports.upload_img = function (file, mimetype, cb, success_cb_server) {
+module.exports.upload_img= function (file, buffer,file_name, cb) {
 
-    const fileId = file;
-    // file = '../tmp/logo/' +file;
-    console.log(file);
-    let types = ["image/jpeg", "image/jpg", "image/png"];
-    if (uploader.validateType({mimetype: mimetype}, fileId, types)) {
-        uploader.resize({
-            fileId: fileId,
-            width: width,
-            height: height,
-            quality: quality,
-            square: true, // обрезать до нужных размеров
-            source: path.resolve(__dirname, '../tmp/logo/' + file),
-            destination: path.resolve(__dirname, '../tmp/uploads/' + file)
-        }, function (destination) {
-            uploader.upload({
-                    fileId: fileId,
-                    bucket: bucket,
-                    source: destination,
-                    name: 'avatar/' + file,
-                    maxFileSize: 1
-                },
-                function (data) { // success
-                    if (data.type == 'result') {
-                        data.url = 'https://s3-' + region + '.amazonaws.com/' + data.path;
-                        setTimeout(function () {
-                            cb && cb(null, data);
-                            success_cb_server && success_cb_server(null, data);
-                        }, 1);
-                    }
-                },
-                function (errMsg, errObject) { //error
-                    cb && cb(null, {error: 'AWS: ' + errMsg, code: 'errupload'});
-                    console.error('unable to upload: ' + errMsg + ':', errObject);
-                    // execute error code
+    let s3 = new AWS.S3();
+    s3.putObject({
+        Bucket: bucket,
+        Key: 'rooms_image/' + file_name,
+        Body: buffer,
+        ACL: 'public-read'
+    }, function (err,res) {
+        if(err){
+            return cb && cb(null, {
+                    success: false,
+                    err: err,
+                    error: err.message
                 });
-        }, function (errMsg, err) {
-            console.error('aws-amazon.js:77 uploader.resize:', errMsg, err);
-            cb && cb(null, {error: 'Resize error', code: 'resize'});
-
-            // execute error code
+        }
+        cb && cb(null, {
+            success: true,
+            url: 'https://s3-' + region + '.amazonaws.com/' + bucket + '/' + 'rooms_image/' + file_name,
+            attach_path: 'rooms/' + file_name,
+            file:file
         });
-    } else {
-        cb && cb(null, {error: 'Failed support types:' + "'image/jpeg', 'image/jpg', 'image/png'", code: 'type'});
 
-    }
+    });
 
 };
 module.exports.upload_json = function (file_name, json, cb) {
