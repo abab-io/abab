@@ -1,41 +1,38 @@
-<div class="nblsv page-content-Room">
-    <div class="section-block lkbv tops">
-
-        <h1>Галерея</h1>
+<div class="nblsv page-content-Room"><div class="section-block lkbv tops">
 
 
-        <div class="col-lg-10 col-md-10">
-            <div class="slider slider-for">
-                {{#room.photo}}
-                <div>
-                    <div class="slt-sl">
+    <div class="col-lg-10 col-md-10">
+        <div class="slider slider-for">
+            {{#room.photo}}
+            <div>
+                <div class="slt-sl">
 
-                        <img data-toggle="modal" data-target="#img-pr"
-                             src="{{fileUrl}}{{.}}.jpeg"
-                             alt="">
-                        <div data-toggle="modal" data-target="#img-pr" class="zoom-s"></div>
-                    </div>
+                    <img data-toggle="modal" data-target="#img-room-{{.}}"
+                         src="{{fileUrl}}{{.}}.jpeg" alt="">
+                    <div data-toggle="modal" data-target="#img-room-{{.}}" class="zoom-s"></div>
                 </div>
-                {{/}}
-
-
             </div>
+            {{/}}
         </div>
-
-        <div class="col-lg-2 col-md-2">
-            <div class="slider slider-nav">
-                {{#room.photo}}
-                <div>
-                    <div class="slt-slg video-before" data-toggle="modal" data-target="#video-modal">
-                        <img src="{{fileUrl}}{{.}}.jpeg" alt="">
-                    </div>
-                </div>
-                {{/}}
-
-            </div>
-        </div>
-        <div class="clearfix"></div>
     </div>
+
+    <div class="col-lg-2 col-md-2">
+        <div class="slider slider-nav">
+
+            {{#room.photo}}
+            <div>
+                <div class="slt-slg">
+                    <img src="{{fileUrl}}{{.}}.jpeg" alt=""></div>
+            </div>
+            {{/}}
+
+        </div>
+    </div>
+    <div class="clearfix"></div>
+</div>
+</div>
+<div class="nblsv page-content-Room">
+
 
 
     <div class="fll-l">

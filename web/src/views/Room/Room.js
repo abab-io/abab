@@ -16,6 +16,73 @@ var reactiveRoom = Ractive.extend({
             }
             ractiveComponent['reactive-RoomApp'].set('minimalPriceDay',minimalPriceDay );
 
+            if ($(window).width() > 991) {
+
+                $('.slider-for').slick({
+                    slidesToShow: 1,
+                    slidesToScroll: 1,
+                    arrows: false,
+                    fade: true,
+                    asNavFor: '.slider-nav'
+                });
+                $('.slider-nav').slick({
+                    vertical: true,
+                    slidesToShow: 4,
+                    slidesToScroll: 1,
+                    asNavFor: '.slider-for',
+                    dots: false,
+
+                    focusOnSelect: true
+                });
+
+
+            }
+
+
+            if ($(window).width() < 602) {
+
+                $('.slider-for').slick({
+                    slidesToShow: 1,
+                    slidesToScroll: 1,
+                    arrows: false,
+                    fade: true,
+                    asNavFor: '.slider-nav'
+                });
+                $('.slider-nav').slick({
+                    vertical: false,
+                    slidesToShow: 3,
+                    slidesToScroll: 1,
+                    asNavFor: '.slider-for',
+                    dots: false,
+
+                    focusOnSelect: true
+                });
+
+
+            }
+
+            if ($(window).width() < 992) {
+
+                $('.slider-for').slick({
+                    slidesToShow: 1,
+                    slidesToScroll: 1,
+                    arrows: false,
+                    fade: true,
+                    asNavFor: '.slider-nav'
+                });
+                $('.slider-nav').slick({
+                    vertical: false,
+                    slidesToShow: 6,
+                    slidesToScroll: 1,
+                    asNavFor: '.slider-for',
+                    dots: false,
+
+                    focusOnSelect: true
+                });
+
+
+            }
+
         }, true);
     }
 });
@@ -33,72 +100,6 @@ init_daterangepicker('#period-input-date-booking', function (start, end, days) {
 
 //
 //
-if ($(window).width() > 991) {
-
-    $('.slider-for').slick({
-        slidesToShow: 1,
-        slidesToScroll: 1,
-        arrows: false,
-        fade: true,
-        asNavFor: '.slider-nav'
-    });
-    $('.slider-nav').slick({
-        vertical: true,
-        slidesToShow: 4,
-        slidesToScroll: 1,
-        asNavFor: '.slider-for',
-        dots: false,
-
-        focusOnSelect: true
-    });
-
-
-}
-
-
-if ($(window).width() < 602) {
-
-    $('.slider-for').slick({
-        slidesToShow: 1,
-        slidesToScroll: 1,
-        arrows: false,
-        fade: true,
-        asNavFor: '.slider-nav'
-    });
-    $('.slider-nav').slick({
-        vertical: false,
-        slidesToShow: 3,
-        slidesToScroll: 1,
-        asNavFor: '.slider-for',
-        dots: false,
-
-        focusOnSelect: true
-    });
-
-
-}
-
-if ($(window).width() < 992) {
-
-    $('.slider-for').slick({
-        slidesToShow: 1,
-        slidesToScroll: 1,
-        arrows: false,
-        fade: true,
-        asNavFor: '.slider-nav'
-    });
-    $('.slider-nav').slick({
-        vertical: false,
-        slidesToShow: 6,
-        slidesToScroll: 1,
-        asNavFor: '.slider-for',
-        dots: false,
-
-        focusOnSelect: true
-    });
-
-
-}
 
 //
 //

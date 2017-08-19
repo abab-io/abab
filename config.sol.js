@@ -1,4 +1,4 @@
-const _address = '0xA661A6A65359892F67A1aB71aE8FcB46C70bEC01'; // smart contract address
+const _address = '0x8EDC5f3Ef13eD3136CeCAE68419D0054D5d7c2fD'; // smart contract address
 const _contract_fixed = 100000000;
 const _name = "Abab";
 const _symbol = "ABC";
