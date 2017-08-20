@@ -1,6 +1,5 @@
 
 var request = require('../modules/request');
-
 module.exports = (API, redis) => {
 
     API.on('get_testnet_eth', true,(user, param, callback) => {
@@ -43,4 +42,6 @@ module.exports = (API, redis) => {
             {name: 'latency_ms', type: "int(11)", title: 'Processing time of the request in ms', default: '122'}
         ]
     });
+
+
 };

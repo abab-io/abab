@@ -462,8 +462,8 @@ module.exports = (API, redis) => {
 
         });
     }, {
-        title: 'Call function smart contract',
-        description: 'Call function smart contract (' + sol_config.sol_config + '):' + sol_config._address,
+        title: 'Send transaction to smart contract function ',
+        description: 'Send transaction to smart contract function(' + sol_config.sol_config + '):' + sol_config._address,
         param: [{
             name: 'from',
             type: "string",
@@ -544,6 +544,72 @@ module.exports = (API, redis) => {
                 type: "string",
                 title: 'HASH transaction blockchain',
                 default: '0x*******'
+            },
+            {name: 'error', type: "object", title: '', default: 'ERROR'},
+            {name: 'latency_ms', type: "int(11)", title: 'Processing time of the request in ms', default: '122'}
+        ]
+    });
+    API.on('callFunctionContract',true, (user, param, callback) => {
+
+        var contract = web3.eth.contract(sol_config._abi).at(sol_config._address);
+        if(!_.find(sol_config._abi, {name: param.function}) || !contract[param.function]){
+            return callback && callback(null, {
+                    error: error.api('Call function error function not found', 'param', {param:param,find_fn:_.find(sol_config._abi, {name: param.function})}, 0),
+                    success: false
+                });
+        }
+        if(!param.param || typeof param.param !== 'object'){
+            return callback && callback(null, {
+                    error: error.api('Param type is not array', 'param', {param:param,find_fn:_.find(sol_config._abi, {name: param.function})}, 0),
+                    success: false
+                });
+        }
+        if(param.param.length !== _.find(sol_config._abi, {name: param.function}).inputs.length){
+            return callback && callback(null, {
+                    error: error.api('Param type is not array', 'param', {param:param,find_fn:_.find(sol_config._abi, {name: param.function})}, 0),
+                    success: false
+                });
+        }
+        let paramContract= param.param ;
+        console.log(param);
+        paramContract.push(function (error, result) {
+            if(error)
+                return callback && callback(null, {
+                        error: error.api('Param type is not array', 'contract', {param:param,find_fn:_.find(sol_config._abi, {name: param.function})}, 2),
+                        success: false
+                    });
+            callback && callback(null,result);
+            console.log('result: ', result, error);
+        });
+        contract[param.function].apply(null,paramContract);
+
+    }, {
+        title: 'Call function SmartContract',
+        description: 'Call function (Read Function, Free)',
+        param: [
+            {
+                name: 'function',
+                type: "string",
+                title: 'name function',
+                necessarily: false,
+                default: '0x'
+            },
+            {
+                name: 'param',
+                type: "array",
+                title: 'array params transfer to function contract',
+                necessarily: false,
+                default: '[]'
+            }
+
+        ],
+        response: [
+            {name: 'success', type: "string", title: 'Success ?', default: 'true, false'},
+            {
+                name: 'result',
+                type: "object",
+                title: 'return is function',
+                default: '*'
             },
             {name: 'error', type: "object", title: '', default: 'ERROR'},
             {name: 'latency_ms', type: "int(11)", title: 'Processing time of the request in ms', default: '122'}
