@@ -194,6 +194,7 @@ module.exports = (API, redis) => {
                             hash: null,
                         }
                     }).save();
+
                 }
                 // bathroom
                 // bathroom_count
