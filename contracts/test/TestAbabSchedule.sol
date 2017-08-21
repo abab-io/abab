@@ -19,7 +19,7 @@ contract TestAbabSchedule {
 
     Assert.equal( abab.GetSchedulesLength(0), 1, "after first insert Schedules");
 
-    var (from0,to0,dayPrice0,weekPrice0,monthPrice0) = abab.GetScheduleByIndex(0, 0);
+    var (from0,to0,dayPrice0,weekPrice0,monthPrice0) = abab.GetMyScheduleByIndex(0, 0);
     Assert.equal( from0       , 111, "check first insert");
     Assert.equal( to0         , 222, "check first insert");
     Assert.equal( dayPrice0   , 333, "check first insert");
@@ -31,7 +31,7 @@ contract TestAbabSchedule {
 
     Assert.equal( abab.GetSchedulesLength(0), 2, "after second insert Schedules");
 
-    var (from1,to1,dayPrice1,weekPrice1,monthPrice1) = abab.GetScheduleByIndex(0, 1);
+    var (from1,to1,dayPrice1,weekPrice1,monthPrice1) = abab.GetMyScheduleByIndex(0, 1);
     Assert.equal( from1       , 666, "check second insert");
     Assert.equal( to1         , 777, "check second insert");
     Assert.equal( dayPrice1   , 888, "check second insert");
@@ -43,14 +43,14 @@ contract TestAbabSchedule {
 
     Assert.equal( abab.GetSchedulesLength(0), 2, "after first update Schedules");
 
-    (from0,to0,dayPrice0,weekPrice0,monthPrice0) = abab.GetScheduleByIndex(0, 0);
+    (from0,to0,dayPrice0,weekPrice0,monthPrice0) = abab.GetMyScheduleByIndex(0, 0);
     Assert.equal( from0       , 112, "check first update");
     Assert.equal( to0         , 234, "check first update");
     Assert.equal( dayPrice0   , 345, "check first update");
     Assert.equal( weekPrice0  , 456, "check first update");
     Assert.equal( monthPrice0 , 567, "check first update");
 
-    (from1,to1,dayPrice1,weekPrice1,monthPrice1) = abab.GetScheduleByIndex(0, 1);
+    (from1,to1,dayPrice1,weekPrice1,monthPrice1) = abab.GetMyScheduleByIndex(0, 1);
     Assert.equal( from1       , 666, "check first update");
     Assert.equal( to1         , 777, "check first update");
     Assert.equal( dayPrice1   , 888, "check first update");
@@ -73,16 +73,16 @@ contract TestAbabSchedule {
     abab.RemoveSchedule(0, 4);
     abab.RemoveSchedule(0, 9);
 
-    var (from,to,dayPrice,weekPrice,monthPrice) = abab.GetScheduleByIndex(0, 0);
+    var (from,to,dayPrice,weekPrice,monthPrice) = abab.GetMyScheduleByIndex(0, 0);
     Assert.equal( from , 1, "0");
     
-    (from,to,dayPrice,weekPrice,monthPrice) = abab.GetScheduleByIndex(0, 2);
+    (from,to,dayPrice,weekPrice,monthPrice) = abab.GetMyScheduleByIndex(0, 2);
     Assert.equal( from , 3, "2");
 
-    (from,to,dayPrice,weekPrice,monthPrice) = abab.GetScheduleByIndex(0, 3);
+    (from,to,dayPrice,weekPrice,monthPrice) = abab.GetMyScheduleByIndex(0, 3);
     Assert.equal( from , 4, "3");
     
-    (from,to,dayPrice,weekPrice,monthPrice) = abab.GetScheduleByIndex(0, 6);
+    (from,to,dayPrice,weekPrice,monthPrice) = abab.GetMyScheduleByIndex(0, 6);
     Assert.equal( from , 8, "6");
   }
 

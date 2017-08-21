@@ -72,4 +72,15 @@ contract('Abab', function(accounts) {
 
     });
   });
+  
+  it("check CalcTotalCost (bug 20170821)", function() {
+    return Abab.deployed().then(function(instance) {
+      abab = instance;
+      
+      abab.UpsertSchedule(0/*_roomIndex*/, 9999999999/*_scheduleIndex*/, 17399/*_from*/, 17430/*_to*/, 100/*_dayPrice*/, 90/*_weekPrice*/, 91/*_monthPrice*/, 0/*_currency*/);
+      return abab.CalcTotalCost.call(accounts[0], 0, 17400, 17401);
+    }).then(function(result){
+      assert.equal(result.toNumber(), 100, "one day price");
+    });  
+  });
 });
