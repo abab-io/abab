@@ -55,7 +55,6 @@ app.use(path_url, function (req, res, next) {
     }
 
 });
-
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
 // parse application/json
@@ -80,6 +79,7 @@ var isPortTaken = function (port, fn) {
 };
 var http_port = config.get('server:http:port');
 var http = require('http').createServer(app).listen(http_port);
+require('./web')(app,express);
 
 
 module.exports.http = http;

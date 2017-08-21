@@ -5,7 +5,7 @@ var mongo_db = mongoose.createConnection(config.get('database:mongodb_url'), {
     /* other options */
 });
 var db;
-
+var Float = require('mongoose-float').loadType(mongoose);
 
 var Schema = mongoose.Schema;
 var schemas = {
@@ -188,13 +188,129 @@ var schemas = {
             default: Date.now
         }
     }),
+    scheduleRoom: new Schema({
+
+        room: {
+            type: Schema.Types.ObjectId,
+            index: true,
+            ref: 'rooms'
+        },
+        _scheduleIndex: {
+            type: Number,
+            index: true,
+            default: null
+        },
+
+        startDate: {
+            type: Date,
+            default: null,
+        },
+        endDate: {
+            type: Date,
+            default: null,
+        },
+        dayPrice: {
+            type: Float,
+            default: 0,
+        },
+        weekPrice: {
+            type: Float,
+            default: 0,
+        },
+        monthPrice: {
+            type: Float,
+            default: 0,
+        },
+        discountWeek: {
+            type: Float,
+            default: 0,
+        },
+        discountMonth: {
+            type: Float,
+            default: 0,
+        },
+        intervalDate: {
+            type: Number,
+            default: 1
+        },
+        tx: {
+            status: {
+                type: Number,
+                default:0,
+            },
+            hash: {
+                type: String,
+                default: null,
+            },
+        },
+        create_at: {
+            type: Date,
+            default: Date.now
+        },
+        update_at: {
+            type: Date,
+            default: Date.now
+        }
+    }),
     rooms: new Schema({
 
-        user: {
-            type: Schema.Types.ObjectId,
-            ref: 'users'
+        _index: {
+            type: Number,
+            default: null,
+        },
+        _hash: {
+            type: String,
+            default: null,
         },
         title: {
+            type: String,
+            default: '',
+        },
+        limit_time_min: {
+            type: String,
+            default: '',
+        },
+        limit_time_max: {
+            type: String,
+            default: '',
+        },
+        people_count: {
+            type: String,
+            default: '',
+        },
+        startTimeCheckIn: {
+            type: String,
+            default: '',
+        },
+        startTimeCheckOut: {
+            type: String,
+            default: '',
+        },
+        endTimeCheckIn: {
+            type: String,
+            default: '',
+        },
+        endTimeCheckOut: {
+            type: String,
+            default: '',
+        },
+        children_count: {
+            type: String,
+            default: '',
+        },
+        bedroom_count: {
+            type: String,
+            default: '',
+        },
+        bed_count: {
+            type: String,
+            default: '',
+        },
+        bathroom_count: {
+            type: String,
+            default: '',
+        },
+        bathroom: {
             type: String,
             default: '',
         },
@@ -206,32 +322,44 @@ var schemas = {
             type: Array,
             default: [],
         },
+        facilities: {
+            type: Array,
+            default: [],
+        },
         wallet: {
             type: String,
             default: '0x',
         },
-        dateRanges: {
-            type: Array,
-            default: [], //Date ranges when you can book example: unix
+        txHash: {
+            type: String,
+            default: '0x',
+        },
+        tx:{
+            type: Schema.Types.ObjectId,
+            ref: 'tx'
         },
         address: {
-            country:  {
+            country: {
                 type: String,
                 default: null,
             },
-            state:  {
+            state: {
                 type: String,
                 default: null,
             },
-            city:  {
+            city: {
                 type: String,
                 default: null,
             },
-            street:  {
+            street: {
                 type: String,
                 default: null,
             },
-            address:  {
+            address: {
+                type: String,
+                default: null,
+            },
+            index: {
                 type: String,
                 default: null,
             },
@@ -246,7 +374,7 @@ var schemas = {
         },
         create_at: {
             type: Date,
-            default: Date.now
+            default: Date.now //filter this param p2p
         },
         update_at: {
             type: Date,

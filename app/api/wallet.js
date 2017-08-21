@@ -15,6 +15,8 @@ const md5 = require('md5');
 
 const _ = require('lodash');
 const SolidityFunction = require('web3/lib/web3/function');
+var request = require('request');
+
 module.exports = (API, redis) => {
     var rateETHUSD = 0;
     API.on('wallet', (user, param, callback) => {
@@ -29,7 +31,6 @@ module.exports = (API, redis) => {
                     success: false
                 });
         }
-        var contract = web3.eth.contract(sol_config._abi).at(sol_config._address);
         if (param.update) {
             db.wallets.update({
                 "user": db.mongoose.Types.ObjectId(user._id),
@@ -282,7 +283,7 @@ module.exports = (API, redis) => {
     });
     API.on('requestFunctionContract', (user, param, callback) => {
 
-        if (!param.from && typeof param.from !== 'string')return callback && callback(null, {
+        if (!param.from || typeof param.from !== 'string')return callback && callback(null, {
                 error: error.api('Request param "from" incorrect', 'param', {
                     pos: 'api/wallet.js(requestFunctionContract):#1',
                     param: param
@@ -290,7 +291,7 @@ module.exports = (API, redis) => {
                 success: false,
 
             });
-        if (!param.function && typeof param.function !== 'string')return callback && callback(null, {
+        if (!param.function || typeof param.function !== 'string')return callback && callback(null, {
                 error: error.api('Request param "function" incorrect', 'param', {
                     pos: 'api/wallet.js(requestFunctionContract):#2',
                     param: param
@@ -298,7 +299,7 @@ module.exports = (API, redis) => {
                 success: false,
 
             });
-        if (!param.param && typeof param.param !== 'string')return callback && callback(null, {
+        if (!param.param || typeof param.param !== 'string')return callback && callback(null, {
                 error: error.api('Request param "param" incorrect', 'param', {
                     pos: 'api/wallet.js(requestFunctionContract):#3',
                     param: param
@@ -336,7 +337,6 @@ module.exports = (API, redis) => {
                     success: false
                 });
         }
-
         param.param = param.param.split(',');
         db.wallets.findOne({
             "user": db.mongoose.Types.ObjectId(user._id),
@@ -368,63 +368,63 @@ module.exports = (API, redis) => {
 
 
                 let gasPriceHex = util.bufferToHex(21000000000);
-                let gasLimitHex = util.bufferToHex(80000);
+                let gasLimitHex = util.bufferToHex(400000);
                 let nonceHex = util.bufferToHex(nonce);
-                    let tx = new Tx({
-                        nonce: nonceHex,
-                        gasPrice: gasPriceHex,
-                        gasLimit: gasLimitHex,
-                        to: sol_config._address,
-                        from: response_s.wallet.address,
-                        value: '0x00',
-                        data: payloadData,
-                        chainId: 3 // 3 == testnet ropsten ,1 == original
+                let tx = new Tx({
+                    nonce: nonceHex,
+                    gasPrice: gasPriceHex,
+                    gasLimit: gasLimitHex,
+                    to: sol_config._address,
+                    from: response_s.wallet.address,
+                    value: '0x00',
+                    data: payloadData,
+                    chainId: 3 // 3 == testnet ropsten ,1 == original
 
-                    });
-                    tx.sign(privateKey);
-                    let serializedTx = tx.serialize();
+                });
+                tx.sign(privateKey);
+                let serializedTx = tx.serialize();
 
-                    web3.eth.sendRawTransaction('0x' + serializedTx.toString('hex'), function (err, hash) {
-                        if (err) {
-                            console.log('Error sendRawTransaction:', err);
+                web3.eth.sendRawTransaction('0x' + serializedTx.toString('hex'), function (err, hash) {
+                    if (err) {
+                        console.log('Error sendRawTransaction:', err);
+                        callback && callback(null,
+                            {
+                                error: error.api('Error send TX', 'web3', err, 0),
+                                success: false
+                            });
+                    }
+                    else {
+
+                        new db.tx({
+                            user: db.mongoose.Types.ObjectId(user._id),
+                            currency: sol_config._symbol,
+                            tx: {
+                                hash: hash,
+                                to: sol_config._address,
+                                from: response_s.wallet.address,
+                                function: param.function,
+                                param: param.param,
+                                rawTx: '0x' + serializedTx.toString('hex')
+                            },
+                            nonce: +nonce + 1,
+                            wallet: response_s.wallet.address,
+                            callback_url: param.callback_url,
+                            status: 1
+                        }).save().then(function (res) {
                             callback && callback(null,
                                 {
-                                    error: error.api('Error send TX', 'web3', err, 0),
+                                    result: res,
+                                    success: true
+                                });
+                        }).catch(function (err) {
+                            return callback && callback(null, {
+                                    error: error.api(err.message, 'db', err, 3),
                                     success: false
                                 });
-                        }
-                        else {
 
-                            new db.tx({
-                                user: db.mongoose.Types.ObjectId(user._id),
-                                currency: sol_config._symbol,
-                                tx: {
-                                    hash: hash,
-                                    to: sol_config._address,
-                                    from: response_s.wallet.address,
-                                    function: param.function,
-                                    param: param.param,
-                                    rawTx:'0x' + serializedTx.toString('hex')
-                                },
-                                nonce: +nonce + 1,
-                                wallet: response_s.wallet.address,
-                                callback_url: param.callback_url,
-                                status: 1
-                            }).save().then(function (res) {
-                                callback && callback(null,
-                                    {
-                                        result:res,
-                                        success: true
-                                    });
-                            }).catch(function (err) {
-                                return callback && callback(null, {
-                                        error: error.api(err.message, 'db', err, 3),
-                                        success: false
-                                    });
-
-                            });
-                        }
-                    });
+                        });
+                    }
+                });
             }).catch(function (err) {
                 return callback && callback(null, {
                         error: error.api(err.message, 'db', err, 5),
@@ -440,8 +440,8 @@ module.exports = (API, redis) => {
 
         });
     }, {
-        title: 'Call function smart contract',
-        description: 'Call function smart contract (' + sol_config.sol_config + '):' + sol_config._address,
+        title: 'Send transaction to smart contract function ',
+        description: 'Send transaction to smart contract function(' + sol_config.sol_config + '):' + sol_config._address,
         param: [{
             name: 'from',
             type: "string",
@@ -527,4 +527,177 @@ module.exports = (API, redis) => {
             {name: 'latency_ms', type: "int(11)", title: 'Processing time of the request in ms', default: '122'}
         ]
     });
+    API.on('callFunctionContract', true, (user, param, callback) => {
+
+        var contract = web3.eth.contract(sol_config._abi).at(sol_config._address);
+        if (!_.find(sol_config._abi, {name: param.function}) || !contract[param.function]) {
+            return callback && callback(null, {
+                    error: error.api('Call function error function not found', 'param', {
+                        param: param,
+                        find_fn: _.find(sol_config._abi, {name: param.function})
+                    }, 0),
+                    success: false
+                });
+        }
+        if (!param.param || typeof param.param !== 'object') {
+            return callback && callback(null, {
+                    error: error.api('Param type is not array', 'param', {
+                        param: param,
+                        find_fn: _.find(sol_config._abi, {name: param.function})
+                    }, 0),
+                    success: false
+                });
+        }
+        if (param.param.length !== _.find(sol_config._abi, {name: param.function}).inputs.length) {
+            return callback && callback(null, {
+                    error: error.api('Param type is not array', 'param', {
+                        param: param,
+                        find_fn: _.find(sol_config._abi, {name: param.function})
+                    }, 0),
+                    success: false
+                });
+        }
+        let paramContract = param.param;
+        console.log(param);
+        paramContract.push(function (error, result) {
+            if (error)
+                return callback && callback(null, {
+                        error: error.api('Param type is not array', 'contract', {
+                            param: param,
+                            find_fn: _.find(sol_config._abi, {name: param.function})
+                        }, 2),
+                        success: false
+                    });
+            callback && callback(null, result);
+            console.log('result: ', result, error);
+        });
+        contract[param.function].apply(null, paramContract);
+
+    }, {
+        title: 'Call function SmartContract',
+        description: 'Call function (Read Function, Free)',
+        param: [
+            {
+                name: 'function',
+                type: "string",
+                title: 'name function',
+                necessarily: false,
+                default: '0x'
+            },
+            {
+                name: 'param',
+                type: "array",
+                title: 'array params transfer to function contract',
+                necessarily: false,
+                default: '[]'
+            }
+
+        ],
+        response: [
+            {name: 'success', type: "string", title: 'Success ?', default: 'true, false'},
+            {
+                name: 'result',
+                type: "object",
+                title: 'return is function',
+                default: '*'
+            },
+            {name: 'error', type: "object", title: '', default: 'ERROR'},
+            {name: 'latency_ms', type: "int(11)", title: 'Processing time of the request in ms', default: '122'}
+        ]
+    });
 };
+
+var web3_events = {
+    NewRoom: function (event, tx, callback) {
+        // console.log(event);
+        let _roomDescriptionHash = web3.fromDecimal(event.args._roomDescriptionHash);
+        db.rooms.findOneAndUpdate({txHash: tx.tx.hash, _hash: _roomDescriptionHash, wallet: event.args.host}, {
+            tx: db.mongoose.Types.ObjectId(tx._id),
+            _index: event.args.roomIndex,
+            status: 3
+        }, {new: true}).then(function (document) {
+            // if (document.dateRanges) {
+            //     for (let i in document.dateRanges) {
+            //         if (document.dateRanges.hasOwnProperty(i)) {
+            //             if (document.dateRanges[i].txStatus === 1) {
+            //                 let param_tx = [
+            //                     event.args.roomIndex, //_roomIndex
+            //                     '9999999999',//_scheduleIndex
+            //                     document.dateRanges[i].startDate,//_from
+            //                     document.dateRanges[i].endDate,//_to
+            //                     +document.dateRanges[i].priceDay,//_dayPrice
+            //                     +(document.dateRanges[i].priceDay-(document.dateRanges[i].priceDay*document.dateRanges[i].discountWeek/100)).toFixed(8),//_weekPrice
+            //                     +(document.dateRanges[i].priceDay-(document.dateRanges[i].priceDay*document.dateRanges[i].discountMonth/100)).toFixed(8),//_monthPrice
+            //                     "USD" //_currency
+            //                 ].join(',');
+            //                 API.emit('requestFunctionContract', user, {
+            //                     from: document.wallet,
+            //                     function: 'UpsertSchedule',
+            //                     param: param_tx
+            //                 }, function (err, res) {
+            //                     db.rooms.findOneAndUpdate({
+            //                         _id: db.mongoose.Types.ObjectId(document._id),
+            //                     }, {
+            //                         tx: db.mongoose.Types.ObjectId(tx._id),
+            //                         _index: event.args.roomIndex,
+            //                         status: 3
+            //                     }, {new: true});
+            //                 });
+            //
+            //
+            //             }
+            //         }
+            //     }
+            // }
+            callback && callback(true);
+        });
+
+        console.log('blockNumber', event.blockNumber);
+        // console.log('transactionHash', event.transactionHash);
+        // console.log('host', event.args.host);
+        // console.log('roomIndex', +event.args.roomIndex);
+        // console.log('_roomDescriptionHash', web3.fromDecimal(event.args._roomDescriptionHash));
+
+        callback && callback();
+    }
+};
+
+if (web3.isConnected()) {
+    // config.set('geth:lastBlockNumber', 1376000);
+    console.log("Web3 connected!\n\tStart synchronization... \n\t Last block:" + config.get('geth:lastBlockNumber'));
+    var contract = web3.eth.contract(sol_config._abi).at(sol_config._address);
+
+    var events = contract.allEvents({fromBlock: config.get('geth:lastBlockNumber'), toBlock: 'latest'});
+    events.watch(function (error, result) {
+        if (result && result.event) {
+            if (!web3_events[result.event]) {
+                return console.error('EVENT Error #web3_events not found:\n', result, '\n\t\t- - - - - - -\n');
+            }
+            db.tx.findOne({"tx.hash": result.transactionHash}).then(function (res) {
+                if (res) {
+                    console.log(res);
+
+                    web3_events[result.event](result, res, function () {
+                        config.set('geth:lastBlockNumber', result.blockNumber);
+                    });
+                    if (res.callback_url && res.callback_url !== '')
+                        request.post(res.callback_url, {
+                            form: {event: result},
+                            timeout: 500
+                        }, function (error, response,) {
+                            console.log('statusCode:', response && response.statusCode);
+                        });
+                }
+
+            }).catch(function (err) {
+                return callback && callback(null, {
+                        error: error.api(err.message, 'db', err, 3),
+                        success: false
+                    });
+
+            });
+        }
+
+    });
+
+}

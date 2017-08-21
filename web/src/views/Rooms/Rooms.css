@@ -1,0 +1,11 @@
+.mapSearch_df{top:105px!important;bottom:0px!important;left:0px!important;right:0px!important;}
+.mainContentWrapper_bv{position:relative!important;width:100%!important;z-index:0!important;}
+@media (min-width: 1128px){
+    .mainContentWrapper_bv{width:66%!important;}
+}
+.mapWrapper_rbx{position:fixed!important;display:none!important;top:105px!important;left:0px!important;bottom:0px!important;right:0px!important;width:40%!important;}
+@media (min-width: 1128px){
+    .mapWrapper_rbx{display:block!important;left:auto!important;width:34%!important;}
+}
+
+

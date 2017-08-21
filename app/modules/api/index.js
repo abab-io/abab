@@ -93,24 +93,14 @@ API = {
                 }
                 json.latency_ms = (new Date()).getTime() - initTimestamp;
                 if (!type) type = 'server';
-                if ('get_cards_info' != name && 'get_finance_data_this_user' != name)
-                    if (!user || !user.webtransfer_id) user.webtransfer_id = 1;
+
                 new db.logsAPI({
-                    user_id: +user.webtransfer_id,
                     method: name,
                     param: param,
                     response: json,
                     error: err,
                     user: {
                         paramConnect: user.paramConnect,
-                        role: user.role,
-                        last_name: user.last_name,
-                        first_name: user.first_name,
-                        email: user.email,
-                        avatar_path: user.avatar_path,
-                        ip: user.ip,
-                        webtransfer_id: user.webtransfer_id,
-                        room: user.room,
                     },
                     latency_ms: json.latency_ms,
                     type_req: type
@@ -120,27 +110,6 @@ API = {
                         json.requestId = res._id;
                     }
                     cb && cb(err, json);
-                    if (err) console.error('db-> db.logsAPI(logs).save ->,', err, {
-                        user_id: user.webtransfer_id,
-                        method: name,
-                        param: param,
-                        response: json,
-                        error: err,
-                        user: {
-                            paramConnect: user.paramConnect,
-                            role: user.role,
-                            last_name: user.last_name,
-                            first_name: user.first_name,
-                            email: user.email,
-                            avatar_path: user.avatar_path,
-                            ip: user.ip,
-                            webtransfer_id: user.webtransfer_id,
-                            room: user.room,
-                        },
-                        latency_ms: json.latency_ms,
-                        type_req: type
-                    })
-
                 });
             });
         } else {

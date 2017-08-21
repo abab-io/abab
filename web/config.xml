@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<widget id="com.abab.io" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:gap="http://phonegap.com/ns/1.0">
+  <name>Abab.io</name>
+  <description>Abab.io: decentralized marketspace for accommodation rentals</description>
+  <author email="developers@abab.io" href="https://abab.io/">Abab.io LLC.</author>
+  <license href="https://abab.io/license">MIT</license>
+  <content src="index.html"/>
+
+</widget>

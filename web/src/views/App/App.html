@@ -1,0 +1,416 @@
+<script>
+
+    $("#slider-range").slider({
+        range: true,
+        min: 0,
+        max: 500,
+        values: [75, 300],
+        slide: function (event, ui) {
+            $("#amount").val("$" + ui.values[0] + " - $" + ui.values[1]);
+        }
+    });
+    $("#amount").val("$" + $("#slider-range").slider("values", 0) +
+        " - $" + $("#slider-range").slider("values", 1));
+
+</script>
+
+
+<div class="modal fade" id="formModal" tabindex="-1" role="dialog" aria-labelledby="formModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+
+            </div>
+            <div class="modal-body">
+                <div class="contentBox_modal">
+                    <section>
+                        <div>
+                            <div>
+                                <form action="/authenticate" method="POST">
+
+                                    <div>
+                                        <div style="margin-bottom: 16px;">
+                                            <input type="hidden" name="from" value="email_login"></div>
+                                        <div style="margin-bottom: 16px;">
+                                            <input type="hidden" name="airlock_id" value=""></div>
+                                        <div style="margin-bottom: 16px;">
+                                            <div class="inspectletIgnore">
+                                                <div class="container_mods">
+                                                    <label class="label_modx" for="email-login-email">Адрес электронной
+                                                        почты</label>
+                                                    <div class="container_mod-sl">
+                                                        <div class="postfix_arx"><i class="fa fa-envelope-o"
+                                                                                    aria-hidden="true"></i>
+
+                                                        </div>
+                                                        <div class="inputContainer_forms">
+                                                            <input type="email" aria-label="Адрес электронной почты"
+                                                                   class="input_pss" id="email-login-email" name="email"
+                                                                   placeholder="Адрес электронной почты" value=""></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div style="margin-bottom: 16px;">
+                                            <div>
+                                                <div class="container_mods">
+                                                    <label class="label_modx" for="email-login-password">Пароль</label>
+                                                    <div class="container_mod-sl">
+                                                        <div class="postfix_arx"><i class="fa fa-key"
+                                                                                    aria-hidden="true"></i>
+
+                                                        </div>
+                                                        <div class="inputContainer_forms">
+                                                            <input type="password" autocomplete="off"
+                                                                   aria-label="Пароль" class="input_pss"
+                                                                   id="email-login-password" name="password"
+                                                                   placeholder="Пароль" value="" autocorrect="off"
+                                                                   autocapitalize="off" spellcheck="false"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div style="margin-bottom: 16px;">
+                                            <div class="va-container va-container-h">
+                                                <div class="va-middle">
+                                                    <label class="container_classx" for="email-login-sr">
+                                                        <div class="column_xcv">
+                                <span class="container_foa2bi">
+                                  <div class="checkbox">
+                                    <label>
+                                      <input type="checkbox" value="" checked="">
+                                      <span class="cr">
+                                        <i class="cr-icon glyphicon glyphicon-ok"></i>
+                                      </span> <b>Запомнить меня</b>
+                                    </label>
+                                  </div>
+
+                                </span>
+                                                        </div>
+
+                                                    </label>
+                                                </div>
+                                                <div class="pull-right va-middle">
+                                                    <div class="text_alt_area">
+                                                        <a href="/forgot_password" class="component_9w5i1l"
+                                                           aria-disabled="false" aria-busy="false">Забыли пароль?</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div style="margin-bottom: 16px;">
+                                            <div id="airlock-inline-container"></div>
+                                        </div>
+                                        <div style="margin-bottom: 16px;">
+                                            <button type="submit" class="button_mods" aria-busy="false">
+                          <span class="text_cvk">
+                            <span>Войти</span>
+                          </span>
+                                            </button>
+
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div style="margin-top: 16px; margin-bottom: 16px;">
+                                <div class="rule_vb"></div>
+                            </div>
+                            <div class="va-container va-container-h">
+                  <span class="va-middle text-center">
+                    <span class="text_bnv">Не зарегистрированы на Abab.io?</span>
+                    <div class="inlineBlock_tops" style="margin-left: 8px; margin-right: 8px;">
+                      <span class="text_alk">
+                        <a href="/signup_login?" class="component_9w5i1l" aria-disabled="false" aria-busy="false">Зарегистрироваться</a>
+                      </span>
+                    </div>
+                  </span>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="headerMainArea">
+    <header class="container_ns">
+        <div class="content_area_full">
+            <div class="container_sizer">
+                <div class="block_nbv_new">
+                    <div>
+                        <div class="logoArea">
+                            <div>
+                                <a href="#Rooms-all" class="home_page">
+                                    <div class="content_nb">
+                                        <div class="logo_sv">
+                                            <div class="icon_fx"></div>
+                                        </div>
+
+                                    </div>
+                                </a>
+                                <button aria-haspopup="true" class="button_cantainer_main">
+                                    <div class="content_nb">
+                                        <div class="logo_sv">
+                                            <div class="icon_fx"></div>
+                                        </div>
+
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="layout_nx"></div>
+                        <div class="layout_nx2">
+                            <div class="container_nbv"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="block_nbv"></div>
+                <div class="block_nbv_new">
+                    <div class="nav_cont">
+                        <nav>
+                            <ul class="list_nav">
+
+
+                                <li class="item_menu">
+                                    <div>
+                                        <div class="container_brx">
+                        <span class="link_xpx" style="cursor: pointer;">
+                          <div class="wrapper_conts">
+                            <div class="content_aix">
+                              <span data-toggle="modal" data-target="#formModal">Войти</span>
+
+                            </div>
+
+                          </div>
+
+                          <div class="lang">
+                            <div class="btn-group bootstrap-select">
+                              <button type="button" class="btn dropdown-toggle btn-default" data-toggle="dropdown"
+                                      role="button" title="RU" aria-expanded="true">
+                                <span class="filter-option pull-left">
+                                  <span class="labels">RU</span>
+                                </span>
+                                &nbsp;
+                                <span class="bs-caret">
+                                  <span class="caret"></span>
+                                </span>
+                              </button>
+                              <div class="dropdown-menu open" role="combobox"
+                                   style="max-height: 515px; overflow: hidden; min-height: 0px;">
+                                <ul class="dropdown-menu inner" role="listbox" aria-expanded="true"
+                                    style="max-height: 503px; overflow-y: auto; min-height: 0px;">
+                                  <li data-original-index="0" class="selected">
+                                    <a tabindex="0" class="" style="" data-tokens="null" role="option"
+                                       aria-disabled="false" aria-selected="true">
+                                      <span class="labels">RU</span>
+                                      <span class="glyphicon glyphicon-ok check-mark"></span>
+                                    </a>
+                                  </li>
+                                  <li data-original-index="1">
+                                    <a tabindex="0" class="" style="" data-tokens="null" role="option"
+                                       aria-disabled="false" aria-selected="false">
+                                      <span class="labels2">EN</span>
+                                      <span class="glyphicon glyphicon-ok check-mark"></span>
+                                    </a>
+                                  </li>
+                                </ul>
+                              </div>
+                              <select class="selectpicker" tabindex="-98">
+                                <option data-content="<span class='labels'>RU</span>
+                                ">RU
+                              </option>
+                              <option data-content="<span class='labels2'>EN</span>
+                              ">EN
+                            </option>
+                          </select>
+                        </div>
+                      </div>
+
+                    </span>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <div class="patch_nbv">
+        <div class="nbv_wrapp">
+            <div class="container_pvx">
+                <!-- react-empty: 257 -->
+
+                <div>
+                    <div class="container_big">
+                        <!-- react-empty: 129 -->
+                        <form action="/s/homes" method="get">
+                            <div class="container_neo2">
+                                <div class="container_mv_aps" style="width:100%;">
+                                    <div>
+                                        <div class="container_brx2">
+                                            <div>
+                                                <div class="container_brx">
+                                                    <div class="container_vs2">
+                                                        <label class="label_hidden_nbs">Где</label>
+                                                        <div class="airl_xv">
+                                                            <div class="prx_style">
+                                                                <div class="prx_style_bv">
+                                                                    <div>
+                                                                        <i class="fa fa-search" aria-hidden="true"></i>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="inputContainer_nb">
+                                                                <input type="text" autocomplete="off" class="input_clk"
+                                                                       id="form-ids" name="location"
+                                                                       placeholder="Где угодно" value=""></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="focusStyle"></div>
+                                </div>
+                                <div class="toch_class" style="width:100%;">
+
+                                    <div class="webcot-lg-datepicker">
+                                        <div class="dateRangePicker_e296pg-o_O-hidden_ajz5vs">
+                                            <span class="icon_slk">
+                                                <i class="fa fa-calendar" aria-hidden="true"></i>
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <button type="button" tabindex="-1" class="button_main_s demo">
+                                                <span class="icon_nx">
+                                                    <span class="icon_slk">
+                                                        <i class="fa fa-calendar" aria-hidden="true"></i>
+                                                        <input type="text" id="config-demo" class="form-control">
+                                                    </span>
+                                                </span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="focusStyle"></div>
+                                </div>
+                                <div class="container_mv_aps" style="width:100%;">
+                                    <!-- react-text: 167 -->
+                                    <!-- /react-text -->
+                                    <div>
+                                        <button type="button" class="button_main_s">
+                    <span class="icon_nx">
+                      <span class="icon_slks">
+                        <i class="fa fa-users" aria-hidden="true"></i>
+
+                      </span>
+                    </span>
+                                            <span class="copy_style dropdown noclose">
+
+                      <span class="dropdown-toggle" type="button" data-toggle="dropdown">
+                        <span>1 гость</span>
+                      </span>
+
+                      <div role="menu" class="block-tbx dropdown-menu">
+
+                        <form>
+
+                          <div class="txls">Взрослые</div>
+                          <div class="quantity">
+                            <input type="number" min="1" max="9" step="1" value="1"></div>
+
+                          <div class="txls">Дети (2-12 лет)</div>
+                          <div class="quantity">
+                            <input type="number" min="1" max="9" step="1" value="1"></div>
+
+                          <div class="txls">Младенцы</div>
+                          <div class="quantity">
+                            <input type="number" min="1" max="9" step="1" value="1"></div>
+
+                          <div class="otx">
+                            <a class="fll" href="#">Отменить</a>
+                            <a class="flr" href="#">Применить</a>
+                          </div>
+
+                        </form>
+
+                      </div>
+
+                    </span>
+
+                                        </button>
+                                    </div>
+                                    <div class="focusStyles"></div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <!-- react-empty: 178 -->
+                <!-- react-empty: 179 -->
+                <!-- react-empty: 180 --> </div>
+        </div>
+        <div class="verticalNavi">
+            <div>
+                <div role="tablist" class="tabs_qlk">
+                    <div class="container_brx">
+                        <div class="containerWrapper_ctx">
+                            <div class="containerOuter">
+                                <div class="containerInner_sx">
+
+                                    <a href="/s/homes?allow_override%5B%5D=" class="text_xcva" role="tab"
+                                       aria-selected="true" aria-busy="false">
+                                        <span>ЖИЛЬЕ</span>
+                                    </a>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <button type="button" class="button_num" aria-hidden="true"
+                                    style="opacity: 0; visibility: hidden;">
+                                <div class="iconContainer_rvb">
+                                    <div class="icon_qplzdw">
+                                        <svg viewBox="0 0 18 18" role="presentation" aria-hidden="true"
+                                             focusable="false"
+                                             style="display: block; fill: currentcolor; height: 14px; width: 14px;">
+                                            <path fill-rule="evenodd"
+                                                  d="M13.703 16.293a1 1 0 1 1-1.415 1.414l-7.995-8a1 1 0 0 1 0-1.414l7.995-8a1 1 0 1 1 1.415 1.414L6.413 9l7.29 7.293z"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="gradient_3cikar-o_O-gradient_backwards_hbkrlm"></div>
+                            </button>
+                            <button type="button" class="button_sdc" aria-hidden="true"
+                                    style="opacity: 0; visibility: hidden;">
+                                <div class="gradient_bvs"></div>
+                                <div class="iconContainer_vcb">
+                                    <div class="icon_qplzdw">
+                                        <svg viewBox="0 0 18 18" role="presentation" aria-hidden="true"
+                                             focusable="false"
+                                             style="display: block; fill: currentcolor; height: 14px; width: 14px;">
+                                            <path fill-rule="evenodd"
+                                                  d="M4.293 1.707A1 1 0 1 1 5.708.293l7.995 8a1 1 0 0 1 0 1.414l-7.995 8a1 1 0 1 1-1.415-1.414L11.583 9l-7.29-7.293z"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<main id="content_block" tabindex="-1" class="main_ns">
+
+</main>
+
+
+
