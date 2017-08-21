@@ -9,12 +9,12 @@ var reactiveRoom = Ractive.extend({
             }
             ractiveComponent['reactive-RoomApp'].set('room', res.rooms[0]);
             var minimalPriceDay = 99999999999;
-            for(var k in  res.rooms[0].dateRanges){
-                if(minimalPriceDay > res.rooms[0].dateRanges[k].priceDay){
+            for (var k in  res.rooms[0].dateRanges) {
+                if (minimalPriceDay > res.rooms[0].dateRanges[k].priceDay) {
                     minimalPriceDay = res.rooms[0].dateRanges[k].priceDay
                 }
             }
-            ractiveComponent['reactive-RoomApp'].set('minimalPriceDay',minimalPriceDay );
+            ractiveComponent['reactive-RoomApp'].set('minimalPriceDay', minimalPriceDay);
 
             if ($(window).width() > 991) {
 
@@ -90,12 +90,15 @@ ractiveComponent['reactive-RoomApp'].on('submitRoom', function () {
     console.log($('#AddRoom').serializeArray());
 });
 
-
 init_daterangepicker('#period-input-date-booking', function (start, end, days) {
     console.log(start, end, days);
     ractiveComponent['reactive-RoomApp'].set('intervalDate', days);
     ractiveComponent['reactive-RoomApp'].set('startDate', start.format('DD.MM.YY'));
     ractiveComponent['reactive-RoomApp'].set('endDate', end.format('DD.MM.YY'));
+    ractiveComponent['reactive-RoomApp'].set('startDateDay', +(moment.utc(start.format('DD.MM.YY'), 'DD.MM.YY').unix() / (24 * 60 * 60)).toFixed(0));
+    ractiveComponent['reactive-RoomApp'].set('endDateDay', + (moment.utc(end.format('DD.MM.YY'), 'DD.MM.YY').unix() / (24 * 60 * 60)).toFixed(0));
+
+
 });
 
 //

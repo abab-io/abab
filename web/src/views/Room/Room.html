@@ -421,40 +421,44 @@
     <div class="fll-r">
         <div class="block-lb" style="overflow: hidden;">
             <div class="lorem-sl">
+                {{#if intervalDate}}
+                500$ за {{intervalDate}} ночей
+                {{else}}
                 от
                 <span>${{minimalPriceDay}}</span>
                 в сутки
+                {{/if}}
             </div>
             <div class="row">
                 <div class="col-sm-12">
                     <div class="input-area">
-                        <label class="text-center" for="">Прибытие-Выезд</label>
+                        <label class="text-center" for="">Прибытие-Выезд </label>
                         <input type="text" id="period-input-date-booking"></div>
                 </div>
 
             </div>
 
-            <div class="row">
-                <div class="col-sm-12">
-                    <div class="input-area">
-                        <label class="text-center" for="">Кол-во гостей</label>
+            <!--<div class="row">-->
+                <!--<div class="col-sm-12">-->
+                    <!--<div class="input-area">-->
+                        <!--<label class="text-center" for="">Кол-во гостей</label>-->
 
-                        <div class="quantity bvcs">
-                            <input type="number" min="1" max="9" step="1" value="1">
-                            <div class="quantity-nav">
-                                <div class="quantity-button quantity-up">+</div>
-                                <div class="quantity-button quantity-down">-</div>
-                            </div>
-                        </div>
+                        <!--<div class="quantity bvcs">-->
+                            <!--<input type="number" min="1" max="9" step="1" value="1">-->
+                            <!--<div class="quantity-nav">-->
+                                <!--<div class="quantity-button quantity-up">+</div>-->
+                                <!--<div class="quantity-button quantity-down">-</div>-->
+                            <!--</div>-->
+                        <!--</div>-->
 
 
-                        <div class="section-block lkbv-n">
+                        <!--<div class="section-block lkbv-n">-->
 
-                        </div>
-                    </div>
-                </div>
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>-->
 
-            </div>
+            <!--</div>-->
             <br>
 
             <div class="row">

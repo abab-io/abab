@@ -26,6 +26,7 @@ module.exports = (API, redis) => {
 
     var web3_events = {
         NewSchedule: function (event, tx, callback) {
+            console.log(event);
             db.scheduleRoom.update({
                 "tx.hash": event.transactionHash
             }, {
@@ -41,6 +42,7 @@ module.exports = (API, redis) => {
         },
         NewRoom: function (event, tx, callback) {
             // console.log(event);
+
             let _roomDescriptionHash = web3.fromDecimal(event.args._roomDescriptionHash);
             db.rooms.findOneAndUpdate({txHash: tx.tx.hash, _hash: _roomDescriptionHash, wallet: event.args.host}, {
                 tx: db.mongoose.Types.ObjectId(tx._id),
@@ -53,78 +55,64 @@ module.exports = (API, redis) => {
                 }).then(function (documents) {
                     async.mapSeries(documents, function (schedule, callback) {
 
-                        async.parallel({
-                            startDateDay: function (dayConvert_callback) {
-                                API.emit('public_fn_Timestamp2Daystamp', user, {timestamp: moment.utc(schedule.startDate).unix()}, function (res) {
-                                    dayConvert_callback(null, res.result.result);
-                                });
-                            },
-                            endDateDay: function (dayConvert_callback) {
-                                API.emit('public_fn_Timestamp2Daystamp', user, {timestamp: moment.utc(schedule.endDate).unix()}, function (res) {
-                                    dayConvert_callback(null, res.result.result);
-                                });
-                            }
-                        }, function (err, dayConvert) {
-                            // results is now equals to: {one: 1, two: 2}
 
-                            let param_tx = [
-                                event.args.roomIndex, //_roomIndex
-                                '9999999999',//_scheduleIndex
-                                dayConvert.startDateDay,//_from
-                                dayConvert.endDateDay,//_to
-                                schedule.dayPrice,//_dayPrice
-                                +(schedule.dayPrice - (schedule.dayPrice * schedule.discountWeek / 100)).toFixed(8),//_weekPrice
-                                +(schedule.dayPrice - (schedule.dayPrice * schedule.discountMonth / 100)).toFixed(8),//_monthPrice
-                                3 //_currency (1 abab 2 eth 3 usd 4 rur)
-                            ].join(',');
+                        let param_tx = [
+                            event.args.roomIndex, //_roomIndex
+                            '9999999999',//_scheduleIndex
+                            +(moment.utc(schedule.startDate).unix() / (24 * 60 * 60)).toFixed(0),//_from
+                            +(moment.utc(schedule.endDate).unix() / (24 * 60 * 60)).toFixed(0),//_to
+                            schedule.dayPrice,//_dayPrice
+                            +(schedule.dayPrice - (schedule.dayPrice * schedule.discountWeek / 100)).toFixed(8),//_weekPrice
+                            +(schedule.dayPrice - (schedule.dayPrice * schedule.discountMonth / 100)).toFixed(8),//_monthPrice
+                            0 //_currency (1 abab 2 eth 3 usd 4 rur)
+                        ].join(',');
 
-                            console.log({
-                                from: document.wallet,
-                                function: 'UpsertSchedule',
-                                param: param_tx
-                            });
-                            API.emit('requestFunctionContract', document.user, {
-                                from: document.wallet,
-                                function: 'UpsertSchedule',
-                                param: param_tx
-                            }, function (err, res) {
-                                db.scheduleRoom.update({
-                                    _id: db.mongoose.Types.ObjectId(schedule._id),
-                                    "tx.status": 1
-                                }, {
-                                    $set: {
-                                        "tx.status": 2,
-                                        "tx.hash": res.result.tx.hash,
-                                    }
-                                }, {}).then(function (docs) {
-                                    console.log(docs);
-                                    callback(null, res.result.tx)
+                        // console.log({
+                        //     from: document.wallet,
+                        //     function: 'UpsertSchedule',
+                        //     param: param_tx
+                        // });
+                        API.emit('requestFunctionContract', document.user, {
+                            from: document.wallet,
+                            function: 'UpsertSchedule',
+                            param: param_tx
+                        }, function (err, res) {
+                            db.scheduleRoom.update({
+                                _id: db.mongoose.Types.ObjectId(schedule._id),
+                                "tx.status": 1
+                            }, {
+                                $set: {
+                                    "tx.status": 2,
+                                    "tx.hash": res.result.tx.hash,
+                                }
+                            }, {}).then(function (docs) {
+                                // console.log(docs);
+                                callback(null, res.result.tx)
 
-                                }).catch(function () {
-                                    callback('error db $ db.scheduleRoom.findOneAndUpdate');
+                            }).catch(function () {
+                                callback('error db $ db.scheduleRoom.findOneAndUpdate');
 
-                                });
                             });
                         });
 
 
                     }, function () {
-                        console.log('scheduleRoom public:', arguments)
+                        // console.log('scheduleRoom public:', arguments);
+                        callback && callback(true);
                     })
 
 
                 });
 
-                callback && callback(true);
+
             });
 
-            console.log('blockNumber', event.blockNumber);
             // console.log('transactionHash', event.transactionHash);
             // console.log('host', event.args.host);
             // console.log('roomIndex', +event.args.roomIndex);
             // console.log('_roomDescriptionHash', web3.fromDecimal(event.args._roomDescriptionHash));
 
-            callback && callback();
+            // callback && callback();
         }
     };
 
@@ -668,8 +656,8 @@ module.exports = (API, redis) => {
         }
         let paramContract = param.param;
         console.log(param);
-        paramContract.push(function (error, result) {
-            if (error)
+        paramContract.push(function (err, result) {
+            if (err)
                 return callback && callback(null, {
                         error: error.api('Param type is not array', 'contract', {
                             param: param,
@@ -677,8 +665,9 @@ module.exports = (API, redis) => {
                         }, 2),
                         success: false
                     });
-            callback && callback(null, result);
             console.log('result: ', result, error);
+            if (typeof result === 'boolean') result = [result];
+            callback && callback(null, result);
         });
         contract[param.function].apply(null, paramContract);
 
@@ -726,10 +715,13 @@ module.exports = (API, redis) => {
                 if (!web3_events[result.event]) {
                     return console.error('EVENT Error #web3_events not found:\n', result, '\n\t\t- - - - - - -\n');
                 }
+                console.log('Synchronization block number:', result.blockNumber);
                 db.tx.findOne({"tx.hash": result.transactionHash}).then(function (res) {
                     if (res) {
                         web3_events[result.event](result, res, function () {
                             config.set('geth:lastBlockNumber', result.blockNumber);
+                            console.log('[Success] Synchronization(' + result.event + ') block number:', result.blockNumber);
+
                         });
                         if (res.callback_url && res.callback_url !== '')
                             request.post(res.callback_url, {

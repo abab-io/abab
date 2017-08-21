@@ -899,19 +899,11 @@ button {
     width: 100%;
 }
 
-.daterangepicker .calendar {
-    margin: 0;
-}
+ .daterangepicker {
 
-
-.daterangepicker {
-    max-width: 257px !important;
+    margin-left: -200px !important;
     padding-left: 7px;
     padding-right: 7px !important;
-}
-
-.daterangepicker.ltr .left .daterangepicker_input {
-    padding-right: 8px;
 }
 
 table.table-condensed i {
