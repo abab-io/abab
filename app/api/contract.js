@@ -19,9 +19,9 @@ module.exports = (API, redis) => {
             };
             for (let i1 in contractFn[key].inputs) {
                 let name_param = contractFn[key].inputs[i1].name;
-                if(!name_param && name_param ==='') name_param = 'param_'+i1;
+                if (!name_param || name_param === '') name_param = 'param_' + i1;
                 docs.param.push({
-                    name: contractFn[key].inputs[i1].name,
+                    name: name_param,
                     type: contractFn[key].inputs[i1].type,
                     title: 'return in contract func',
                     default: '',
@@ -31,51 +31,57 @@ module.exports = (API, redis) => {
             }
             for (let i2 in contractFn[key].outputs) {
                 docs.response.push({
-                    name: 'result.'+contractFn[key].outputs[i2].name,
+                    name: 'result.' + contractFn[key].outputs[i2].name,
                     type: contractFn[key].outputs[i2].type,
                     title: 'return in contract func',
                     default: '0'
                 })
             }
             API.on('fn_' + contractFn[key].name, true, (user, param, callback) => {
-                let method =param.method.split('_fn_')[1];
-                console.log(method);
+                let method = param.method.split('_fn_')[1];
                 let contractABI = _.find(sol_config._abi, {name: method});
-                if(!contractABI || contractABI.type !== 'function'){
+                if (!contractABI || contractABI.type !== 'function') {
                     return callback && callback(null, {
                             error: error.api('Request function is not found function contract', 'param', {
-                                pos: 'api/contract.js('+param.method+'):#autogenerate_API_function :1',
+                                pos: 'api/contract.js(' + param.method + '):#autogenerate_API_function :1',
                                 param: param
                             }, 0),
                             success: false
                         });
                 }
-                console.log(contractABI);
                 let callParam = [];
-                for(let i_in in contractABI.inputs){
-                    if(!param[contractABI.inputs[i_in].name]){
+                for (let i_in in contractABI.inputs) {
+                    let name_param = contractABI.inputs[i_in].name;
+                    if (!name_param || name_param === '') name_param = 'param_' + i_in;
+                    if (!param[name_param]) {
                         return callback && callback(null, {
                                 error: error.api('Request param is not found', 'param', {
-                                    pos: 'api/contract.js('+param.method+'):#autogenerate_API_function :2',
+                                    pos: 'api/contract.js(' + param.method + '):#autogenerate_API_function :2',
                                     param: param,
-                                    param_name_err:contractABI.inputs[i_in].name,
-                                    contractABI_param:contractABI.inputs[i_in],
+                                    param_name_err: name_param,
+                                    contractABI_param: contractABI.inputs[i_in],
                                 }, 0),
                                 success: false
                             });
                     }
-                    callParam.push(param[contractABI.inputs[i_in].name]);
-
-                }
-                for(let i_out in  contractABI.outputs){
-
+                    callParam.push(param[name_param]);
                 }
 
-                API.emit('public_callFunctionContract',user,{function:method,param:callParam},function (err,res) {
+                API.emit('public_callFunctionContract', user, {
+                    function: method,
+                    param: callParam
+                }, function (err, res) {
+                    let response = {};
+                    for (let i_out in  contractABI.outputs) {
+                        let name_param = contractABI.outputs[i_out].name;
+                        if (name_param === '') name_param = 'index_' + i_out;
+                        if (!res[i_out])
+                            response[name_param] = res.toString();
+                        else
+                            response[name_param] = res[i_out].toString();
+                    }
 
-                    console.log(arguments);
-                    callback && callback(null,res);
-
+                    callback && callback(null, {success: true,result:response});
                 });
             }, docs);
 

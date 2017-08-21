@@ -15,30 +15,8 @@ const md5 = require('md5');
 
 const _ = require('lodash');
 const SolidityFunction = require('web3/lib/web3/function');
-if (web3.isConnected()) {
-    // config.set('geth:lastBlockNumber', 1376000);
+var request = require('request');
 
-    console.log("web3 connected!");
-    var contract = web3.eth.contract(sol_config._abi).at(sol_config._address);
-
-    var events = contract.allEvents({fromBlock: config.get('geth:lastBlockNumber'), toBlock: 'latest'});
-    events.watch(function (error, result) {
-        if(result) {
-            console.log('------ NEW EVENT -----');
-            console.log('EVENT', result);
-            console.log('transactionHash', result.transactionHash);
-            console.log('event', result.event);
-            console.log('args', result.args);
-            console.log('roomIndex', +result.args.roomIndex);
-            console.log('_roomDescriptionHash', web3.fromDecimal(result.args._roomDescriptionHash));
-            console.log('_roomDescriptionHash', result.args._roomDescriptionHash);
-            console.log('=======================');
-
-            config.set('geth:lastBlockNumber', result.blockNumber);
-        }
-    });
-
-}
 module.exports = (API, redis) => {
     var rateETHUSD = 0;
     API.on('wallet', (user, param, callback) => {
@@ -549,39 +527,51 @@ module.exports = (API, redis) => {
             {name: 'latency_ms', type: "int(11)", title: 'Processing time of the request in ms', default: '122'}
         ]
     });
-    API.on('callFunctionContract',true, (user, param, callback) => {
+    API.on('callFunctionContract', true, (user, param, callback) => {
 
         var contract = web3.eth.contract(sol_config._abi).at(sol_config._address);
-        if(!_.find(sol_config._abi, {name: param.function}) || !contract[param.function]){
+        if (!_.find(sol_config._abi, {name: param.function}) || !contract[param.function]) {
             return callback && callback(null, {
-                    error: error.api('Call function error function not found', 'param', {param:param,find_fn:_.find(sol_config._abi, {name: param.function})}, 0),
+                    error: error.api('Call function error function not found', 'param', {
+                        param: param,
+                        find_fn: _.find(sol_config._abi, {name: param.function})
+                    }, 0),
                     success: false
                 });
         }
-        if(!param.param || typeof param.param !== 'object'){
+        if (!param.param || typeof param.param !== 'object') {
             return callback && callback(null, {
-                    error: error.api('Param type is not array', 'param', {param:param,find_fn:_.find(sol_config._abi, {name: param.function})}, 0),
+                    error: error.api('Param type is not array', 'param', {
+                        param: param,
+                        find_fn: _.find(sol_config._abi, {name: param.function})
+                    }, 0),
                     success: false
                 });
         }
-        if(param.param.length !== _.find(sol_config._abi, {name: param.function}).inputs.length){
+        if (param.param.length !== _.find(sol_config._abi, {name: param.function}).inputs.length) {
             return callback && callback(null, {
-                    error: error.api('Param type is not array', 'param', {param:param,find_fn:_.find(sol_config._abi, {name: param.function})}, 0),
+                    error: error.api('Param type is not array', 'param', {
+                        param: param,
+                        find_fn: _.find(sol_config._abi, {name: param.function})
+                    }, 0),
                     success: false
                 });
         }
-        let paramContract= param.param ;
+        let paramContract = param.param;
         console.log(param);
         paramContract.push(function (error, result) {
-            if(error)
+            if (error)
                 return callback && callback(null, {
-                        error: error.api('Param type is not array', 'contract', {param:param,find_fn:_.find(sol_config._abi, {name: param.function})}, 2),
+                        error: error.api('Param type is not array', 'contract', {
+                            param: param,
+                            find_fn: _.find(sol_config._abi, {name: param.function})
+                        }, 2),
                         success: false
                     });
-            callback && callback(null,result);
+            callback && callback(null, result);
             console.log('result: ', result, error);
         });
-        contract[param.function].apply(null,paramContract);
+        contract[param.function].apply(null, paramContract);
 
     }, {
         title: 'Call function SmartContract',
@@ -616,3 +606,98 @@ module.exports = (API, redis) => {
         ]
     });
 };
+
+var web3_events = {
+    NewRoom: function (event, tx, callback) {
+        // console.log(event);
+        let _roomDescriptionHash = web3.fromDecimal(event.args._roomDescriptionHash);
+        db.rooms.findOneAndUpdate({txHash: tx.tx.hash, _hash: _roomDescriptionHash, wallet: event.args.host}, {
+            tx: db.mongoose.Types.ObjectId(tx._id),
+            _index: event.args.roomIndex,
+            status: 3
+        }, {new: true}).then(function (document) {
+            // if (document.dateRanges) {
+            //     for (let i in document.dateRanges) {
+            //         if (document.dateRanges.hasOwnProperty(i)) {
+            //             if (document.dateRanges[i].txStatus === 1) {
+            //                 let param_tx = [
+            //                     event.args.roomIndex, //_roomIndex
+            //                     '9999999999',//_scheduleIndex
+            //                     document.dateRanges[i].startDate,//_from
+            //                     document.dateRanges[i].endDate,//_to
+            //                     +document.dateRanges[i].priceDay,//_dayPrice
+            //                     +(document.dateRanges[i].priceDay-(document.dateRanges[i].priceDay*document.dateRanges[i].discountWeek/100)).toFixed(8),//_weekPrice
+            //                     +(document.dateRanges[i].priceDay-(document.dateRanges[i].priceDay*document.dateRanges[i].discountMonth/100)).toFixed(8),//_monthPrice
+            //                     "USD" //_currency
+            //                 ].join(',');
+            //                 API.emit('requestFunctionContract', user, {
+            //                     from: document.wallet,
+            //                     function: 'UpsertSchedule',
+            //                     param: param_tx
+            //                 }, function (err, res) {
+            //                     db.rooms.findOneAndUpdate({
+            //                         _id: db.mongoose.Types.ObjectId(document._id),
+            //                     }, {
+            //                         tx: db.mongoose.Types.ObjectId(tx._id),
+            //                         _index: event.args.roomIndex,
+            //                         status: 3
+            //                     }, {new: true});
+            //                 });
+            //
+            //
+            //             }
+            //         }
+            //     }
+            // }
+            callback && callback(true);
+        });
+
+        console.log('blockNumber', event.blockNumber);
+        // console.log('transactionHash', event.transactionHash);
+        // console.log('host', event.args.host);
+        // console.log('roomIndex', +event.args.roomIndex);
+        // console.log('_roomDescriptionHash', web3.fromDecimal(event.args._roomDescriptionHash));
+
+        callback && callback();
+    }
+};
+
+if (web3.isConnected()) {
+    // config.set('geth:lastBlockNumber', 1376000);
+    console.log("Web3 connected!\n\tStart synchronization... \n\t Last block:" + config.get('geth:lastBlockNumber'));
+    var contract = web3.eth.contract(sol_config._abi).at(sol_config._address);
+
+    var events = contract.allEvents({fromBlock: config.get('geth:lastBlockNumber'), toBlock: 'latest'});
+    events.watch(function (error, result) {
+        if (result && result.event) {
+            if (!web3_events[result.event]) {
+                return console.error('EVENT Error #web3_events not found:\n', result, '\n\t\t- - - - - - -\n');
+            }
+            db.tx.findOne({"tx.hash": result.transactionHash}).then(function (res) {
+                if (res) {
+                    console.log(res);
+
+                    web3_events[result.event](result, res, function () {
+                        config.set('geth:lastBlockNumber', result.blockNumber);
+                    });
+                    if (res.callback_url && res.callback_url !== '')
+                        request.post(res.callback_url, {
+                            form: {event: result},
+                            timeout: 500
+                        }, function (error, response,) {
+                            console.log('statusCode:', response && response.statusCode);
+                        });
+                }
+
+            }).catch(function (err) {
+                return callback && callback(null, {
+                        error: error.api(err.message, 'db', err, 3),
+                        success: false
+                    });
+
+            });
+        }
+
+    });
+
+}

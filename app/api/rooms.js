@@ -5,7 +5,7 @@ const db = require('../modules/db');
 const error = require('../modules/error/api');
 const aws = require('../modules/aws-amazon-s3');
 const crypto = require('crypto');
-
+var moment = require('moment');
 module.exports = (API, redis) => {
     API.on('GetRooms', true, (user, param, callback) => {
         let findPram = {};
@@ -50,6 +50,7 @@ module.exports = (API, redis) => {
                     success: false
                 });
         }
+
         if (param.photo && typeof param.photo !== 'string' && typeof param.photo !== 'object') {
             return callback && callback(null, {
                     error: error.api('Request param "photo" incorrect', 'param', {
@@ -117,6 +118,12 @@ module.exports = (API, redis) => {
                 });
         }
 
+        if (param.dateRanges) {
+            for (let i in param.dateRanges) {
+                param.dateRanges[i].txHash = null;
+                param.dateRanges[i].txStatus = 1;
+            }
+        }
         if (!param._id && !param._index) {
             new db.rooms({
 
@@ -136,7 +143,7 @@ module.exports = (API, redis) => {
                 startTimeCheckOut: param.startTimeCheckOut,
                 endTimeCheckIn: param.endTimeCheckIn,
                 endTimeCheckOut: param.endTimeCheckOut,
-                dateRanges: param.dateRanges,
+                // dateRanges: param.dateRanges,
                 address: {
                     country: param.address_country,
                     state: param.address_state,
@@ -150,7 +157,44 @@ module.exports = (API, redis) => {
                 txHash: null,
                 status: param.status //0 - draft , 1 - wait confirm, 2 - send to blockchain, 3 -success public
             }).save().then(function (document) {
+                console.log(document._doc._id);
+                for (let i in  param.dateRanges) {
+                    console.log('=====\n');
+                    console.log({
 
+                        room: db.mongoose.Types.ObjectId(document._doc._id),
+                        _scheduleIndex: null,
+                        startDate: moment(param.dateRanges[i].startDate,'DD.MM.YY').toDate(),
+                        endDate: moment(param.dateRanges[i].endDate,'DD.MM.YY').toDate(),
+                        dayPrice: param.dateRanges[i].priceDay,
+                        weekPrice:  +(param.dateRanges[i].priceDay-(param.dateRanges[i].priceDay*param.dateRanges[i].discountWeek/100)).toFixed(8),
+                        monthPrice:  +(param.dateRanges[i].priceDay-(param.dateRanges[i].priceDay*param.dateRanges[i].discountMonth/100)).toFixed(8),
+                        discountWeek: 1*(1*param.dateRanges[i].discountWeek).toFixed(8),
+                        discountMonth: 1*(1*param.dateRanges[i].discountMonth).toFixed(8),
+                        intervalDate: null,
+                        tx: {
+                            status: 1,
+                            hash: null,
+                        }
+                    });
+                    new db.scheduleRoom({
+
+                        room: db.mongoose.Types.ObjectId(document._doc._id),
+                        _scheduleIndex: 9999999,
+                        startDate: moment.utc(param.dateRanges[i].startDate,'DD.MM.YY').toDate(),
+                        endDate: moment.utc(param.dateRanges[i].endDate,'DD.MM.YY').toDate(),
+                        dayPrice: param.dateRanges[i].priceDay,
+                        weekPrice:  +(param.dateRanges[i].priceDay-(param.dateRanges[i].priceDay*param.dateRanges[i].discountWeek/100)).toFixed(8),
+                        monthPrice:  +(param.dateRanges[i].priceDay-(param.dateRanges[i].priceDay*param.dateRanges[i].discountMonth/100)).toFixed(8),
+                        discountWeek: 1*(1*param.dateRanges[i].discountWeek).toFixed(8),
+                        discountMonth: 1*(1*param.dateRanges[i].discountMonth).toFixed(8),
+                        intervalDate: null,
+                        tx: {
+                            status: 1,
+                            hash: null,
+                        }
+                    }).save();
+                }
                 // bathroom
                 // bathroom_count
                 // bed_count
@@ -239,7 +283,6 @@ module.exports = (API, redis) => {
                         ]);
                         let _hash = '0x' + crypto.createHash('sha1').update(JSON.stringify(_document)).digest('hex');
                         aws.upload_json(_hash + '.json', _document, function () {
-                            console.log('AWS_1', arguments);
                             API.emit('requestFunctionContract', user, {
                                 from: document.wallet,
                                 function: 'UpsertRoomFromHost',
@@ -248,10 +291,9 @@ module.exports = (API, redis) => {
                                 if (res.success === false) {
                                     return callback && callback(null, res);
                                 }
-                                console.log('requestFunctionContract_1', res.result.tx.hash);
-
                                 db.rooms.findOneAndUpdate({_id: db.mongoose.Types.ObjectId(param._id)}, {
                                     txHash: res.result.tx.hash,
+                                    tx: db.mongoose.Types.ObjectId(res.result._id),
                                     _hash: _hash,
                                     status: 2
                                 }, {new: true}).then(function (document) {

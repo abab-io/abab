@@ -5,7 +5,7 @@ var mongo_db = mongoose.createConnection(config.get('database:mongodb_url'), {
     /* other options */
 });
 var db;
-
+var Float = require('mongoose-float').loadType(mongoose);
 
 var Schema = mongoose.Schema;
 var schemas = {
@@ -188,6 +188,70 @@ var schemas = {
             default: Date.now
         }
     }),
+    scheduleRoom: new Schema({
+
+        room: {
+            type: Schema.Types.ObjectId,
+            index: true,
+            ref: 'rooms'
+        },
+        _scheduleIndex: {
+            type: Number,
+            index: true,
+            default: null
+        },
+
+        startDate: {
+            type: Date,
+            default: null,
+        },
+        endDate: {
+            type: Date,
+            default: null,
+        },
+        dayPrice: {
+            type: Float,
+            default: 0,
+        },
+        weekPrice: {
+            type: Float,
+            default: 0,
+        },
+        monthPrice: {
+            type: Float,
+            default: 0,
+        },
+        discountWeek: {
+            type: Float,
+            default: 0,
+        },
+        discountMonth: {
+            type: Float,
+            default: 0,
+        },
+        intervalDate: {
+            type: Number,
+            default: 1
+        },
+        tx: {
+            status: {
+                type: Number,
+                default:0,
+            },
+            hash: {
+                type: String,
+                default: null,
+            },
+        },
+        create_at: {
+            type: Date,
+            default: Date.now
+        },
+        update_at: {
+            type: Date,
+            default: Date.now
+        }
+    }),
     rooms: new Schema({
 
         _index: {
@@ -270,32 +334,32 @@ var schemas = {
             type: String,
             default: '0x',
         },
-        dateRanges: {
-            type: Array,
-            default: [], //Date ranges when you can book example: unix
+        tx:{
+            type: Schema.Types.ObjectId,
+            ref: 'tx'
         },
         address: {
-            country:  {
+            country: {
                 type: String,
                 default: null,
             },
-            state:  {
+            state: {
                 type: String,
                 default: null,
             },
-            city:  {
+            city: {
                 type: String,
                 default: null,
             },
-            street:  {
+            street: {
                 type: String,
                 default: null,
             },
-            address:  {
+            address: {
                 type: String,
                 default: null,
             },
-            index:  {
+            index: {
                 type: String,
                 default: null,
             },
