@@ -59,7 +59,7 @@ module.exports = (API, redis) => {
                                     dayConvert_callback(null, res.result.result);
                                 });
                             },
-                            endDateDay: function (callback) {
+                            endDateDay: function (dayConvert_callback) {
                                 API.emit('public_fn_Timestamp2Daystamp', user, {timestamp: moment.utc(schedule.endDate).unix()}, function (res) {
                                     dayConvert_callback(null, res.result.result);
                                 });
