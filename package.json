@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/bodgan-medvedev/abab#readme",
   "dependencies": {
+    "async": "^2.5.0",
     "aws-sdk": "^2.7.0",
     "body-parser": "^1.17.2",
     "chokidar": "^1.7.0",

@@ -127,6 +127,7 @@ module.exports = (API, redis) => {
         if (!param._id && !param._index) {
             new db.rooms({
 
+                user: db.mongoose.Types.ObjectId(user._id),
                 title: param.title,
                 description: param.description,
                 photo: param.photo,
@@ -157,37 +158,20 @@ module.exports = (API, redis) => {
                 txHash: null,
                 status: param.status //0 - draft , 1 - wait confirm, 2 - send to blockchain, 3 -success public
             }).save().then(function (document) {
-                console.log(document._doc._id);
-                for (let i in  param.dateRanges) {
-                    console.log('=====\n');
-                    console.log({
 
+                for (let i in  param.dateRanges) {
+
+
+                    new db.scheduleRoom({
                         room: db.mongoose.Types.ObjectId(document._doc._id),
                         _scheduleIndex: null,
-                        startDate: moment(param.dateRanges[i].startDate,'DD.MM.YY').toDate(),
-                        endDate: moment(param.dateRanges[i].endDate,'DD.MM.YY').toDate(),
-                        dayPrice: param.dateRanges[i].priceDay,
-                        weekPrice:  +(param.dateRanges[i].priceDay-(param.dateRanges[i].priceDay*param.dateRanges[i].discountWeek/100)).toFixed(8),
-                        monthPrice:  +(param.dateRanges[i].priceDay-(param.dateRanges[i].priceDay*param.dateRanges[i].discountMonth/100)).toFixed(8),
-                        discountWeek: 1*(1*param.dateRanges[i].discountWeek).toFixed(8),
-                        discountMonth: 1*(1*param.dateRanges[i].discountMonth).toFixed(8),
-                        intervalDate: null,
-                        tx: {
-                            status: 1,
-                            hash: null,
-                        }
-                    });
-                    new db.scheduleRoom({
-
-                        room: db.mongoose.Types.ObjectId(document._doc._id),
-                        _scheduleIndex: 9999999,
-                        startDate: moment.utc(param.dateRanges[i].startDate,'DD.MM.YY').toDate(),
-                        endDate: moment.utc(param.dateRanges[i].endDate,'DD.MM.YY').toDate(),
-                        dayPrice: param.dateRanges[i].priceDay,
-                        weekPrice:  +(param.dateRanges[i].priceDay-(param.dateRanges[i].priceDay*param.dateRanges[i].discountWeek/100)).toFixed(8),
-                        monthPrice:  +(param.dateRanges[i].priceDay-(param.dateRanges[i].priceDay*param.dateRanges[i].discountMonth/100)).toFixed(8),
-                        discountWeek: 1*(1*param.dateRanges[i].discountWeek).toFixed(8),
-                        discountMonth: 1*(1*param.dateRanges[i].discountMonth).toFixed(8),
+                        startDate: moment.utc(param.dateRanges[i].startDate, 'DD.MM.YY').toDate(),
+                        endDate: moment.utc(param.dateRanges[i].endDate, 'DD.MM.YY').toDate(),
+                        dayPrice: +(+param.dateRanges[i].priceDay).toFixed(8),
+                        weekPrice: +(param.dateRanges[i].priceDay - (param.dateRanges[i].priceDay * param.dateRanges[i].discountWeek / 100)).toFixed(8),
+                        monthPrice: +(param.dateRanges[i].priceDay - (param.dateRanges[i].priceDay * param.dateRanges[i].discountMonth / 100)).toFixed(8),
+                        discountWeek: 1 * (1 * param.dateRanges[i].discountWeek).toFixed(8),
+                        discountMonth: 1 * (1 * param.dateRanges[i].discountMonth).toFixed(8),
                         intervalDate: null,
                         tx: {
                             status: 1,
@@ -298,7 +282,6 @@ module.exports = (API, redis) => {
                                     _hash: _hash,
                                     status: 2
                                 }, {new: true}).then(function (document) {
-                                    console.log('findOneAndUpdate_1', arguments);
                                     return callback && callback(null, {
                                             room: filterObject(document._doc, [
                                                 '_id',
