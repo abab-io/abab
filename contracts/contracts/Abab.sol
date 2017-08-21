@@ -245,12 +245,19 @@ contract Abab is Ownable,Claimable,StandardToken {
       return rooms[msg.sender][_roomIndex].schedulesLength;
     }
 
-  function GetScheduleByIndex(uint _roomIndex, uint _index) 
+  function GetScheduleByIndex(address _host, uint _roomIndex, uint _index)
   public constant 
   returns(uint from, uint to, uint dayPrice, uint weekPrice, uint monthPrice) 
   {
       var s = rooms[msg.sender][_roomIndex].schedules[_index];
       return (s.from, s.to, s.dayPrice, s.weekPrice, s.monthPrice);
+  }
+
+  function GetMyScheduleByIndex(uint _roomIndex, uint _index) 
+  public constant 
+  returns(uint from, uint to, uint dayPrice, uint weekPrice, uint monthPrice) 
+  {
+      return GetScheduleByIndex(msg.sender, _roomIndex, _index);
   }
 
   function RemoveSchedule(uint _roomIndex, uint _scheduleIndex)
