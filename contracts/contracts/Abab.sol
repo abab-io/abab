@@ -316,6 +316,16 @@ contract Abab is Ownable,Claimable,StandardToken {
     return true; 
   }
 
+  function min(uint arg1, uint arg2, uint arg3)
+  public 
+  constant
+  returns(uint result)
+  {
+    if((arg1<arg2)&&(arg1<arg3)) return arg1;
+    if((arg2<arg1)&&(arg2<arg3)) return arg2;
+    return arg3;
+  }
+  
   function CalcTotalCost(address _host, uint _roomIndex, uint _from, uint _to)
   public 
   constant
@@ -328,8 +338,8 @@ contract Abab is Ownable,Claimable,StandardToken {
 
     var schedulesLength = rooms[_host][_roomIndex].schedulesLength;
 
-    uint needFrom = _from;
-    uint nextFrom = _to;
+    uint needFrom  = _from;
+    uint nextFrom  = maxUInt;
     uint daysCount = _to-_from;
     uint totalCost = 0;
 
@@ -349,7 +359,7 @@ contract Abab is Ownable,Claimable,StandardToken {
         // log2('nextFrom= ', nextFrom);
 
         uint price = daysCount>=30 ? schedules_i.monthPrice : daysCount>=7 ? schedules_i.weekPrice : schedules_i.dayPrice;
-        totalCost += price*(( schedules_i.to < nextFrom ? schedules_i.to : nextFrom ) - needFrom);
+        totalCost += price*(min( schedules_i.to, nextFrom, _to) - needFrom);
         needFrom = schedules_i.to<nextFrom ? schedules_i.to : nextFrom;
 
         // log('-----------------');
@@ -357,7 +367,7 @@ contract Abab is Ownable,Claimable,StandardToken {
         // log2('needFrom=' ,needFrom);
         // log2('totalCost=',totalCost);
         
-        if(needFrom>=_to) break;
+        if(needFrom>=_to) return totalCost;
  
         //needFrom = nextFrom;
         nextFrom = _to;
@@ -370,7 +380,7 @@ contract Abab is Ownable,Claimable,StandardToken {
         }
       }
     }
-    return totalCost;
+    return 0;
   }
 
   function Booking(address _host, uint _roomIndex, uint _from, uint _to)
