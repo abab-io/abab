@@ -154,7 +154,7 @@ module.exports = (API, redis) => {
                     index: param.address_index,
                 },
                 facilities: param.facilities,
-                location: [param.location_latitude, param.location_longitude],
+                location: [param.location_latitude*1, param.location_longitude*1],
                 txHash: null,
                 status: param.status //0 - draft , 1 - wait confirm, 2 - send to blockchain, 3 -success public
             }).save().then(function (document) {

@@ -9,7 +9,6 @@ var reactiveRooms = Ractive.extend({
 
 
             markers = res.rooms.map(function (room, i) {
-                console.log(room.location[0], room.location[1]);
                 if(room.location[0] && room.location[1]) {
                     var infowindow = new google.maps.InfoWindow({
                         content: '<div id="content">' +
@@ -27,7 +26,7 @@ var reactiveRooms = Ractive.extend({
                         maxWidth: 250
                     });
                     var marker = new google.maps.Marker({
-                        position: {lat: room.location[0], lng: room.location[1]},
+                        position: {lat: room.location[0]*1, lng: room.location[1]*1},
                         // label: ''
                         animation: google.maps.Animation.DROP,
                         map: map
@@ -37,7 +36,8 @@ var reactiveRooms = Ractive.extend({
                         infowindow.open(map, marker);
                     });
                     return marker;
-                }else return false;
+                }
+                else return false;
             });
             map = new google.maps.Map(document.getElementById('map-canvas'), {
                 zoom: 2,
