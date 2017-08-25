@@ -72,4 +72,27 @@ contract('Abab', function(accounts) {
 
     });
   });
+  
+  it("check CalcTotalCost (bug 'over end range' 20170821)", function() {
+    return Abab.deployed().then(function(instance) {
+      abab = instance;
+      
+      abab.UpsertSchedule(0/*_roomIndex*/, 9999999999/*_scheduleIndex*/, 200/*_from*/, 300/*_to*/, 1/*_dayPrice*/, 1/*_weekPrice*/, 1/*_monthPrice*/, 0/*_currency*/);
+      return abab.CalcTotalCost.call(accounts[0], 0, 250, 350);
+    }).then(function(result){
+      assert.equal(result.toNumber(), 0, "over end range");
+    });  
+  });
+  
+  it("zero in middele", function() {
+    return Abab.deployed().then(function(instance) {
+      abab = instance;
+      
+      abab.UpsertSchedule(0/*_roomIndex*/, 9999999999/*_scheduleIndex*/, 400/*_from*/, 440/*_to*/, 1/*_dayPrice*/, 1/*_weekPrice*/, 1/*_monthPrice*/, 0/*_currency*/);
+      abab.UpsertSchedule(0/*_roomIndex*/, 9999999999/*_scheduleIndex*/, 460/*_from*/, 500/*_to*/, 1/*_dayPrice*/, 1/*_weekPrice*/, 1/*_monthPrice*/, 0/*_currency*/);
+      return abab.CalcTotalCost.call(accounts[0], 0, 430, 470);
+    }).then(function(result){
+      assert.equal(result.toNumber(), 0, "over end range");
+    });  
+  });
 });

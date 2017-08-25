@@ -245,12 +245,19 @@ contract Abab is Ownable,Claimable,StandardToken {
       return rooms[msg.sender][_roomIndex].schedulesLength;
     }
 
-  function GetScheduleByIndex(uint _roomIndex, uint _index) 
+  function GetScheduleByIndex(address _host, uint _roomIndex, uint _index)
   public constant 
   returns(uint from, uint to, uint dayPrice, uint weekPrice, uint monthPrice) 
   {
-      var s = rooms[msg.sender][_roomIndex].schedules[_index];
+      var s = rooms[_host][_roomIndex].schedules[_index];
       return (s.from, s.to, s.dayPrice, s.weekPrice, s.monthPrice);
+  }
+
+  function GetMyScheduleByIndex(uint _roomIndex, uint _index) 
+  public constant 
+  returns(uint from, uint to, uint dayPrice, uint weekPrice, uint monthPrice) 
+  {
+      return GetScheduleByIndex(msg.sender, _roomIndex, _index);
   }
 
   function RemoveSchedule(uint _roomIndex, uint _scheduleIndex)
@@ -289,6 +296,8 @@ contract Abab is Ownable,Claimable,StandardToken {
   public constant
   returns(bool result)
   {
+    require(_to>=_from);
+    
     var room = rooms[_host][_roomIndex];
 
     //check, that this date don't booking
@@ -307,22 +316,30 @@ contract Abab is Ownable,Claimable,StandardToken {
     return true; 
   }
 
+  function min(uint arg1, uint arg2, uint arg3)
+  public 
+  constant
+  returns(uint result)
+  {
+    if((arg1<arg2)&&(arg1<arg3)) return arg1;
+    if((arg2<arg1)&&(arg2<arg3)) return arg2;
+    return arg3;
+  }
+  
   function CalcTotalCost(address _host, uint _roomIndex, uint _from, uint _to)
   public 
   constant
   returns(uint result)
   {
-    require(_to>=_from);
-
     //check, that this date don't booking
     if(!DateIsFree(_host, _roomIndex, _from, _to)) return 0;
 
     var room = rooms[_host][_roomIndex];
 
-    var schedulesLength = rooms[msg.sender][_roomIndex].schedulesLength;
+    var schedulesLength = rooms[_host][_roomIndex].schedulesLength;
 
-    uint needFrom = _from;
-    uint nextFrom = _to;
+    uint needFrom  = _from;
+    uint nextFrom  = maxUInt;
     uint daysCount = _to-_from;
     uint totalCost = 0;
 
@@ -342,7 +359,7 @@ contract Abab is Ownable,Claimable,StandardToken {
         // log2('nextFrom= ', nextFrom);
 
         uint price = daysCount>=30 ? schedules_i.monthPrice : daysCount>=7 ? schedules_i.weekPrice : schedules_i.dayPrice;
-        totalCost += price*(( schedules_i.to < nextFrom ? schedules_i.to : nextFrom ) - needFrom);
+        totalCost += price*(min( schedules_i.to, nextFrom, _to) - needFrom);
         needFrom = schedules_i.to<nextFrom ? schedules_i.to : nextFrom;
 
         // log('-----------------');
@@ -350,7 +367,7 @@ contract Abab is Ownable,Claimable,StandardToken {
         // log2('needFrom=' ,needFrom);
         // log2('totalCost=',totalCost);
         
-        if(needFrom>=_to) break;
+        if(needFrom>=_to) return totalCost;
  
         //needFrom = nextFrom;
         nextFrom = _to;
@@ -363,7 +380,7 @@ contract Abab is Ownable,Claimable,StandardToken {
         }
       }
     }
-    return totalCost;
+    return 0;
   }
 
   function Booking(address _host, uint _roomIndex, uint _from, uint _to)
@@ -378,7 +395,7 @@ contract Abab is Ownable,Claimable,StandardToken {
       uint _bookingIndex = room.bookingLength;
       room.booking[ _bookingIndex ] = BookingRecord(msg.sender, _from, _to, totalCost, 0, totalCost, 0);
       room.bookingLength = _bookingIndex + 1;
-      NewBooking(_host, _roomIndex, _bookingIndex); // TODO расчёт в AbabCoin
+      NewBooking(_host, _roomIndex, _bookingIndex); // TODO расчёт в AbabCoin 
     }
   }
   
@@ -412,20 +429,3 @@ contract Abab is Ownable,Claimable,StandardToken {
     }
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
