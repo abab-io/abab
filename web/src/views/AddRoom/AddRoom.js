@@ -45,8 +45,8 @@ ractiveComponent['reactive-AddRoomApp'].on('address', function () {
                 map2.setZoom(11);
 
 
-            ractiveComponent['reactive-AddRoomApp'].set('lng', results[0].geometry.location.lng());
-            ractiveComponent['reactive-AddRoomApp'].set('lat', results[0].geometry.location.lat());
+            ractiveComponent['reactive-AddRoomApp'].set('lng', results[0].geometry.location.lng().toFixed(3));
+            ractiveComponent['reactive-AddRoomApp'].set('lat', results[0].geometry.location.lat().toFixed(3));
             map2.setCenter({lng:results[0].geometry.location.lng(),lat:results[0].geometry.location.lat()});
             marker_home.setPosition({lng:results[0].geometry.location.lng(),lat:results[0].geometry.location.lat()});
         } else {
