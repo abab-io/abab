@@ -1,17 +1,20 @@
 
-var map2 = new google.maps.Map(document.getElementById('map-canvas2'), {
-    zoom: 1,
-    center: {lat: 20, lng: 20}
-});
+var map2 = false;
 var geocode =new google.maps.Geocoder();
-var marker_home = new google.maps.Marker({
-    position: {lat: 0, lng: -20},
-    map: map2,
-    draggable:true,
-    title:"Drag me!"
-});
+var marker_home = false;
 var reactiveAddRoom = Ractive.extend({
+
     oninit: function () {
+        map2 = new google.maps.Map(document.getElementById('map-canvas2'), {
+            zoom: 1,
+            center: {lat: 20, lng: 20}
+        });
+        marker_home = new google.maps.Marker({
+            position: {lat: 0, lng: -20},
+            map: map2,
+            draggable:true,
+            title:"Drag me!"
+        });
         console.log('reactiveAddRoom oninit');
     }
 });
