@@ -620,6 +620,8 @@
 
                 <h2>Место положение</h2>
                 <div class="inputContainer_nb">
+                    <input type="hidden" name="location_latitude" value="{{lat}}">
+                    <input type="hidden" name="location_longitude" value="{{lng}}">
                     <input type="text" name="address_country" autocomplete="off" class="input_clk" placeholder="Странна" value="" on-change="address"
                            style="height: 40px;
     font-size: 17px !important;">
@@ -627,7 +629,7 @@
                            value="" style="height: 40px;font-size: 17px !important;">
                     <input type="text" name="address_city" autocomplete="off" class="input_clk" placeholder="Город" value="" on-change="address"
                            style="height: 40px;font-size: 17px !important;">
-                    <input type="text" name="address_address" autocomplete="off" class="input_clk" placeholder="Аддрес (село,ул,дом)" value="" on-change="address"
+                    <input type="text" name="address_address" autocomplete="on" class="input_clk" placeholder="Аддрес (село,ул,дом)" value="" on-change="address"
                            style="height: 40px;font-size: 17px !important;">
                 </div>
                 <div class="inputContainer_nb" id="map-canvas2" style="height: 350px;">

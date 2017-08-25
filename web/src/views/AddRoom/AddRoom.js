@@ -16,6 +16,8 @@ var reactiveAddRoom = Ractive.extend({
     }
 });
 ractiveComponent['reactive-AddRoomApp'].set('photos', []);
+ractiveComponent['reactive-AddRoomApp'].set('lng', false);
+ractiveComponent['reactive-AddRoomApp'].set('lat', false);
 
 ractiveComponent['reactive-AddRoomApp'].on('address', function () {
     var formarr = $('#AddRoom').serializeArray();
@@ -41,6 +43,10 @@ ractiveComponent['reactive-AddRoomApp'].on('address', function () {
                 map2.setZoom(8);
             if(form_obj['address_address']  && form_obj['address_address']!== '')
                 map2.setZoom(11);
+
+
+            ractiveComponent['reactive-AddRoomApp'].set('lng', results[0].geometry.location.lng());
+            ractiveComponent['reactive-AddRoomApp'].set('lat', results[0].geometry.location.lat());
             map2.setCenter({lng:results[0].geometry.location.lng(),lat:results[0].geometry.location.lat()});
             marker_home.setPosition({lng:results[0].geometry.location.lng(),lat:results[0].geometry.location.lat()});
         } else {
