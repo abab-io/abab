@@ -416,4 +416,59 @@ module.exports = (API, redis) => {
         ]
     });
 
+    API.on('Booking', (user, param, callback) => {
+        let findPram = {};
+        if (!findPram._id){
+
+        }
+        if (findPram._id) findPram._id = db.mongoose.Types.ObjectId(findPram._id);
+
+        try {
+        } catch (e) {
+            return callback && callback(null, {
+                    error: error.api('param.find._id is not valid', 'param', e, 0),
+                    success: false
+                });
+        }
+        db.rooms.find(findPram).then(function (documents) {
+
+
+            return callback && callback(null, {
+                    rooms: documents,
+                    success: true
+                });
+        }).catch(function (err) {
+            return callback && callback(null, {
+                    error: error.api(err.message, 'db', err, 5),
+                    success: false
+                });
+
+        });
+
+    }, {
+        title: 'Booking Room',
+        description: 'Booking room',
+        param: [
+            {name: '_id', type: "string", title: '_id or _roomIndex', default: ''},
+            {name: '_roomIndex', type: "string", title: '_roomIndex or _id', default: ''},
+            {name: 'wallet', type: "string", title: 'address creater', default: '0x'},
+
+            {name: 'from', type: "int", title: 'date from', default: '0'},
+            {name: 'to', type: "int", title: 'date to', default: '0'},
+
+        ],
+        response: [
+            {name: 'success', type: "string", title: 'Success ?', default: 'true, false'},
+            {
+                name: 'txHash',
+                type: "string",
+                title: 'HASH transaction blockchain if status >2 else null',
+                default: '0x*******'
+            },
+            {name: 'error', type: "object", title: '', default: 'ERROR'},
+            {name: 'latency_ms', type: "int(11)", title: 'Processing time of the request in ms', default: '122'}
+        ]
+    });
+
+
 };

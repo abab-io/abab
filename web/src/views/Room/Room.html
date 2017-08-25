@@ -1,38 +1,38 @@
-<div class="nblsv page-content-Room"><div class="section-block lkbv tops">
+<div class="nblsv page-content-Room">
+    <div class="section-block lkbv tops">
 
 
-    <div class="col-lg-10 col-md-10">
-        <div class="slider slider-for">
-            {{#room.photo}}
-            <div>
-                <div class="slt-sl">
+        <div class="col-lg-10 col-md-10">
+            <div class="slider slider-for">
+                {{#room.photo}}
+                <div>
+                    <div class="slt-sl">
 
-                    <img data-toggle="modal" data-target="#img-room-{{.}}"
-                         src="{{fileUrl}}{{.}}.jpeg" alt="">
-                    <div data-toggle="modal" data-target="#img-room-{{.}}" class="zoom-s"></div>
+                        <img data-toggle="modal" data-target="#img-room-{{.}}"
+                             src="{{fileUrl}}{{.}}.jpeg" alt="">
+                        <div data-toggle="modal" data-target="#img-room-{{.}}" class="zoom-s"></div>
+                    </div>
                 </div>
+                {{/}}
             </div>
-            {{/}}
         </div>
-    </div>
 
-    <div class="col-lg-2 col-md-2">
-        <div class="slider slider-nav">
+        <div class="col-lg-2 col-md-2">
+            <div class="slider slider-nav">
 
-            {{#room.photo}}
-            <div>
-                <div class="slt-slg">
-                    <img src="{{fileUrl}}{{.}}.jpeg" alt=""></div>
+                {{#room.photo}}
+                <div>
+                    <div class="slt-slg">
+                        <img src="{{fileUrl}}{{.}}.jpeg" alt=""></div>
+                </div>
+                {{/}}
+
             </div>
-            {{/}}
-
         </div>
+        <div class="clearfix"></div>
     </div>
-    <div class="clearfix"></div>
-</div>
 </div>
 <div class="nblsv page-content-Room">
-
 
 
     <div class="fll-l">
@@ -222,16 +222,18 @@
                                 <br>
                                 <br>
                                 Неделя:
-                                <strong>{{discountWeek}}% (~{{(priceDay-(priceDay/100*discountWeek)).toFixed(0)}} день)</strong>
+                                <strong>{{discountWeek}}% (~{{(priceDay-(priceDay/100*discountWeek)).toFixed(0)}}
+                                    день)</strong>
                                 <br>
                                 <br>
                                 Месяц:
-                                <strong>{{discountMonth}}% (~{{(priceDay-(priceDay/100*discountMonth)).toFixed(0)}} день)</strong>
+                                <strong>{{discountMonth}}% (~{{(priceDay-(priceDay/100*discountMonth)).toFixed(0)}}
+                                    день)</strong>
                             </p>
 
                         </div>
                         <div class="txt-l-block" style="max-width: 400px;width: 100%">
-                        <hr>
+                            <hr>
                         </div>
                         {{/}}
                         <div class="txt-l-block" style="max-width: 390px;">
@@ -421,12 +423,20 @@
     <div class="fll-r">
         <div class="block-lb" style="overflow: hidden;">
             <div class="lorem-sl">
+                {{#if !loadingCost}}
                 {{#if intervalDate}}
-                500$ за {{intervalDate}} ночей
+                {{#if cost && +cost !== 0 }}
+                {{cost}} ABA за {{intervalDate}} ночей
+                {{else}}
+                Обект в данные дни не готов принимать гостей!
+                {{/if}}
                 {{else}}
                 от
                 <span>${{minimalPriceDay}}</span>
                 в сутки
+                {{/if}}
+                {{else}}
+                Расчет стоимости...
                 {{/if}}
             </div>
             <div class="row">
@@ -439,31 +449,31 @@
             </div>
 
             <!--<div class="row">-->
-                <!--<div class="col-sm-12">-->
-                    <!--<div class="input-area">-->
-                        <!--<label class="text-center" for="">Кол-во гостей</label>-->
+            <!--<div class="col-sm-12">-->
+            <!--<div class="input-area">-->
+            <!--<label class="text-center" for="">Кол-во гостей</label>-->
 
-                        <!--<div class="quantity bvcs">-->
-                            <!--<input type="number" min="1" max="9" step="1" value="1">-->
-                            <!--<div class="quantity-nav">-->
-                                <!--<div class="quantity-button quantity-up">+</div>-->
-                                <!--<div class="quantity-button quantity-down">-</div>-->
-                            <!--</div>-->
-                        <!--</div>-->
+            <!--<div class="quantity bvcs">-->
+            <!--<input type="number" min="1" max="9" step="1" value="1">-->
+            <!--<div class="quantity-nav">-->
+            <!--<div class="quantity-button quantity-up">+</div>-->
+            <!--<div class="quantity-button quantity-down">-</div>-->
+            <!--</div>-->
+            <!--</div>-->
 
 
-                        <!--<div class="section-block lkbv-n">-->
+            <!--<div class="section-block lkbv-n">-->
 
-                        <!--</div>-->
-                    <!--</div>-->
-                <!--</div>-->
+            <!--</div>-->
+            <!--</div>-->
+            <!--</div>-->
 
             <!--</div>-->
             <br>
 
             <div class="row">
                 <div class="col-sm-12">
-                    <button type="submit" class="button_mods" aria-busy="false">
+                    <button type="button" class="button_mods" aria-busy="false" on-click="booking">
             <span class="text_cvk">
               <span>Запросить бронирование</span>
             </span>
@@ -476,7 +486,7 @@
             <hr>
 
             <div class="txtl-a">
-                <p>За прошлую неделю объявление посмотрели 1300 раз</p>
+                <p>За прошлую неделю объявление посмотрели 13 раз</p>
 
                 <img src="data:image/svg+xml;utf8;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pgo8IS0tIEdlbmVyYXRvcjogQWRvYmUgSWxsdXN0cmF0b3IgMTYuMC4wLCBTVkcgRXhwb3J0IFBsdWctSW4gLiBTVkcgVmVyc2lvbjogNi4wMCBCdWlsZCAwKSAgLS0+CjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0iQ2FwYV8xIiB4PSIwcHgiIHk9IjBweCIgd2lkdGg9IjMycHgiIGhlaWdodD0iMzJweCIgdmlld0JveD0iMCAwIDU0LjMwOCA1NC4zMDgiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDU0LjMwOCA1NC4zMDg7IiB4bWw6c3BhY2U9InByZXNlcnZlIj4KPGc+Cgk8cGF0aCBkPSJNNTMuNTgzLDI1LjkwMWMtNS40NDgtOS40MTItMTUuNTc1LTE1LjI1OS0yNi40MjktMTUuMjU5UzYuMTczLDE2LjQ4OSwwLjcyNSwyNS45MDJMMCwyNy4xNTRsMC43MjUsMS4yNTEgICBjNS40NDgsOS40MTMsMTUuNTc1LDE1LjI2LDI2LjQyOSwxNS4yNnMyMC45ODEtNS44NDksMjYuNDI5LTE1LjI2bDAuNzI1LTEuMjUzTDUzLjU4MywyNS45MDF6IE0yNy43NTMsMzYuODMgICBjLTUuMzQyLDAtOS42ODgtNC4zNDctOS42ODgtOS42ODhzNC4zNDYtOS42ODgsOS42ODgtOS42ODhjMi4zMDEsMCw0LjQ2MSwwLjc5OSw2LjE2OCwyLjIyMmMtMi40NjgsMS41NzItNC4wNjcsNC4zMjctNC4wNjcsNy40NjYgICBjMCwzLjE0MSwxLjYsNS44OTUsNC4wNjgsNy40NjZDMzIuMjE0LDM2LjAzMSwzMC4wNTMsMzYuODMsMjcuNzUzLDM2LjgzeiBNNS44MjcsMjcuMTU0YzIuNTg3LTMuOTI3LDYuMTg5LTcuMDEyLDEwLjMzMy04Ljk5OCAgIGMtMS45MzIsMi40ODctMy4wOTUsNS42LTMuMDk1LDguOTg2YzAsMy40MDIsMS4xNzMsNi41MywzLjEyMyw5LjAyM0MxMi4wMzIsMzQuMTgsOC40MiwzMS4wOSw1LjgyNywyNy4xNTR6IE00MC4wNTIsMzUuMTM0ICAgYzAuMDc5LTAuMTIxLDAuMTYxLTAuMjM5LDAuMjM3LTAuMzYzbDIuMDk5LTMuNDQxbC00LjAxOS0wLjM1Yy0xLjk3MS0wLjE3Mi0zLjUxNi0xLjg1Ny0zLjUxNi0zLjgzOCAgIGMwLTEuOTgxLDEuNTQ1LTMuNjY2LDMuNTE2LTMuODM3bDQuMDItMC4zNDlsLTIuMS0zLjQ0M2MtMC4wNjgtMC4xMTEtMC4xNDMtMC4yMTUtMC4yMTMtMC4zMjRjMy4zMywxLjk2LDYuMjI5LDQuNjYyLDguNDA0LDcuOTY1ICAgQzQ2LjI5OSwzMC40NjUsNDMuMzkzLDMzLjE3Miw0MC4wNTIsMzUuMTM0eiIgZmlsbD0iI2U2YTgxNyIvPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+Cjwvc3ZnPgo=">
 

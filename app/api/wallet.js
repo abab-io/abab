@@ -41,7 +41,7 @@ module.exports = (API, redis) => {
             });
         },
         NewRoom: function (event, tx, callback) {
-            // console.log(event);
+            console.log(event);
 
             let _roomDescriptionHash = web3.fromDecimal(event.args._roomDescriptionHash);
             db.rooms.findOneAndUpdate({txHash: tx.tx.hash, _hash: _roomDescriptionHash, wallet: event.args.host}, {
@@ -49,6 +49,10 @@ module.exports = (API, redis) => {
                 _index: event.args.roomIndex,
                 status: 3
             }, {new: true}).populate('user').then(function (document) {
+                if(!document){
+                     console.log('[data]',{txHash: tx.tx.hash, _hash: _roomDescriptionHash, wallet: event.args.host});
+                    return console.error('[Error] EventBlock: '+event.blockNumber);
+                }
                 db.scheduleRoom.find({
                     room: db.mongoose.Types.ObjectId(document._doc._id),
                     "tx.status": 1
@@ -99,6 +103,8 @@ module.exports = (API, redis) => {
                     }, function () {
                         // console.log('scheduleRoom public:', arguments);
                         callback && callback(true);
+                    }).catch(function () {
+                        console.error('db event',arguments)
                     })
 
 

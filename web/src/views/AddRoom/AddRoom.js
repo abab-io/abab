@@ -1,3 +1,15 @@
+
+var map2 = new google.maps.Map(document.getElementById('map-canvas2'), {
+    zoom: 1,
+    center: {lat: 20, lng: 20}
+});
+var geocode =new google.maps.Geocoder();
+new google.maps.Marker({
+    position: {lat: 0, lng: -20},
+    map: map2,
+    draggable:true,
+    title:"Drag me!"
+});
 var reactiveAddRoom = Ractive.extend({
     oninit: function () {
         console.log('reactiveAddRoom oninit');
@@ -5,6 +17,21 @@ var reactiveAddRoom = Ractive.extend({
 });
 ractiveComponent['reactive-AddRoomApp'].set('photos', []);
 
+ractiveComponent['reactive-AddRoomApp'].on('address', function () {
+    geocode.geocode({address:'Украина'}, function(results, status) {
+        var formarr = $('#AddRoom').serializeArray();
+
+        console.log(results,status,formarr);
+        if (status == 'OK') {
+            map.setCenter(results[0].geometry.location);
+            var marker = new google.maps.Marker({
+                map: map,
+                position: results[0].geometry.location
+            });
+        } else {
+            // alert('Geocode was not successful for the following reason: ' + status);
+        }});
+});
 ractiveComponent['reactive-AddRoomApp'].on('submitRoom', function () {
     var formarr = $('#AddRoom').serializeArray();
     var form_obj = {};
@@ -79,7 +106,7 @@ ractiveComponent['reactive-AddRoomApp'].on('submitRoom', function () {
                     if (!resAPI || !resAPI.room || !resAPI.room.txHash)
                         swal({
                             title: 'Ошибка',
-                            type: 'Error',
+                            type: 'error',
                             confirmButtonText: 'Ok',
                             showCancelButton: false
                         });

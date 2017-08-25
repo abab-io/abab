@@ -90,16 +90,76 @@ ractiveComponent['reactive-RoomApp'].on('submitRoom', function () {
     console.log($('#AddRoom').serializeArray());
 });
 
+ractiveComponent['reactive-RoomApp'].on('booking', function () {
+    swal({
+        title: 'Подтверждение',
+        type: 'question',
+        confirmButtonText: 'Да',
+        cancelButtonText: 'Нет',
+        showCancelButton: true,
+        text: "Вы действительно хотите забронировать данный обект с "+ractiveComponent['reactive-RoomApp'].get('startDate')+' по '+ractiveComponent['reactive-RoomApp'].get('endDate'),
+        showLoaderOnConfirm: true,
+        preConfirm: function () {
+            swal({
+                title: ('Бронирование...'),
+                closeOnConfirm: false,
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                showConfirmButton: true,
+                showCancelButton: false,
+                showLoaderOnConfirm: true,
+                text: _chat_e('Может занять несколько секунд'),
+                preConfirm: function () {
+                    return new Promise(function (resolve, reject) {
+                        // here should be AJAX request
+                        setTimeout(function () {
+                            resolve();
+                        }, 30000);
+                    });
+                },
+            });
+            swal.showLoading();
+            var room_data = ractiveComponent['reactive-RoomApp'].get('room');
+            var sd = ractiveComponent['reactive-RoomApp'].get('startDateDay');
+            var ed = ractiveComponent['reactive-RoomApp'].get('endDateDay');
+            API('fn_CalcTotalCost',{_host:room_data.wallet,_roomIndex:room_data._index,_from:sd,_to:ed},true,function (res) {
+                if(!res.result.result || +res.result.result <= 0){
+                    swal({
+                        title: 'Ошибка',
+                        type: 'error',
+                        text: 'Обект не готов принимать гостей в данные числа попробуйте другие  или выбирите другой обект',
+                        confirmButtonText: 'Ок',
+                        showCancelButton: false
+                    });
+                }
+
+            },true)
+        }
+    });
+
+});
+
 init_daterangepicker('#period-input-date-booking', function (start, end, days) {
+    var room_data = ractiveComponent['reactive-RoomApp'].get('room');
     console.log(start, end, days);
+    console.log(room_data);
     ractiveComponent['reactive-RoomApp'].set('intervalDate', days);
     ractiveComponent['reactive-RoomApp'].set('startDate', start.format('DD.MM.YY'));
     ractiveComponent['reactive-RoomApp'].set('endDate', end.format('DD.MM.YY'));
-    ractiveComponent['reactive-RoomApp'].set('startDateDay', +(moment.utc(start.format('DD.MM.YY'), 'DD.MM.YY').unix() / (24 * 60 * 60)).toFixed(0));
-    ractiveComponent['reactive-RoomApp'].set('endDateDay', + (moment.utc(end.format('DD.MM.YY'), 'DD.MM.YY').unix() / (24 * 60 * 60)).toFixed(0));
+    var sd = +(moment.utc(start.format('DD.MM.YY'), 'DD.MM.YY').unix() / (24 * 60 * 60)).toFixed(0);
+    var ed = +(moment.utc(end.format('DD.MM.YY'), 'DD.MM.YY').unix() / (24 * 60 * 60)).toFixed(0);
+    ractiveComponent['reactive-RoomApp'].set('startDateDay',sd);
+    ractiveComponent['reactive-RoomApp'].set('endDateDay', ed);
+    ractiveComponent['reactive-RoomApp'].set('loadingCost', true);
 
+    API('fn_CalcTotalCost',{_host:room_data.wallet,_roomIndex:room_data._index,_from:sd,_to:ed},true,function (res) {
+        console.log(res);
+        ractiveComponent['reactive-RoomApp'].set('cost', res.result.result);
+        ractiveComponent['reactive-RoomApp'].set('loadingCost', false);
 
+    },true)
 });
+
 
 //
 //

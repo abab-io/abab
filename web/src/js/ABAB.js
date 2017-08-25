@@ -232,7 +232,16 @@ function updatePlugins() {
 
     });
 }
+function initMap() {
+    ABAB.map.init=true;
+    ABAB.map.fn(true);
+
+}
 var ABAB = {
+    map:{
+        init:false,
+        fn:function(){}
+    },
     event: {},
     page: null,
     pageObj: {
