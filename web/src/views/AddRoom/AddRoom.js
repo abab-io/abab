@@ -4,7 +4,7 @@ var map2 = new google.maps.Map(document.getElementById('map-canvas2'), {
     center: {lat: 20, lng: 20}
 });
 var geocode =new google.maps.Geocoder();
-new google.maps.Marker({
+var marker_home = new google.maps.Marker({
     position: {lat: 0, lng: -20},
     map: map2,
     draggable:true,
@@ -18,16 +18,31 @@ var reactiveAddRoom = Ractive.extend({
 ractiveComponent['reactive-AddRoomApp'].set('photos', []);
 
 ractiveComponent['reactive-AddRoomApp'].on('address', function () {
-    geocode.geocode({address:'Украина'}, function(results, status) {
-        var formarr = $('#AddRoom').serializeArray();
+    var formarr = $('#AddRoom').serializeArray();
+    var form_obj = {};
+    for (var i in formarr) {
+        if (form_obj[formarr[i].name] && typeof form_obj[formarr[i].name] === 'string') {
+            form_obj[formarr[i].name] = [form_obj[formarr[i].name], formarr[i].value];
+        } else if (form_obj[formarr[i].name] && typeof form_obj[formarr[i].name] === 'object') {
+            form_obj[formarr[i].name].push(formarr[i].value);
+        } else
+            form_obj[formarr[i].name] = formarr[i].value
+    }
+    geocode.geocode({address:form_obj['address_address']+','+form_obj['address_city']+','+form_obj['address_state']+','+form_obj['address_country']}, function(results, status) {
 
-        console.log(results,status,formarr);
+        // console.log(results[0].geometry.location.lat(),status,form_obj);
+        // console.log(results[0].geometry.location.lng(),status,form_obj);
         if (status == 'OK') {
-            map.setCenter(results[0].geometry.location);
-            var marker = new google.maps.Marker({
-                map: map,
-                position: results[0].geometry.location
-            });
+            if(form_obj['address_country']  && form_obj['address_country']!== '')
+                map2.setZoom(4);
+            if(form_obj['address_state']  && form_obj['address_state']!== '')
+                map2.setZoom(6);
+            if(form_obj['address_city']  && form_obj['address_city']!== '')
+                map2.setZoom(8);
+            if(form_obj['address_address']  && form_obj['address_address']!== '')
+                map2.setZoom(11);
+            map2.setCenter({lng:results[0].geometry.location.lng(),lat:results[0].geometry.location.lat()});
+            marker_home.setPosition({lng:results[0].geometry.location.lng(),lat:results[0].geometry.location.lat()});
         } else {
             // alert('Geocode was not successful for the following reason: ' + status);
         }});
