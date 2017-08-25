@@ -9,7 +9,8 @@ var reactiveRooms = Ractive.extend({
 
 
             markers = res.rooms.map(function (room, i) {
-                if(room.location[0] && room.location[0]) {
+                console.log(room.location[0], room.location[1]);
+                if(room.location[0] && room.location[1]) {
                     var infowindow = new google.maps.InfoWindow({
                         content: '<div id="content">' +
                         '<div id="siteNotice">' +
@@ -36,7 +37,7 @@ var reactiveRooms = Ractive.extend({
                         infowindow.open(map, marker);
                     });
                     return marker;
-                }
+                }else return false;
             });
             map = new google.maps.Map(document.getElementById('map-canvas'), {
                 zoom: 2,
