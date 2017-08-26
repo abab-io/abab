@@ -6,13 +6,12 @@ var reactiveRoom = Ractive.extend({
 
         API('GetRooms', {find: {_id: ABAB.pageObj.tab_page}}, true, function (res) {
             map3 = new google.maps.Map(document.getElementById('map-canvas3'), {
-                zoom: 1,
-                center: {lat: 20, lng: 20}
+                zoom: 11,
+                center: {lat: 1*res.rooms[0].location[0], lng: 1*res.rooms[0].location[0]}
             });
             marker_homeThis = new google.maps.Marker({
-                position: {lat: 0, lng: -20},
-                map: map2,
-                draggable:true,
+                position:  {lat: 1*res.rooms[0].location[0], lng: 1*res.rooms[0].location[0]},
+                map: map3,
                 title:"Drag me!"
             });
             console.log(res);
