@@ -1,7 +1,20 @@
+var map3;
+var marker_homeThis;
 var reactiveRoom = Ractive.extend({
     oninit: function () {
         console.log('reactiveAddRoom oninit');
+
         API('GetRooms', {find: {_id: ABAB.pageObj.tab_page}}, true, function (res) {
+            map3 = new google.maps.Map(document.getElementById('map-canvas3'), {
+                zoom: 1,
+                center: {lat: 20, lng: 20}
+            });
+            marker_homeThis = new google.maps.Marker({
+                position: {lat: 0, lng: -20},
+                map: map2,
+                draggable:true,
+                title:"Drag me!"
+            });
             console.log(res);
             if (res.error || !res.rooms || res.rooms.length !== 1) {
                 ABAB.setPage('Rooms', 'all');
@@ -84,6 +97,31 @@ var reactiveRoom = Ractive.extend({
             }
 
         }, true);
+
+
+        init_daterangepicker('#period-input-date-booking', function (start, end, days) {
+            var room_data = ractiveComponent['reactive-RoomApp'].get('room');
+            console.log(start, end, days);
+            console.log(room_data);
+            ractiveComponent['reactive-RoomApp'].set('intervalDate', days);
+            ractiveComponent['reactive-RoomApp'].set('startDate', start.format('DD.MM.YY'));
+            ractiveComponent['reactive-RoomApp'].set('endDate', end.format('DD.MM.YY'));
+            var sd = +(moment.utc(start.format('DD.MM.YY'), 'DD.MM.YY').unix() / (24 * 60 * 60)).toFixed(0);
+            var ed = +(moment.utc(end.format('DD.MM.YY'), 'DD.MM.YY').unix() / (24 * 60 * 60)).toFixed(0);
+            ractiveComponent['reactive-RoomApp'].set('startDateDay',sd);
+            ractiveComponent['reactive-RoomApp'].set('endDateDay', ed);
+            ractiveComponent['reactive-RoomApp'].set('loadingCost', true);
+
+            API('fn_CalcTotalCost',{_host:room_data.wallet,_roomIndex:room_data._index,_from:sd,_to:ed},true,function (res) {
+                console.log(res);
+                ractiveComponent['reactive-RoomApp'].set('cost', res.result.result);
+                ractiveComponent['reactive-RoomApp'].set('loadingCost', false);
+
+            },true)
+        });
+
+
+
     }
 });
 ractiveComponent['reactive-RoomApp'].on('submitRoom', function () {
@@ -138,29 +176,6 @@ ractiveComponent['reactive-RoomApp'].on('booking', function () {
     });
 
 });
-
-init_daterangepicker('#period-input-date-booking', function (start, end, days) {
-    var room_data = ractiveComponent['reactive-RoomApp'].get('room');
-    console.log(start, end, days);
-    console.log(room_data);
-    ractiveComponent['reactive-RoomApp'].set('intervalDate', days);
-    ractiveComponent['reactive-RoomApp'].set('startDate', start.format('DD.MM.YY'));
-    ractiveComponent['reactive-RoomApp'].set('endDate', end.format('DD.MM.YY'));
-    var sd = +(moment.utc(start.format('DD.MM.YY'), 'DD.MM.YY').unix() / (24 * 60 * 60)).toFixed(0);
-    var ed = +(moment.utc(end.format('DD.MM.YY'), 'DD.MM.YY').unix() / (24 * 60 * 60)).toFixed(0);
-    ractiveComponent['reactive-RoomApp'].set('startDateDay',sd);
-    ractiveComponent['reactive-RoomApp'].set('endDateDay', ed);
-    ractiveComponent['reactive-RoomApp'].set('loadingCost', true);
-
-    API('fn_CalcTotalCost',{_host:room_data.wallet,_roomIndex:room_data._index,_from:sd,_to:ed},true,function (res) {
-        console.log(res);
-        ractiveComponent['reactive-RoomApp'].set('cost', res.result.result);
-        ractiveComponent['reactive-RoomApp'].set('loadingCost', false);
-
-    },true)
-});
-
-
 //
 //
 
