@@ -12,10 +12,10 @@ var reactiveRoom = Ractive.extend({
                 return swal('Уппс...', 'Не удалось загрузить комнату', 'error')
             }
             ractiveComponent['reactive-RoomApp'].set('room', res.rooms[0]);
-            var minimalPriceDay = 99999999999;
+            var minimalPriceDay = 999999999;
             for (var k in  res.rooms[0].dateRanges) {
-                if (minimalPriceDay > res.rooms[0].dateRanges[k].priceDay) {
-                    minimalPriceDay = res.rooms[0].dateRanges[k].priceDay
+                if (minimalPriceDay > res.rooms[0].dateRanges[k].dayPrice) {
+                    minimalPriceDay = res.rooms[0].dateRanges[k].dayPrice
                 }
             }
             map3 = new google.maps.Map(document.getElementById('map-canvas3'), {

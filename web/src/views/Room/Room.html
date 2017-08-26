@@ -210,7 +210,7 @@
                                 Стоимость за <strong>1 ночь</strong>:
                                 <br>
                                 <br>
-                                <strong style="font-size: 25px;padding: 10px;">${{dayPrice}}</strong>
+                                <strong style="font-size: 25px;padding: 10px;"> {{dayPrice}} ABA</strong>
                             </p>
 
 
@@ -222,12 +222,12 @@
                                 <br>
                                 <br>
                                 Неделя:
-                                <strong>{{discountWeek}}% (~{{(weekPrice).toFixed(0)}}
+                                <strong>{{discountWeek}}% (~{{(weekPrice).toFixed(0)}} ABA
                                     день)</strong>
                                 <br>
                                 <br>
                                 Месяц:
-                                <strong>{{discountMonth}}% (~{{(monthPrice).toFixed(2)}}
+                                <strong>{{discountMonth}}% (~{{(monthPrice).toFixed(2)}}ABA
                                     день)</strong>
                             </p>
 
@@ -432,7 +432,7 @@
                 {{/if}}
                 {{else}}
                 от
-                <span>${{minimalPriceDay}}</span>
+                <span>{{minimalPriceDay}} ABA</span>
                 в сутки
                 {{/if}}
                 {{else}}
