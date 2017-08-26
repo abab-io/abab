@@ -6,6 +6,7 @@ const error = require('../modules/error/api');
 const aws = require('../modules/aws-amazon-s3');
 const crypto = require('crypto');
 var moment = require('moment');
+const async = require('async');
 module.exports = (API, redis) => {
     API.on('GetRooms', true, (user, param, callback) => {
         let findPram = {};
@@ -19,12 +20,45 @@ module.exports = (API, redis) => {
                 });
         }
         db.rooms.find(findPram).then(function (documents) {
-
-
-            return callback && callback(null, {
-                    rooms: documents,
-                    success: true
+            async.reduce([1, 2, 3], 0, function (memo, item, callback) {
+                // pointless async:
+                process.nextTick(function () {
+                    callback(null, memo + item)
                 });
+            }, function (err, result) {
+                // result is now equal to the last value of memo, which is 6
+            });
+            async.reduce(documents, {}, function (obj, room, cb) {
+                db.scheduleRoom.find({
+                    room: db.mongoose.Types.ObjectId(room._id),
+                    // "tx.status": 1
+                }).then(function (schedules) {
+                    obj[room._id] = schedules;
+                    cb(null, obj)
+                }).catch(function (err) {
+                    return callback && callback(null, {
+                            error: error.api(err.message, 'db', err, 5),
+                            success: false
+                        });
+
+                });
+            }, function (err, res) {
+                if (err)
+                    return callback && callback(null, {
+                            error: error.api('scheduleRoom get error', 'async', err, 5),
+                            success: false
+                        });
+                let all = documents.map(function (roomOne) {
+                    if (!res[roomOne._doc._id]) roomOne._doc.dateRanges = [];
+                    if (res[roomOne._doc._id]) roomOne._doc.dateRanges = res[roomOne._doc._id];
+                    return roomOne._doc;
+                });
+                return callback && callback(null, {
+                        rooms: all,
+                        success: true
+                    });
+            });
+
         }).catch(function (err) {
             return callback && callback(null, {
                     error: error.api(err.message, 'db', err, 5),
@@ -154,7 +188,7 @@ module.exports = (API, redis) => {
                     index: param.address_index,
                 },
                 facilities: param.facilities,
-                location: [param.location_latitude*1, param.location_longitude*1],
+                location: [param.location_latitude * 1, param.location_longitude * 1],
                 txHash: null,
                 status: param.status //0 - draft , 1 - wait confirm, 2 - send to blockchain, 3 -success public
             }).save().then(function (document) {
@@ -418,7 +452,7 @@ module.exports = (API, redis) => {
 
     API.on('Booking', (user, param, callback) => {
         let findPram = {};
-        if (!findPram._id){
+        if (!findPram._id) {
 
         }
         if (findPram._id) findPram._id = db.mongoose.Types.ObjectId(findPram._id);

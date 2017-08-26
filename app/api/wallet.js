@@ -103,11 +103,11 @@ module.exports = (API, redis) => {
                     }, function () {
                         // console.log('scheduleRoom public:', arguments);
                         callback && callback(true);
-                    }).catch(function () {
-                        console.error('db event',arguments)
                     })
 
 
+                }).catch(function () {
+                    console.error('db event',arguments)
                 });
 
 
