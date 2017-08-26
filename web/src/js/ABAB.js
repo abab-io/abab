@@ -102,7 +102,7 @@ function API(method, param, _public, cb, reset_cb) {
     } else {
         if(_public) method = 'public_'+method;
         $.ajax({
-            url: "http://localhost:8000/api/v1/?method="+method+"&api_key=DJUQU-PkRT1Upz-SNgol-Y4gdX-dD7OC3-1500657341036",
+            url: "/api/v1/?method="+method+"&api_key=DJUQU-PkRT1Upz-SNgol-Y4gdX-dD7OC3-1500657341036",
             type: "get", //send it through get method
             data: param,
             success: function (response) {
