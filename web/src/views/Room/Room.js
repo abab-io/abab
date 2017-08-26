@@ -12,7 +12,7 @@ var reactiveRoom = Ractive.extend({
             marker_homeThis = new google.maps.Marker({
                 position:  {lat: 1*res.rooms[0].location[0], lng: 1*res.rooms[0].location[0]},
                 map: map3,
-                title:"Drag me!"
+                title:"This room!"
             });
             console.log(res);
             if (res.error || !res.rooms || res.rooms.length !== 1) {
