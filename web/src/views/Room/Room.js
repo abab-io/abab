@@ -5,15 +5,7 @@ var reactiveRoom = Ractive.extend({
         console.log('reactiveAddRoom oninit');
 
         API('GetRooms', {find: {_id: ABAB.pageObj.tab_page}}, true, function (res) {
-            map3 = new google.maps.Map(document.getElementById('map-canvas3'), {
-                zoom: 11,
-                center: {lat: 1*res.rooms[0].location[0], lng: 1*res.rooms[0].location[0]}
-            });
-            marker_homeThis = new google.maps.Marker({
-                position:  {lat: 1*res.rooms[0].location[0], lng: 1*res.rooms[0].location[0]},
-                map: map3,
-                title:"This room!"
-            });
+
             console.log(res);
             if (res.error || !res.rooms || res.rooms.length !== 1) {
                 ABAB.setPage('Rooms', 'all');
@@ -26,6 +18,15 @@ var reactiveRoom = Ractive.extend({
                     minimalPriceDay = res.rooms[0].dateRanges[k].priceDay
                 }
             }
+            map3 = new google.maps.Map(document.getElementById('map-canvas3'), {
+                zoom: 13,
+                center: {lat: 1*res.rooms[0].location[0], lng: 1*res.rooms[0].location[1]}
+            });
+            marker_homeThis = new google.maps.Marker({
+                position:  {lat: 1*res.rooms[0].location[0], lng: 1*res.rooms[0].location[1]},
+                map: map3,
+                title:"This room!"
+            });
             ractiveComponent['reactive-RoomApp'].set('minimalPriceDay', minimalPriceDay);
 
             if ($(window).width() > 991) {
