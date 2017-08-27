@@ -158,6 +158,41 @@
                                             </div>
                                         </div>
                                         <div style="margin-bottom: 16px;">
+                                            <div class="inspectletIgnore">
+                                                <div class="container_mods">
+                                                    <label class="label_modx" for="email-login-name">Имя</label>
+                                                    <div class="container_mod-sl">
+                                                        <!--<div class="postfix_arx"><i class="fa fa-envelope-o"-->
+                                                        <!--aria-hidden="true"></i>-->
+
+                                                        <!--</div>-->
+                                                        <div class="inputContainer_forms">
+                                                            <input type="email" aria-label="Имя"
+                                                                   class="input_pss" id="email-login-name" name="name"
+                                                                   placeholder="Имя" value=""></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div style="margin-bottom: 16px;">
+                                            <div class="inspectletIgnore">
+                                                <div class="container_mods">
+                                                    <label class="label_modx" for="email-login-surname">Фамилия</label>
+                                                    <div class="container_mod-sl">
+                                                        <!--<div class="postfix_arx"><i class="fa fa-envelope-o"-->
+                                                        <!--aria-hidden="true"></i>-->
+
+                                                        <!--</div>-->
+                                                        <div class="inputContainer_forms">
+                                                            <input type="email" aria-label="Фамилия"
+                                                                   class="input_pss" id="email-login-surname"
+                                                                   name="surname"
+                                                                   placeholder="Фамилия" value=""></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div style="margin-bottom: 16px;">
                                             <div>
                                                 <div class="container_mods">
                                                     <label class="label_modx" for="email-login-password">Пароль</label>
@@ -179,7 +214,8 @@
                                         <div style="margin-bottom: 16px;">
                                             <div>
                                                 <div class="container_mods">
-                                                    <label class="label_modx" for="email-login-password">Пароль</label>
+                                                    <label class="label_modx" for="email-login-password2">Пароль еще
+                                                        раз</label>
                                                     <div class="container_mod-sl">
                                                         <div class="postfix_arx"><i class="fa fa-key"
                                                                                     aria-hidden="true"></i>
@@ -187,9 +223,10 @@
                                                         </div>
                                                         <div class="inputContainer_forms">
                                                             <input type="password" autocomplete="off"
-                                                                   aria-label="Пароль" class="input_pss"
-                                                                   id="email-login-password" name="password"
-                                                                   placeholder="Пароль" value="" autocorrect="off"
+                                                                   aria-label="Пароль еще раз" class="input_pss"
+                                                                   id="email-login-password2" name="password"
+                                                                   placeholder="Пароль еще раз" value=""
+                                                                   autocorrect="off"
                                                                    autocapitalize="off" spellcheck="false"></div>
                                                     </div>
                                                 </div>
@@ -200,7 +237,7 @@
                                             <button type="button" class="button_mods" aria-busy="false"
                                                     on-click="auth_start">
                           <span class="text_cvk">
-                            <span>Войти</span>
+                            <span>Зарегистрироваться</span>
                           </span>
                                             </button>
 
@@ -278,7 +315,11 @@
                         <span class="link_xpx" style="cursor: pointer;">
                           <div class="wrapper_conts">
                             <div class="content_aix">
-                              <span data-toggle="modal" data-target="#formModal">Войти</span>
+                                {{#if user}}
+                                    <span>{{user.name}} {{user.surname}}</span>
+                                {{else}}
+                                    <span data-toggle="modal" data-target="#formModal">Войти</span>
+                                {{/if}}
 
                             </div>
 
