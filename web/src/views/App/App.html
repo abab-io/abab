@@ -27,13 +27,12 @@
                     <section>
                         <div>
                             <div>
-                                <form action="/authenticate" method="POST">
+                                <form action="#" method="get" onsubmit="return false;" id="auth_form">
 
                                     <div>
                                         <div style="margin-bottom: 16px;">
-                                            <input type="hidden" name="from" value="email_login"></div>
-                                        <div style="margin-bottom: 16px;">
-                                            <input type="hidden" name="airlock_id" value=""></div>
+                                            <input type="hidden" name="from" value="login"></div>
+
                                         <div style="margin-bottom: 16px;">
                                             <div class="inspectletIgnore">
                                                 <div class="container_mods">
@@ -79,7 +78,7 @@
                                 <span class="container_foa2bi">
                                   <div class="checkbox">
                                     <label>
-                                      <input type="checkbox" value="" checked="">
+                                      <input type="checkbox" value="" checked="" name="forget">
                                       <span class="cr">
                                         <i class="cr-icon glyphicon glyphicon-ok"></i>
                                       </span> <b>Запомнить меня</b>
@@ -91,19 +90,19 @@
 
                                                     </label>
                                                 </div>
-                                                <div class="pull-right va-middle">
-                                                    <div class="text_alt_area">
-                                                        <a href="/forgot_password" class="component_9w5i1l"
-                                                           aria-disabled="false" aria-busy="false">Забыли пароль?</a>
-                                                    </div>
-                                                </div>
+                                                <!--<div class="pull-right va-middle">-->
+                                                <!--<div class="text_alt_area">-->
+                                                <!--<a href="/forgot_password" class="component_9w5i1l"-->
+                                                <!--aria-disabled="false" aria-busy="false">Забыли пароль?</a>-->
+                                                <!--</div>-->
+                                                <!--</div>-->
                                             </div>
                                         </div>
                                         <div style="margin-bottom: 16px;">
                                             <div id="airlock-inline-container"></div>
                                         </div>
                                         <div style="margin-bottom: 16px;">
-                                            <button type="submit" class="button_mods" aria-busy="false">
+                                            <button type="button" class="button_mods" aria-busy="false" on-click="login">
                           <span class="text_cvk">
                             <span>Войти</span>
                           </span>
@@ -121,7 +120,7 @@
                     <span class="text_bnv">Не зарегистрированы на Abab.io?</span>
                     <div class="inlineBlock_tops" style="margin-left: 8px; margin-right: 8px;">
                       <span class="text_alk">
-                        <a href="/signup_login?" class="component_9w5i1l" aria-disabled="false" aria-busy="false">Зарегистрироваться</a>
+                        <a class="component_9w5i1l pointer" on-click="register_modal" aria-disabled="false" aria-busy="false">Зарегистрироваться</a>
                       </span>
                     </div>
                   </span>

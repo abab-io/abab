@@ -22,6 +22,15 @@ var reactiveApp = Ractive.extend({
 });
 
 
+ractiveComponent['rootApp'].on('register_modal', function () {
+    console.log('register_modal click');
+});
+
+ractiveComponent['rootApp'].on('login', function () {
+    console.log('login click');
+    console.log($('#auth_form').serializeArray());
+
+});
 window.onpopstate = function (event) {
     if (location.hash.replace('#', '').split('-')[0] && location.hash.replace('#', '').split('-')[0] != '')
         ABAB.setPage(location.hash.replace('#', '').split('-')[0], location.hash.replace('#', '').split('-')[1], true);
