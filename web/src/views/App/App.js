@@ -82,6 +82,8 @@ ractiveComponent['rootApp'].on('auth_start', function () {
             name: form_obj.name,
             surname: form_obj.surname
         }, function (res) {
+            if (res.error)
+                return swal('Ошибка авторизации', res.error.message, 'error');
             console.log(res);
         }, true)
     }
