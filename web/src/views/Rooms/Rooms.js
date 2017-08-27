@@ -17,7 +17,7 @@ var reactiveRooms = Ractive.extend({
                         '<h1 id="firstHeading" class="firstHeading">' + room.title + '</h1>' +
                         '<div id="bodyContent">' +
                         '<p><b>' + room.title + '</b></p>' +
-                        '<p>Transaction: <a href="//' + room.txHash + '" target="_blank">' +
+                        '<p>Transaction: <a href="'+ractiveComponent['reactive-RoomsApp'].get('blockchain_url')+'tx/' + room.txHash + '" target="_blank">' +
                         room.txHash + '</a>' +
                         '<br>' +
                         '(last update ' + room.update_at.split('T')[0] + ').</p>' +
