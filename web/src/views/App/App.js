@@ -84,6 +84,9 @@ ractiveComponent['rootApp'].on('auth_start', function () {
         }, function (res) {
             if (res.error)
                 return swal('Ошибка авторизации', res.error.message, 'error');
+             swal('Успешно зарегестрированны', 'На вашу почту "'+form_obj.email+'", было отправлено письмо с ссылкой на активацию аккаунта', 'success');
+            if (ractiveComponent['rootApp'].get('auth_type') === 'reg') ractiveComponent['rootApp'].set('auth_type', 'login');
+
             console.log(res);
         }, true)
     }
