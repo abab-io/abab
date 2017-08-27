@@ -44,23 +44,27 @@ ractiveComponent['rootApp'].on('change_type_auth_modal', function () {
     console.log('register_modal click');
 });
 if (localStorage.getItem('auth')) {
-    var loginData = JSON.parse(localStorage.getItem('auth'));
-    API('public_auth_email', loginData, function (res) {
-        console.log(res);
-        if (res.error) {
-            localStorage.removeItem('auth');
-            return swal('Ошибка авторизации', res.error.message, 'error');
-        }
-        if (res.success && res.user) {
-            ABAB.auth(res);
+    try {
+        var loginData = JSON.parse(localStorage.getItem('auth'));
+        API('public_auth_email', loginData, function (res) {
+            console.log(res);
+            if (res.error) {
+                localStorage.removeItem('auth');
+                return swal('Ошибка авторизации', res.error.message, 'error');
+            }
+            if (res.success && res.user) {
+                ABAB.auth(res);
 
-        } else {
-            localStorage.removeItem('auth');
-            return swal('Ошибка авторизации', res.error.message, 'error');
-        }
-    }, true)
+            } else {
+                localStorage.removeItem('auth');
+                return swal('Ошибка авторизации', res.error.message, 'error');
+            }
+        }, true);
+    }catch (e){
+        console.error('auth storage parse',e);
+        localStorage.removeItem('auth');
+    }
 }
-console.log(JSON.parse(localStorage.getItem('auth')));
 ractiveComponent['rootApp'].on('auth_start', function () {
     console.log('login click');
     var formarr = $('#auth_form').serializeArray();
