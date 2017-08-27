@@ -320,11 +320,11 @@
                                     <div class="sectionContainer_atr">
                                         <div class="cardGrid_o1rkka">
                                             {{#rooms}}
-                                            <div class="container_grd" >
+                                            <div class="container_grd">
                                                 <div class="cardContainer_bn">
                                                     <div>
 
-                                                        <div class="listingCardWrapper_xs" >
+                                                        <div class="listingCardWrapper_xs">
                                                             <div class="comment">
                                                                 <a href="#Room-{{_id}}"><span>Подробнее</span></a>
                                                             </div>
@@ -468,33 +468,18 @@
                       <div>
                         <ul data-id="SearchResultsPagination" class="buttonList_vc">
                           <li class="buttonContainer_lbv">
-                            <a href="#1" class="link_page-active">
+                            <a class="link_page-active pointer" on-click="pageset:1">
                               <div class="numberContainer_btx-o">1</div>
                             </a>
                           </li>
-                          <li class="buttonContainer_arm">
-                            <a href="#3" class="link_page">
-                              <div class="numberContainer_btx">2</div>
+                            <li class="buttonContainer_arm-ox">
+                                <a class="link_page pointer" on-click="pageset:2">
+                                    <div class="numberContainer_btx-o">2</div>
                             </a>
                           </li>
-                          <li class="buttonContainer_arm">
-                                                        <a href="#3" class="link_page">
 
-                              <div class="numberContainer_btx">3</div>
-                            </a>
-                          </li>
-                          <li class="buttonContainer_arm">
-                            <div class="more-page_main">
-                              <div class="more-page_">…</div>
-                            </div>
-                          </li>
-                          <li class="buttonContainer_arm">
-                            <a href="#17" class="link_page">
-                              <div class="numberContainer_btx">17</div>
-                            </a>
-                          </li>
                           <li class="buttonContainer_arm-ox">
-                            <a href="#next" class="link_page">
+                            <a href="" class="link_page pointer">
                               <div class="chevronButton_x">
                                 <div class="chevronContainer_xb">
                                   <svg viewBox="0 0 18 18" role="img" focusable="false"
@@ -512,14 +497,14 @@
                                     </nav>
                                     <div style="margin-top: 8px;">
                     <span>
-                      <span>1</span>
+                      <span>{{+(rooms_count.skip+1)}}</span>
                        –
-                      <span>19</span>
+                      <span>{{+(rooms_count.skip+rooms.length)}}</span>
 
                       из
 
                       <span>
-                        <span>0+ вариантов </span>
+                        <span>{{rooms_count.room}} вариантов </span>
                       </span>
                     </span>
                                     </div>
@@ -662,7 +647,8 @@
                                                                 <div style="margin-top: 16px;">
                                                                     <ul class="listLayout_nb">
                                                                         <li class="item_xca">
-                                                                            <a href="#page-development" class="component_auto"
+                                                                            <a href="#page-development"
+                                                                               class="component_auto"
                                                                                aria-disabled="false" aria-busy="false">
                                                                                 <span>Доверие и безопасность</span>
                                                                             </a>
@@ -683,9 +669,10 @@
                                                                 <div style="margin-top: 16px;">
                                                                     <ul class="listLayout_nb">
                                                                         <li class="item_xca">
-                                                                            <a href="#Create-Room" style="cursor: pointer"
+                                                                            <a href="#Create-Room"
+                                                                               style="cursor: pointer"
                                                                                class="component_auto">
-                                                                                <span >+ Добавить свой обект</span>
+                                                                                <span>+ Добавить свой обект</span>
                                                                             </a>
                                                                         </li>
 

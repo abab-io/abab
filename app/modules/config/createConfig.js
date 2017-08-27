@@ -14,6 +14,7 @@ config.set('domain', 'abab.io', true, true);
 config.set('database:mongodb_url', 'mongodb://user:pass@127.0.0.1:27017/db_name', true, true);
 config.set('geth:host', 'http://127.0.0.1:8545', true, true);
 config.set('geth:lastBlockNumber', 1376000, true, true);
+config.set('google:api:maps:key', '', true, true);    // and set config key APP.html:554 <script>
 config.set('server:url:path', '/', true, true);
 
 portfinder.getPorts(3, {port: 8000}, function (err, port) {

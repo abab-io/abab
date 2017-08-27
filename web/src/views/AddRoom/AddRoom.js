@@ -5,15 +5,18 @@ var marker_home = false;
 var reactiveAddRoom = Ractive.extend({
 
     oninit: function () {
-        map2 = new google.maps.Map(document.getElementById('map-canvas2'), {
-            zoom: 1,
-            center: {lat: 20, lng: 20}
-        });
-        marker_home = new google.maps.Marker({
-            position: {lat: 0, lng: -20},
-            map: map2,
-            draggable:true,
-            title:"Drag me!"
+        ABAB.map.call_wait_auth(function () {
+
+            map2 = new google.maps.Map(document.getElementById('map-canvas2'), {
+                zoom: 1,
+                center: {lat: 20, lng: 20}
+            });
+            marker_home = new google.maps.Marker({
+                position: {lat: 0, lng: -20},
+                map: map2,
+                draggable: true,
+                title: "Drag me!"
+            });
         });
         console.log('reactiveAddRoom oninit');
     }
@@ -34,7 +37,7 @@ ractiveComponent['reactive-AddRoomApp'].on('address', function () {
             form_obj[formarr[i].name] = formarr[i].value
     }
     geocode.geocode({address:form_obj['address_address']+','+form_obj['address_city']+','+form_obj['address_state']+','+form_obj['address_country']}, function(results, status) {
-
+        console.log(results);
         // console.log(results[0].geometry.location.lat(),status,form_obj);
         // console.log(results[0].geometry.location.lng(),status,form_obj);
         if (status == 'OK') {

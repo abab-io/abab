@@ -2,11 +2,32 @@
  * Created by bogdanmedvedev on 24.07.17.
  */
 const db = require('../modules/db');
+const config = require('../modules/config');
 const error = require('../modules/error/api');
 const aws = require('../modules/aws-amazon-s3');
 const crypto = require('crypto');
 var moment = require('moment');
 const async = require('async');
+var NodeGeocoder = require('node-geocoder');
+
+var options = {
+    provider: 'google',
+
+    // Optional depending on the providers
+    httpAdapter: 'https', // Default
+    apiKey: config.get('google:api:maps:key'), // for Mapquest, OpenCage, Google Premier
+    formatter: '%P,%S,%T,%z',     // 'gpx', 'string', ...
+    formatterPattern: '%P,%S,%T,%z'
+};
+var geocoder = NodeGeocoder(options);
+geocoder.geocode('Днепропетровск')
+    .then(function (res) {
+        console.log(res);
+    })
+    .catch(function (err) {
+        console.log(err);
+    });
+
 module.exports = (API, redis) => {
     API.on('GetRooms', true, (user, param, callback) => {
         let findPram = {};
@@ -27,10 +48,16 @@ module.exports = (API, redis) => {
         if (param.page && !isNaN(param.page) && +param.page > 0) {
             skip = limit * (param.page - 1)
         }
+        console.log(param);
         async.parallel({
             count: function (count_callback) {
                 db.rooms.count(findPram).then(function (count) {
-                    return count_callback && count_callback(null, count);
+                    return count_callback && count_callback(null, {
+                            room: count,
+                            page: Math.ceil(+(count / limit).toFixed(5)),
+                            skip: skip,
+                            limit: limit
+                        });
                 }).catch(function (err) {
                     return count_callback && count_callback({
                             error: error.api(err.message, 'db', err, 6),
@@ -38,7 +65,7 @@ module.exports = (API, redis) => {
                         });
                 });
             },
-            rooms: function () {
+            rooms: function (callback) {
                 db.rooms.find(findPram).skip(skip).limit(limit).then(function (documents) {
 
                     async.reduce(documents, {}, function (obj, room, cb) {
@@ -89,7 +116,7 @@ module.exports = (API, redis) => {
 
             }
             return callback && callback(null, {
-                    rooms: res.rooms,
+                    rooms: res.rooms.rooms,
                     count: res.count,
                     success: true
                 });
@@ -145,6 +172,7 @@ module.exports = (API, redis) => {
                     success: false
                 });
         }
+
         if (param.address_country && typeof param.address_country !== 'string') {
             return callback && callback(null, {
                     error: error.api('Request param "address_country" incorrect', 'param', {
@@ -187,113 +215,123 @@ module.exports = (API, redis) => {
                 param.dateRanges[i].txStatus = 1;
             }
         }
+
         if (!param._id && !param._index) {
-            new db.rooms({
+            geocoder.geocode(param.address_country + ',' + param.address_state + ',' + param.address_city).then(function (res) {
+                    console.log(res[0].country);
 
-                user: db.mongoose.Types.ObjectId(user._id),
-                title: param.title,
-                description: param.description,
-                photo: param.photo,
-                wallet: param.wallet,
-                bathroom: param.bathroom,
-                bathroom_count: param.bathroom_count,
-                bed_count: param.bed_count,
-                bedroom_count: param.bedroom_count,
-                children_count: param.children_count,
-                limit_time_min: param.limit_time_min,
-                limit_time_max: param.limit_time_max,
-                people_count: param.people_count,
-                startTimeCheckIn: param.startTimeCheckIn,
-                startTimeCheckOut: param.startTimeCheckOut,
-                endTimeCheckIn: param.endTimeCheckIn,
-                endTimeCheckOut: param.endTimeCheckOut,
-                // dateRanges: param.dateRanges,
-                address: {
-                    country: param.address_country,
-                    state: param.address_state,
-                    city: param.address_city,
-                    street: param.address_street,
-                    address: param.address_address,
-                    index: param.address_index,
-                },
-                facilities: param.facilities,
-                location: [param.location_latitude * 1, param.location_longitude * 1],
-                txHash: null,
-                status: param.status //0 - draft , 1 - wait confirm, 2 - send to blockchain, 3 -success public
-            }).save().then(function (document) {
+                    new db.rooms({
 
-                for (let i in  param.dateRanges) {
+                        user: db.mongoose.Types.ObjectId(user._id),
+                        title: param.title,
+                        description: param.description,
+                        photo: param.photo,
+                        wallet: param.wallet,
+                        bathroom: param.bathroom,
+                        bathroom_count: param.bathroom_count,
+                        bed_count: param.bed_count,
+                        bedroom_count: param.bedroom_count,
+                        children_count: param.children_count,
+                        limit_time_min: param.limit_time_min,
+                        limit_time_max: param.limit_time_max,
+                        people_count: param.people_count,
+                        startTimeCheckIn: param.startTimeCheckIn,
+                        startTimeCheckOut: param.startTimeCheckOut,
+                        endTimeCheckIn: param.endTimeCheckIn,
+                        endTimeCheckOut: param.endTimeCheckOut,
+                        // dateRanges: param.dateRanges,
+                        address: {
+                            country: res[0].country,
+                            state: res[0].administrativeLevels.level1long,
+                            city: res[0].city,
+                            street: param.address_street,
+                            address: param.address_address,
+                            index: res[0].zipcode,
+                        },
+                        facilities: param.facilities,
+                        location: [param.location_latitude * 1, param.location_longitude * 1],
+                        txHash: null,
+                        status: param.status //0 - draft , 1 - wait confirm, 2 - send to blockchain, 3 -success public
+                    }).save().then(function (document) {
+
+                        for (let i in  param.dateRanges) {
 
 
-                    new db.scheduleRoom({
-                        room: db.mongoose.Types.ObjectId(document._doc._id),
-                        _scheduleIndex: null,
-                        startDate: moment.utc(param.dateRanges[i].startDate, 'DD.MM.YY').toDate(),
-                        endDate: moment.utc(param.dateRanges[i].endDate, 'DD.MM.YY').toDate(),
-                        dayPrice: +(+param.dateRanges[i].priceDay).toFixed(8),
-                        weekPrice: +(param.dateRanges[i].priceDay - (param.dateRanges[i].priceDay * param.dateRanges[i].discountWeek / 100)).toFixed(8),
-                        monthPrice: +(param.dateRanges[i].priceDay - (param.dateRanges[i].priceDay * param.dateRanges[i].discountMonth / 100)).toFixed(8),
-                        discountWeek: 1 * (1 * param.dateRanges[i].discountWeek).toFixed(8),
-                        discountMonth: 1 * (1 * param.dateRanges[i].discountMonth).toFixed(8),
-                        intervalDate: null,
-                        tx: {
-                            status: 1,
-                            hash: null,
+                            new db.scheduleRoom({
+                                room: db.mongoose.Types.ObjectId(document._doc._id),
+                                _scheduleIndex: null,
+                                startDate: moment.utc(param.dateRanges[i].startDate, 'DD.MM.YY').toDate(),
+                                endDate: moment.utc(param.dateRanges[i].endDate, 'DD.MM.YY').toDate(),
+                                dayPrice: +(+param.dateRanges[i].priceDay).toFixed(8),
+                                weekPrice: +(param.dateRanges[i].priceDay - (param.dateRanges[i].priceDay * param.dateRanges[i].discountWeek / 100)).toFixed(8),
+                                monthPrice: +(param.dateRanges[i].priceDay - (param.dateRanges[i].priceDay * param.dateRanges[i].discountMonth / 100)).toFixed(8),
+                                discountWeek: 1 * (1 * param.dateRanges[i].discountWeek).toFixed(8),
+                                discountMonth: 1 * (1 * param.dateRanges[i].discountMonth).toFixed(8),
+                                intervalDate: null,
+                                tx: {
+                                    status: 1,
+                                    hash: null,
+                                }
+                            }).save();
+
                         }
-                    }).save();
+                        // bathroom
+                        // bathroom_count
+                        // bed_count
+                        // bedroom_count
+                        // children_count
+                        // dateRanges
+                        // endTimeCheckIn
+                        // endTimeCheckOut
+                        // facilities
+                        // limit_time_max
+                        // limit_time_min
+                        // people_count
+                        // startTimeCheckIn
+                        // startTimeCheckOut
+                        return callback && callback(null, {
+                                room: filterObject(document._doc, [
+                                    '_id',
+                                    '_index',
+                                    '_hash',
+                                    'bathroom',
+                                    'bathroom_count',
+                                    'bed_count',
+                                    'bedroom_count',
+                                    'children_count',
+                                    'endTimeCheckIn',
+                                    'endTimeCheckOut',
+                                    'startTimeCheckIn',
+                                    'startTimeCheckOut',
+                                    'facilities',
+                                    'people_count',
+                                    'limit_time_min',
+                                    'limit_time_max',
+                                    'title',
+                                    'description',
+                                    'photo',
+                                    'wallet',
+                                    'dateRanges',
+                                    'address',
+                                    'location',
+                                    'status',
+                                    'update_at',
+                                ]),
+                                success: true
+                            });
+                    }).catch(function (err) {
+                        return callback && callback(null, {
+                                error: error.api(err.message, 'db', err, 5),
+                                success: false
+                            });
 
-                }
-                // bathroom
-                // bathroom_count
-                // bed_count
-                // bedroom_count
-                // children_count
-                // dateRanges
-                // endTimeCheckIn
-                // endTimeCheckOut
-                // facilities
-                // limit_time_max
-                // limit_time_min
-                // people_count
-                // startTimeCheckIn
-                // startTimeCheckOut
-                return callback && callback(null, {
-                        room: filterObject(document._doc, [
-                            '_id',
-                            '_index',
-                            '_hash',
-                            'bathroom',
-                            'bathroom_count',
-                            'bed_count',
-                            'bedroom_count',
-                            'children_count',
-                            'endTimeCheckIn',
-                            'endTimeCheckOut',
-                            'startTimeCheckIn',
-                            'startTimeCheckOut',
-                            'facilities',
-                            'people_count',
-                            'limit_time_min',
-                            'limit_time_max',
-                            'title',
-                            'description',
-                            'photo',
-                            'wallet',
-                            'dateRanges',
-                            'address',
-                            'location',
-                            'status',
-                            'update_at',
-                        ]),
-                        success: true
                     });
-            }).catch(function (err) {
-                return callback && callback(null, {
-                        error: error.api(err.message, 'db', err, 5),
-                        success: false
-                    });
-
-            });
+                }).catch(function (err) {
+                    return callback && callback(null, {
+                            error: error.api('Error geo data', 'param', err, 0),
+                            success: false
+                        });
+                });
         } else {
 
 
