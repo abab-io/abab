@@ -330,11 +330,11 @@ var ABAB = {
                 fn();
             }
         },
-        logout: function () {
+        logout: function (callback) {
             ABAB.auth_action.user = null;
             ractiveComponent['rootApp'].set('user', false);
             localStorage.removeItem('auth');
-
+            callback && callback();
         },
         auth_emit: function () {
             if (!ABAB.auth_action.status) {

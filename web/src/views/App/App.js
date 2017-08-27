@@ -32,7 +32,9 @@ ractiveComponent['rootApp'].on('logout', function () {
         text: "Вы действительно хотите выйти?",
         showLoaderOnConfirm: true,
         preConfirm: function () {
-            ABAB.auth_action.logout();
+            ABAB.auth_action.logout(function () {
+                swal.closeModal();
+            });
         }});
 });
 ractiveComponent['rootApp'].on('change_type_auth_modal', function () {
