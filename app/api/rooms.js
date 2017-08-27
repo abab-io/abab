@@ -16,13 +16,11 @@ var options = {
     // Optional depending on the providers
     httpAdapter: 'https', // Default
     apiKey: config.get('google:api:maps:key'), // for Mapquest, OpenCage, Google Premier
-    formatter: '%P,%S,%T,%z',     // 'gpx', 'string', ...
-    formatterPattern: '%P,%S,%T,%z'
 };
 var geocoder = NodeGeocoder(options);
-geocoder.geocode('Днепропетровск')
+geocoder.geocode('229 Hennessy Rd,Wan Chai')
     .then(function (res) {
-        console.log(res);
+        console.log( res[0].extra.neighborhood || res[0].city);
     })
     .catch(function (err) {
         console.log(err);
@@ -217,8 +215,7 @@ module.exports = (API, redis) => {
         }
 
         if (!param._id && !param._index) {
-            geocoder.geocode(param.address_country + ',' + param.address_state + ',' + param.address_city).then(function (res) {
-                    console.log(res[0].country);
+            geocoder.geocode(param.address_country + ',' + param.address_state + ',' + param.address_city+','+param.address_address).then(function (res) {
 
                     new db.rooms({
 
@@ -242,11 +239,11 @@ module.exports = (API, redis) => {
                         // dateRanges: param.dateRanges,
                         address: {
                             country: res[0].country,
-                            state: res[0].administrativeLevels.level1long,
-                            city: res[0].city,
-                            street: param.address_street,
+                            state: res[0].administrativeLevels.level1long || res[0].extra.neighborhood,
+                            city: res[0].city || res[0].extra.neighborhood,
+                            street: res[0].streetName,
                             address: param.address_address,
-                            index: res[0].zipcode,
+                            index: res[0].zipcode || param.address_index,
                         },
                         facilities: param.facilities,
                         location: [param.location_latitude * 1, param.location_longitude * 1],

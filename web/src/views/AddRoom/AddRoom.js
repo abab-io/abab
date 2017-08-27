@@ -1,12 +1,11 @@
 
 var map2 = false;
-var geocode =new google.maps.Geocoder();
+var geocode =false;
 var marker_home = false;
 var reactiveAddRoom = Ractive.extend({
-
     oninit: function () {
         ABAB.map.call_wait_auth(function () {
-
+            geocode=new google.maps.Geocoder();
             map2 = new google.maps.Map(document.getElementById('map-canvas2'), {
                 zoom: 1,
                 center: {lat: 20, lng: 20}
@@ -100,6 +99,24 @@ ractiveComponent['reactive-AddRoomApp'].on('submitRoom', function () {
     swal.showLoading();
     API('UpsertRoom', form_obj, false, function (resAPI) {
         console.log(resAPI);
+        if(resAPI.error){
+            if(resAPI.code && resAPI.code ==='auth'){
+                swal({
+                    title: 'Ошибка',
+                    type: 'error',
+                    text: 'Для сохранения обекта вам нужно авторизоватся',
+                    confirmButtonText: 'Ok',
+                    showCancelButton: false
+                });
+            }else
+            swal({
+                title: 'Ошибка',
+                type: 'error',
+                text: resAPI.error.message,
+                confirmButtonText: 'Ok',
+                showCancelButton: false
+            });
+        }
         swal({
             title: ('Отправка транзакции...'),
             closeOnConfirm: false,
