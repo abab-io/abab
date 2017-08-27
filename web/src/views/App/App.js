@@ -22,6 +22,19 @@ var reactiveApp = Ractive.extend({
 });
 
 ractiveComponent['rootApp'].set('auth_type', 'login');
+ractiveComponent['rootApp'].on('logout', function () {
+    swal({
+        title: 'Подтверждение',
+        type: 'question',
+        confirmButtonText: 'Да',
+        cancelButtonText: 'Нет',
+        showCancelButton: true,
+        text: "Вы действительно хотите выйти?",
+        showLoaderOnConfirm: true,
+        preConfirm: function () {
+            ABAB.auth_action.logout();
+        }});
+});
 ractiveComponent['rootApp'].on('change_type_auth_modal', function () {
 
     if (ractiveComponent['rootApp'].get('auth_type') === 'reg') ractiveComponent['rootApp'].set('auth_type', 'login');

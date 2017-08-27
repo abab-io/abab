@@ -316,7 +316,7 @@
                           <div class="wrapper_conts">
                             <div class="content_aix">
                                 {{#if user}}
-                                    <span>{{user.name}} {{user.surname}}</span>
+                                    <span on-click="logout">{{user.name}} {{user.surname}}</span>
                                 {{else}}
                                     <span data-toggle="modal" data-target="#formModal">Войти</span>
                                 {{/if}}
