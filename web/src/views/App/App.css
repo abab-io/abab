@@ -217,7 +217,7 @@ body.webcot-header #smart-banner{display:none;}
 .button_num::-moz-focus-inner{border:0px!important;padding:0px!important;margin:0px!important;}
 .button_sdc{background:transparent!important;border:0px!important;cursor:pointer!important;height:100%!important;padding:0px!important;position:absolute!important;top:0px!important;right:0px!important;-webkit-transition:opacity 300ms ease-out 0ms, visibility 300ms linear 0ms!important;-moz-transition:opacity 300ms ease-out 0ms, visibility 300ms linear 0ms!important;transition:opacity 300ms ease-out 0ms, visibility 300ms linear 0ms!important;}
 .button_sdc::-moz-focus-inner{border:0px!important;padding:0px!important;margin:0px!important;}
-.containerInner_sx{height:100%!important;overflow-x:scroll!important;overflow-y:auto!important;white-space:nowrap!important;}
+.containerInner_sx{height:100%!important;overflow-x:none!important;overflow-y:auto!important;white-space:nowrap!important;}
 
 .filterBarWrapper_hfnjlw-o_O-filterBarWrapper_relative_e296pg{height:64px!important;position:relative!important;}
 .bar_higg {
