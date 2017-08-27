@@ -25,7 +25,7 @@ ractiveComponent['rootApp'].set('auth_type','login');
 ractiveComponent['rootApp'].on('change_type_auth_modal', function () {
 
     if(ractiveComponent['rootApp'].get('auth_type') === 'reg') ractiveComponent['rootApp'].set('auth_type','login');
-    if(ractiveComponent['rootApp'].get('auth_type') === 'login') ractiveComponent['rootApp'].set('auth_type','reg');
+    else if(ractiveComponent['rootApp'].get('auth_type') === 'login') ractiveComponent['rootApp'].set('auth_type','reg');
     console.log('register_modal click');
 });
 
