@@ -19,55 +19,84 @@ module.exports = (API, redis) => {
                     success: false
                 });
         }
-        db.rooms.find(findPram).then(function (documents) {
-            async.reduce([1, 2, 3], 0, function (memo, item, callback) {
-                // pointless async:
-                process.nextTick(function () {
-                    callback(null, memo + item)
-                });
-            }, function (err, result) {
-                // result is now equal to the last value of memo, which is 6
-            });
-            async.reduce(documents, {}, function (obj, room, cb) {
-                db.scheduleRoom.find({
-                    room: db.mongoose.Types.ObjectId(room._id),
-                    // "tx.status": 1
-                }).then(function (schedules) {
-                    obj[room._id] = schedules;
-                    cb(null, obj)
+        let skip = 0;
+        let limit = 30;
+        if (param.count_page && !isNaN(param.count_page) && +param.count_page > 0) {
+            limit = param.count_page;
+        }
+        if (param.page && !isNaN(param.page) && +param.page > 0) {
+            skip = limit * (param.page - 1)
+        }
+        async.parallel({
+            count: function (count_callback) {
+                db.rooms.count(findPram).then(function (count) {
+                    return count_callback && count_callback(null, count);
                 }).catch(function (err) {
-                    return callback && callback(null, {
+                    return count_callback && count_callback({
+                            error: error.api(err.message, 'db', err, 6),
+                            success: false
+                        });
+                });
+            },
+            rooms: function () {
+                db.rooms.find(findPram).skip(skip).limit(limit).then(function (documents) {
+
+                    async.reduce(documents, {}, function (obj, room, cb) {
+                        db.scheduleRoom.find({
+                            room: db.mongoose.Types.ObjectId(room._id),
+                            // "tx.status": 1
+                        }).then(function (schedules) {
+                            obj[room._id] = schedules;
+                            cb(null, obj)
+                        }).catch(function (err) {
+                            return callback && callback(null, {
+                                    error: error.api(err.message, 'db', err, 5),
+                                    success: false
+                                });
+
+                        });
+                    }, function (err, res) {
+                        if (err)
+                            return callback && callback(null, {
+                                    error: error.api('scheduleRoom get error', 'async', err, 5),
+                                    success: false
+                                });
+                        let all = documents.map(function (roomOne) {
+                            if (!res[roomOne._doc._id]) roomOne._doc.dateRanges = [];
+                            if (res[roomOne._doc._id]) roomOne._doc.dateRanges = res[roomOne._doc._id];
+                            return roomOne._doc;
+                        });
+                        return callback && callback(null, {
+                                rooms: all,
+                                success: true
+                            });
+                    });
+
+                }).catch(function (err) {
+                    return callback && callback({
                             error: error.api(err.message, 'db', err, 5),
                             success: false
                         });
 
                 });
-            }, function (err, res) {
-                if (err)
-                    return callback && callback(null, {
-                            error: error.api('scheduleRoom get error', 'async', err, 5),
-                            success: false
-                        });
-                let all = documents.map(function (roomOne) {
-                    if (!res[roomOne._doc._id]) roomOne._doc.dateRanges = [];
-                    if (res[roomOne._doc._id]) roomOne._doc.dateRanges = res[roomOne._doc._id];
-                    return roomOne._doc;
-                });
+            }
+        }, function (err, res) {
+            if (err) {
                 return callback && callback(null, {
-                        rooms: all,
-                        success: true
+                        error: error.api(err.message, 'db', err, 5),
+                        success: false
                     });
-            });
 
-        }).catch(function (err) {
+            }
             return callback && callback(null, {
-                    error: error.api(err.message, 'db', err, 5),
-                    success: false
+                    rooms: res.rooms,
+                    count: res.count,
+                    success: true
                 });
-
         });
 
-    }, {}, {
+
+    }, {
         title: 'Get Rooms',
         description: 'Get all Rooms',
         param: [],

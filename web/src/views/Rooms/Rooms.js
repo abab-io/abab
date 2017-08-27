@@ -5,6 +5,7 @@ var reactiveRooms = Ractive.extend({
 
         console.log('reactiveRooms oninit');
         API('GetRooms', true, {}, function (res) {
+            console.log(res);
             ractiveComponent['reactive-RoomsApp'].set('rooms', res.rooms);
 
 
