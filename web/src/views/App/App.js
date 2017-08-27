@@ -21,15 +21,28 @@ var reactiveApp = Ractive.extend({
 
 });
 
+ractiveComponent['rootApp'].set('auth_type','login');
+ractiveComponent['rootApp'].on('change_type_auth_modal', function () {
 
-ractiveComponent['rootApp'].on('register_modal', function () {
+    if(ractiveComponent['rootApp'].get('auth_type') === 'reg') ractiveComponent['rootApp'].set('auth_type','login');
+    if(ractiveComponent['rootApp'].get('auth_type') === 'login') ractiveComponent['rootApp'].set('auth_type','reg');
     console.log('register_modal click');
 });
 
-ractiveComponent['rootApp'].on('login', function () {
+ractiveComponent['rootApp'].on('auth_start', function () {
     console.log('login click');
-    console.log($('#auth_form').serializeArray());
+    var formarr = $('#auth_form').serializeArray();
 
+    var form_obj = {};
+    for (var i in formarr) {
+        if (form_obj[formarr[i].name] && typeof form_obj[formarr[i].name] === 'string') {
+            form_obj[formarr[i].name] = [form_obj[formarr[i].name], formarr[i].value];
+        } else if (form_obj[formarr[i].name] && typeof form_obj[formarr[i].name] === 'object') {
+            form_obj[formarr[i].name].push(formarr[i].value);
+        } else
+            form_obj[formarr[i].name] = formarr[i].value
+    }
+    console.log(form_obj);
 });
 window.onpopstate = function (event) {
     if (location.hash.replace('#', '').split('-')[0] && location.hash.replace('#', '').split('-')[0] != '')

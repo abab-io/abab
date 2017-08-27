@@ -25,9 +25,10 @@
             <div class="modal-body">
                 <div class="contentBox_modal">
                     <section>
-                        <div>
+                        <form action="#" method="get" onsubmit="return false;" id="auth_form">
+                            {{#if auth_type === 'login'}}
                             <div>
-                                <form action="#" method="get" onsubmit="return false;" id="auth_form">
+                                <div>
 
                                     <div>
                                         <div style="margin-bottom: 16px;">
@@ -102,7 +103,8 @@
                                             <div id="airlock-inline-container"></div>
                                         </div>
                                         <div style="margin-bottom: 16px;">
-                                            <button type="button" class="button_mods" aria-busy="false" on-click="login">
+                                            <button type="button" class="button_mods" aria-busy="false"
+                                                    on-click="auth_start">
                           <span class="text_cvk">
                             <span>Войти</span>
                           </span>
@@ -110,22 +112,119 @@
 
                                         </div>
                                     </div>
-                                </form>
+
+                                </div>
+                                <div style="margin-top: 16px; margin-bottom: 16px;">
+                                    <div class="rule_vb"></div>
+                                </div>
+                                <div class="va-container va-container-h">
+                              <span class="va-middle text-center">
+                                <span class="text_bnv">Не зарегистрированы на Abab.io?</span>
+                                <div class="inlineBlock_tops" style="margin-left: 8px; margin-right: 8px;">
+                                  <span class="text_alk">
+                                    <a class="component_9w5i1l pointer" on-click="change_type_auth_modal"
+                                       aria-disabled="false" aria-busy="false">Зарегистрироваться</a>
+                                  </span>
+                                </div>
+                              </span>
+                                </div>
                             </div>
-                            <div style="margin-top: 16px; margin-bottom: 16px;">
-                                <div class="rule_vb"></div>
+                            {{/if}}
+                            {{#if auth_type === 'reg'}}
+                            <div>
+                                <div>
+
+
+                                    <div>
+                                        <div style="margin-bottom: 16px;">
+                                            <input type="hidden" name="from" value="reg"></div>
+
+                                        <div style="margin-bottom: 16px;">
+                                            <div class="inspectletIgnore">
+                                                <div class="container_mods">
+                                                    <label class="label_modx" for="email-login-email">Адрес электронной
+                                                        почты</label>
+                                                    <div class="container_mod-sl">
+                                                        <div class="postfix_arx"><i class="fa fa-envelope-o"
+                                                                                    aria-hidden="true"></i>
+
+                                                        </div>
+                                                        <div class="inputContainer_forms">
+                                                            <input type="email" aria-label="Адрес электронной почты"
+                                                                   class="input_pss" id="email-login-email" name="email"
+                                                                   placeholder="Адрес электронной почты" value=""></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div style="margin-bottom: 16px;">
+                                            <div>
+                                                <div class="container_mods">
+                                                    <label class="label_modx" for="email-login-password">Пароль</label>
+                                                    <div class="container_mod-sl">
+                                                        <div class="postfix_arx"><i class="fa fa-key"
+                                                                                    aria-hidden="true"></i>
+
+                                                        </div>
+                                                        <div class="inputContainer_forms">
+                                                            <input type="password" autocomplete="off"
+                                                                   aria-label="Пароль" class="input_pss"
+                                                                   id="email-login-password" name="password"
+                                                                   placeholder="Пароль" value="" autocorrect="off"
+                                                                   autocapitalize="off" spellcheck="false"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div style="margin-bottom: 16px;">
+                                            <div>
+                                                <div class="container_mods">
+                                                    <label class="label_modx" for="email-login-password">Пароль</label>
+                                                    <div class="container_mod-sl">
+                                                        <div class="postfix_arx"><i class="fa fa-key"
+                                                                                    aria-hidden="true"></i>
+
+                                                        </div>
+                                                        <div class="inputContainer_forms">
+                                                            <input type="password" autocomplete="off"
+                                                                   aria-label="Пароль" class="input_pss"
+                                                                   id="email-login-password" name="password"
+                                                                   placeholder="Пароль" value="" autocorrect="off"
+                                                                   autocapitalize="off" spellcheck="false"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div style="margin-bottom: 16px;">
+                                            <button type="button" class="button_mods" aria-busy="false"
+                                                    on-click="auth_start">
+                          <span class="text_cvk">
+                            <span>Войти</span>
+                          </span>
+                                            </button>
+
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div style="margin-top: 16px; margin-bottom: 16px;">
+                                    <div class="rule_vb"></div>
+                                </div>
+                                <div class="va-container va-container-h">
+                              <span class="va-middle text-center">
+                                <span class="text_bnv">Уже зарегистрированы на Abab.io?</span>
+                                <div class="inlineBlock_tops" style="margin-left: 8px; margin-right: 8px;">
+                                  <span class="text_alk">
+                                    <a class="component_9w5i1l pointer" on-click="change_type_auth_modal"
+                                       aria-disabled="false" aria-busy="false">Войти</a>
+                                  </span>
+                                </div>
+                              </span>
+                                </div>
                             </div>
-                            <div class="va-container va-container-h">
-                  <span class="va-middle text-center">
-                    <span class="text_bnv">Не зарегистрированы на Abab.io?</span>
-                    <div class="inlineBlock_tops" style="margin-left: 8px; margin-right: 8px;">
-                      <span class="text_alk">
-                        <a class="component_9w5i1l pointer" on-click="register_modal" aria-disabled="false" aria-busy="false">Зарегистрироваться</a>
-                      </span>
-                    </div>
-                  </span>
-                            </div>
-                        </div>
+                            {{/if}}
+                        </form>
                     </section>
                 </div>
             </div>
