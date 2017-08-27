@@ -35,7 +35,8 @@ ractiveComponent['rootApp'].on('logout', function () {
             ABAB.auth_action.logout(function () {
                 swal.closeModal();
             });
-        }});
+        }
+    });
 });
 ractiveComponent['rootApp'].on('change_type_auth_modal', function () {
 
@@ -60,11 +61,14 @@ if (localStorage.getItem('auth')) {
                 return swal('Ошибка авторизации', res.error.message, 'error');
             }
         }, true);
-    }catch (e){
-        console.error('auth storage parse',e);
+    } catch (e) {
+        console.error('auth storage parse', e);
         localStorage.removeItem('auth');
     }
 }
+ractiveComponent['rootApp'].on('location_input_scan', function () {
+    console.log($('#location_input_scan').val());
+});
 ractiveComponent['rootApp'].on('auth_start', function () {
     console.log('login click');
     var formarr = $('#auth_form').serializeArray();
@@ -88,7 +92,7 @@ ractiveComponent['rootApp'].on('auth_start', function () {
         }, function (res) {
             if (res.error)
                 return swal('Ошибка авторизации', res.error.message, 'error');
-             swal('Успешно зарегестрированны', 'На вашу почту "'+form_obj.email+'", было отправлено письмо с ссылкой на активацию аккаунта', 'success');
+            swal('Успешно зарегестрированны', 'На вашу почту "' + form_obj.email + '", было отправлено письмо с ссылкой на активацию аккаунта', 'success');
             if (ractiveComponent['rootApp'].get('auth_type') === 'reg') ractiveComponent['rootApp'].set('auth_type', 'login');
 
             console.log(res);
@@ -179,3 +183,87 @@ function init_daterangepicker(selector, callback) {
     });
 
 }
+$('#location_input_scan').flexdatalist({
+    url: '/api/v1/?method=public_geoCode',
+    visibleProperties: ["city", "district", "coutry"],
+    searchDisabled: true,
+    selectionRequired: true,
+    valueProperty: '*',
+    groupBy: 'coutry',
+    textProperty: '{city}',
+
+}).on('change:flexdatalist', function (event, data) {
+    var json;
+    try {
+        json = JSON.parse(data.value)
+    } catch (e) {
+        console.error(e)
+    }
+    var find = {};
+
+
+    if (json && json.city) {
+
+        if(json.city === 'Moscow'){
+            console.error('One and the same city can have several names');
+            json.city  = 'Moskva';
+        }
+        find = {
+            $or: [{
+                "address.city": {
+                    '$regex': json.city,
+                    '$options': 'i'
+                }
+            }, {"address.country": {'$regex': json.city, '$options': 'i'}}]
+        };
+    }
+    API('GetRooms', {page: 1, find: find}, true, function (res) {
+
+        ractiveComponent['reactive-RoomsApp'].set('rooms', res.rooms);
+        ractiveComponent['reactive-RoomsApp'].set('rooms_count', res.count);
+
+        if (window.map && window.geocode && window.geocode) {
+            geocode = res.rooms.map(function (room, i) {
+                if (room.location[0] && room.location[1]) {
+                    var infowindow = new google.maps.InfoWindow({
+                        content: '<div id="content">' +
+                        '<div id="siteNotice">' +
+                        '</div>' +
+                        '<h1 id="firstHeading" class="firstHeading">' + room.title + '</h1>' +
+                        '<div id="bodyContent">' +
+                        '<p><b>' + room.title + '</b></p>' +
+                        '<p>Transaction: <a href="' + ractiveComponent['reactive-RoomsApp'].get('blockchain_url') + 'tx/' + room.txHash + '" target="_blank">' +
+                        room.txHash + '</a>' +
+                        '<br>' +
+                        '(last update ' + room.update_at.split('T')[0] + ').</p>' +
+                        '</div>' +
+                        '</div>',
+                        maxWidth: 250
+                    });
+                    var marker = new google.maps.Marker({
+                        position: {lat: room.location[0] * 1, lng: room.location[1] * 1},
+                        // label: ''
+                        animation: google.maps.Animation.DROP,
+                        map: map
+
+                    });
+                    marker.addListener('click', function () {
+                        infowindow.open(map, marker);
+                    });
+                    return marker;
+                }
+                else return false;
+            });
+            new MarkerClusterer(map, markers,
+                {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
+
+            geocode.geocode({address: json.city + ',' + json.country}, function (results, status) {
+                map.setCenter({lng: results[0].geometry.location.lng(), lat: results[0].geometry.location.lat()});
+                map.setZoom(8);
+            });
+        }
+    });
+
+
+    console.log(data.value);
+});

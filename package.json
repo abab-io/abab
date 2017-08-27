@@ -39,6 +39,7 @@
     "express-recaptcha": "^2.2.0",
     "express-recaptcha-middleware": "^1.0.1",
     "express-session": "^1.15.3",
+    "google-places": "0.0.2",
     "helmet": "^3.6.1",
     "jade": "^1.11.0",
     "keythereum": "^1.0.1",

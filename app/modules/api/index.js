@@ -93,10 +93,9 @@ API = {
                 }
                 json.latency_ms = (new Date()).getTime() - initTimestamp;
                 if (!type) type = 'server';
-
                 new db.logsAPI({
                     method: name,
-                    param: param,
+                    param:{url:querystring.stringify(param)},
                     response: json,
                     error: err,
                     user: {
@@ -109,6 +108,9 @@ API = {
                         json.latency_ms = (new Date()).getTime() - initTimestamp;
                         json.requestId = res._id;
                     }
+                    if(err)
+                    cb && cb(err.stack || err, json);
+                    else
                     cb && cb(err, json);
                 });
             });

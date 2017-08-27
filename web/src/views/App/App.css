@@ -1146,7 +1146,12 @@ span:after{border:0!important;}
 /*! CSS Used fontfaces */
 @font-face{font-family:'Glyphicons Halflings';src:url(/src/fonts/glyphicons-halflings-regular.eot);src:url(/src/fonts/glyphicons-halflings-regular.eot#iefix) format('embedded-opentype'), url(/src/fonts/glyphicons-halflings-regular.woff2) format('woff2'), url(/src/fonts/glyphicons-halflings-regular.woff) format('woff'), url(/src/fonts/glyphicons-halflings-regular.ttf) format('truetype'), url(/src/fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular) format('svg');}
 @font-face{font-family:'Glyphicons Halflings';src:url(/src/fonts/glyphicons-halflings-regular.eot);src:url(/src/fonts/glyphicons-halflings-regular.eot#iefix) format('embedded-opentype'), url(/src/fonts/glyphicons-halflings-regular.woff2) format('woff2'), url(/src/fonts/glyphicons-halflings-regular.woff) format('woff'), url(/src/fonts/glyphicons-halflings-regular.ttf) format('truetype'), url(/src/fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular) format('svg');}
-
+.flexdatalist-results span:not(:first-child):not(.highlight) {
+    padding-left: 10px;
+    display: inline-block;
+    font-size: 80%;
+    color: rgba(0, 0, 0, 0.50);
+}
 .container_neo {
     display: block !important;
 }
