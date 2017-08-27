@@ -18,14 +18,6 @@ var options = {
     apiKey: config.get('google:api:maps:key'), // for Mapquest, OpenCage, Google Premier
 };
 var geocoder = NodeGeocoder(options);
-geocoder.geocode('229 Hennessy Rd,Wan Chai')
-    .then(function (res) {
-        console.log( res[0].extra.neighborhood || res[0].city);
-    })
-    .catch(function (err) {
-        console.log(err);
-    });
-
 module.exports = (API, redis) => {
     API.on('GetRooms', true, (user, param, callback) => {
         let findPram = {};
