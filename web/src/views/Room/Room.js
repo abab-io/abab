@@ -170,6 +170,14 @@ ractiveComponent['reactive-RoomApp'].on('booking', function () {
                         showCancelButton: false
                     });
                 }
+                var txHash = '0xa1b1d9551211755165a677c5e9d4b1041f4b5fd6';
+                swal({
+                    title: 'Успешно забрронировано',
+                    type: 'success',
+                    text: "<div style='position: initial; width: 100%; vertical-align: bottom;text-overflow: ellipsis;overflow: hidden;'>Ropsten Ethereum TxHash: <a href='https://ropsten.etherscan.io/tx/" + txHash + "' target='_blank' title='" + txHash + "'>" + txHash + "</a></div>",
+                    confirmButtonText: 'Ок',
+                    showCancelButton: false
+                });
 
             },true)
         }
