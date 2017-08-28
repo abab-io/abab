@@ -8,8 +8,8 @@ contract Abab is Ownable,Claimable,StandardToken {
   uint constant maxUInt = 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
   uint constant error   = maxUInt;
 
-  // event log(string s);
-  // event log2(string s, uint i);
+  event log(string s);
+  event logUint(string s, uint i);
 
   struct  Schedule {
     uint from;
@@ -20,6 +20,8 @@ contract Abab is Ownable,Claimable,StandardToken {
     uint currency;    // see Currencies array
   }
 
+  enum BookingStatus { New, Agreed, Cancel, Complete } // TODO Complete? 
+
   struct  BookingRecord {
     address guest;
     uint from;
@@ -27,7 +29,7 @@ contract Abab is Ownable,Claimable,StandardToken {
     uint totalCost;
     uint currency;
     uint ababCoinTotalCost;
-    uint status; //TODO change type to enum or short  //status 0-new; 1-appruve ; 2 - cancel ; 3 - complete
+    BookingStatus status;
   }
 
   struct Room {
@@ -91,7 +93,7 @@ contract Abab is Ownable,Claimable,StandardToken {
   public
   returns (uint roomIndex)
   {
-      return UpsertRoom(_roomIndex, _roomDescriptionHash, msg.sender, _partner, _partnerPPM, _minNightCount, _timeForBooking);
+    return UpsertRoom(_roomIndex, _roomDescriptionHash, msg.sender, _partner, _partnerPPM, _minNightCount, _timeForBooking);
   }
 
   function UpsertRoomFromPartner(
@@ -150,7 +152,7 @@ contract Abab is Ownable,Claimable,StandardToken {
   {
     return rooms[msg.sender][_roomIndex].roomDescriptionHash;
   }
-  
+
   function RemoveRoomFromPartner(address _host, uint _roomIndex)
   public
   {
@@ -277,41 +279,41 @@ contract Abab is Ownable,Claimable,StandardToken {
 
   event NewBooking    (address indexed host, uint roomIndex, uint bookingIndex);
   event UpdateBooking (address indexed host, uint roomIndex, uint bookingIndex);
-  
-  function Timestamp2Daystamp(uint timestamp)
+
+  function GetDate(uint timestamp)
   public constant
   returns(uint result)
   {
     return timestamp/1 days;
   }
-  
-  function GetBlockDayStamp()
-  public
+
+  function GetTime(uint datetime)
+  public constant
   returns(uint result)
   {
-    return Timestamp2Daystamp(now);
+    uint dayCount = datetime / 1 days;
+    return datetime - 1 days * dayCount;
   }
-  
-  function DateIsFree(address _host, uint _roomIndex, uint _from, uint _to)
+
+  function DateIsFree(address _host, uint _roomIndex, uint _from, uint _to, uint nowDateTime)
   public constant
   returns(bool result)
   {
-    require(_to>=_from);
-    
     var room = rooms[_host][_roomIndex];
+    var nowDate = GetDate(nowDateTime);
+
+    if ((_from + room.minNightCount) > _to) return false;
+    if (_from < nowDate) return false;
+    if ((_from == nowDate) && (nowDate >= room.timeForBooking)) return false;
 
     //check, that this date don't booking
     uint i = room.bookingLength;
-    while(i>0){
+    while(i>0) {
       --i;
       var booking_i = room.booking[i];
-      if (booking_i.to > GetBlockDayStamp()) 
-          return true; 
-      if (!(
-        ((booking_i.to < _to) && (booking_i.from < _from)) 
-        ||
-        ((booking_i.to > _to) && (booking_i.from > _from)) 
-      )) return false;
+      if (booking_i.status > BookingStatus.Agreed)  continue;
+      if (booking_i.to < nowDate) continue; 
+      if (!((booking_i.from > _to)||(booking_i.to <= _from))) return false;
     }
     return true; 
   }
@@ -325,14 +327,15 @@ contract Abab is Ownable,Claimable,StandardToken {
     if((arg2<arg1)&&(arg2<arg3)) return arg2;
     return arg3;
   }
-  
-  function CalcTotalCost(address _host, uint _roomIndex, uint _from, uint _to)
-  public 
-  constant
-  returns(uint result)
+
+  function CalcTotalCost(address _host, uint _roomIndex, uint _from, uint _to, uint _nowDateTime)
+  public constant
+  returns(uint totalCost)
   {
+    totalCost = 0;
+
     //check, that this date don't booking
-    if(!DateIsFree(_host, _roomIndex, _from, _to)) return 0;
+    if(!DateIsFree(_host, _roomIndex, _from, _to, _nowDateTime)) return 0;
 
     var room = rooms[_host][_roomIndex];
 
@@ -341,7 +344,6 @@ contract Abab is Ownable,Claimable,StandardToken {
     uint needFrom  = _from;
     uint nextFrom  = maxUInt;
     uint daysCount = _to-_from;
-    uint totalCost = 0;
 
     // log2('needFrom=' ,needFrom);
     // log2('nextFrom=' ,nextFrom);
@@ -385,21 +387,34 @@ contract Abab is Ownable,Claimable,StandardToken {
 
   function Booking(address _host, uint _roomIndex, uint _from, uint _to)
   public
-  returns(bool result) // TODO или удалить или возвращать
   {
-    if (_from<=GetBlockDayStamp()) return false;
-    
+    if (_from < GetDate(now)) return;
     var room = rooms[_host][_roomIndex];
-    uint totalCost = CalcTotalCost(_host, _roomIndex, _from, _to);
-    if(totalCost>0){
-      uint _bookingIndex = room.bookingLength;
-      room.booking[ _bookingIndex ] = BookingRecord(msg.sender, _from, _to, totalCost, 0, totalCost, 0);
-      room.bookingLength = _bookingIndex + 1;
-      NewBooking(_host, _roomIndex, _bookingIndex); // TODO расчёт в AbabCoin 
+
+    uint totalCost = CalcTotalCost(_host, _roomIndex, _from, _to, now);
+    if(totalCost>0) {
+      NewBooking(_host, _roomIndex, room.bookingLength);
+      room.booking[ room.bookingLength ] = BookingRecord(msg.sender, _from, _to, totalCost, 0, totalCost, BookingStatus.New);
+      room.bookingLength = room.bookingLength + 1;
     }
   }
-  
-  function ApproveBooking(address _host, uint _roomIndex, uint _bookingIndex)
+
+  function GetBookingLength(address _host, uint _roomIndex)
+  public constant
+  returns(uint result)
+  {
+    return rooms[_host][_roomIndex].bookingLength;
+  }
+
+  function GetBooking(address _host, uint _roomIndex, uint _bookingIndex)
+  public constant
+  returns(address guest, uint from, uint to, uint totalCost, uint currency, uint ababCoinTotalCost, BookingStatus status)
+  {
+    var b = rooms[_host][_roomIndex].booking[_bookingIndex];
+    return (b.guest, b.from, b.to, b.totalCost, b.currency, b.ababCoinTotalCost, b.status);
+  }
+
+  function AgreeBooking(address _host, uint _roomIndex, uint _bookingIndex)
   public
   {
     if (_roomIndex >= rooms[_host].length)
@@ -408,8 +423,8 @@ contract Abab is Ownable,Claimable,StandardToken {
     if((room.partner != msg.sender) && (_host != msg.sender) )
       return;
     
-    if (room.booking[_bookingIndex].status == 0 ){
-      room.booking[_bookingIndex].status = 1;
+    if (room.booking[_bookingIndex].status == BookingStatus.New){
+      room.booking[_bookingIndex].status = BookingStatus.Agreed;
       UpdateBooking(_host, _roomIndex, _bookingIndex);
     }
   }
@@ -423,8 +438,8 @@ contract Abab is Ownable,Claimable,StandardToken {
     if((room.partner != msg.sender) && (_host != msg.sender) && (room.booking[_bookingIndex].guest != msg.sender) )
       return;
     
-    if ((room.booking[_bookingIndex].status == 0) || (room.booking[_bookingIndex].status == 1)){
-      room.booking[_bookingIndex].status = 1;
+    if ((room.booking[_bookingIndex].status == BookingStatus.New) || (room.booking[_bookingIndex].status == BookingStatus.Agreed)){
+      room.booking[_bookingIndex].status = BookingStatus.Cancel;
       UpdateBooking(_host, _roomIndex, _bookingIndex);
     }
   }

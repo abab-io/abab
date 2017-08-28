@@ -1,8 +1,6 @@
 pragma solidity ^0.4.11;
 
-
 import './Ownable.sol';
-
 
 /**
  * @title Claimable
