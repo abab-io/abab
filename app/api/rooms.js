@@ -34,7 +34,7 @@ module.exports = (API, redis) => {
 
         places.autocomplete({input: param.address || param.keyword}, function (err, response) {
             let result = [];
-            async.map(response.predictions, function (data,callback) {
+            async.map(response.predictions, function (data, callback) {
                 places.details({reference: data.reference}, function (err, response) {
                     let coutry = '';
                     let district = null;
@@ -46,17 +46,17 @@ module.exports = (API, redis) => {
 
                     }
                     if (response.result.types[0] === 'country' || response.result.types[0] === 'locality') {
-                        callback(null,{city:response.result.name,district:district,coutry:coutry});
-                    }else{
+                        callback(null, {city: response.result.name, district: district, coutry: coutry});
+                    } else {
                         callback()
                     }
                 });
-            }, function(err, results) {
+            }, function (err, results) {
                 let scan_res = results.filter(function (item) {
-                    if(item) return true;
+                    if (item) return true;
                     return false;
                 });
-                callback && callback(null,{results:scan_res,success:true});
+                callback && callback(null, {results: scan_res, success: true});
             });
 
         });
@@ -568,13 +568,22 @@ module.exports = (API, redis) => {
                     success: false
                 });
         }
-        db.rooms.find(findPram).then(function (documents) {
+        db.rooms.findOne(findPram).then(function (room) {
+            API.emit('requestFunctionContract', user, {
+                from: room.wallet,
+                function: 'Booking',
+                param: room.wallet + "," + room._index + "," + param._from + "," + param._to
+            }, function (err, res) {
+                if (res.success === false) {
+                    return callback && callback(null, res);
+                }
 
-
-            return callback && callback(null, {
-                    rooms: documents,
-                    success: true
-                });
+                return callback && callback(null, {
+                        room: room,
+                        tx: res,
+                        success: true
+                    });
+            });
         }).catch(function (err) {
             return callback && callback(null, {
                     error: error.api(err.message, 'db', err, 5),

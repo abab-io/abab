@@ -20,12 +20,12 @@ var reactiveRoom = Ractive.extend({
             }
             map3 = new google.maps.Map(document.getElementById('map-canvas3'), {
                 zoom: 13,
-                center: {lat: 1*res.rooms[0].location[0], lng: 1*res.rooms[0].location[1]}
+                center: {lat: 1 * res.rooms[0].location[0], lng: 1 * res.rooms[0].location[1]}
             });
             marker_homeThis = new google.maps.Marker({
-                position:  {lat: 1*res.rooms[0].location[0], lng: 1*res.rooms[0].location[1]},
+                position: {lat: 1 * res.rooms[0].location[0], lng: 1 * res.rooms[0].location[1]},
                 map: map3,
-                title:"This room!"
+                title: "This room!"
             });
             ractiveComponent['reactive-RoomApp'].set('minimalPriceDay', minimalPriceDay);
 
@@ -108,18 +108,22 @@ var reactiveRoom = Ractive.extend({
             ractiveComponent['reactive-RoomApp'].set('endDate', end.format('DD.MM.YY'));
             var sd = +(moment.utc(start.format('DD.MM.YY'), 'DD.MM.YY').unix() / (24 * 60 * 60)).toFixed(0);
             var ed = +(moment.utc(end.format('DD.MM.YY'), 'DD.MM.YY').unix() / (24 * 60 * 60)).toFixed(0);
-            ractiveComponent['reactive-RoomApp'].set('startDateDay',sd);
+            ractiveComponent['reactive-RoomApp'].set('startDateDay', sd);
             ractiveComponent['reactive-RoomApp'].set('endDateDay', ed);
             ractiveComponent['reactive-RoomApp'].set('loadingCost', true);
 
-            API('fn_CalcTotalCost',{_host:room_data.wallet,_roomIndex:room_data._index,_from:sd,_to:ed},true,function (res) {
+            API('fn_CalcTotalCost', {
+                _host: room_data.wallet,
+                _roomIndex: room_data._index,
+                _from: sd,
+                _to: ed
+            }, true, function (res) {
                 console.log(res);
                 ractiveComponent['reactive-RoomApp'].set('cost', res.result.result);
                 ractiveComponent['reactive-RoomApp'].set('loadingCost', false);
 
-            },true)
+            }, true)
         });
-
 
 
     }
@@ -135,7 +139,7 @@ ractiveComponent['reactive-RoomApp'].on('booking', function () {
         confirmButtonText: 'Да',
         cancelButtonText: 'Нет',
         showCancelButton: true,
-        text: "Вы действительно хотите забронировать данный обект с "+ractiveComponent['reactive-RoomApp'].get('startDate')+' по '+ractiveComponent['reactive-RoomApp'].get('endDate'),
+        text: "Вы действительно хотите забронировать данный обект с " + ractiveComponent['reactive-RoomApp'].get('startDate') + ' по ' + ractiveComponent['reactive-RoomApp'].get('endDate'),
         showLoaderOnConfirm: true,
         preConfirm: function () {
             swal({
@@ -160,9 +164,14 @@ ractiveComponent['reactive-RoomApp'].on('booking', function () {
             var room_data = ractiveComponent['reactive-RoomApp'].get('room');
             var sd = ractiveComponent['reactive-RoomApp'].get('startDateDay');
             var ed = ractiveComponent['reactive-RoomApp'].get('endDateDay');
-            API('fn_CalcTotalCost',{_host:room_data.wallet,_roomIndex:room_data._index,_from:sd,_to:ed},true,function (res) {
-                if(!res.result.result || +res.result.result <= 0){
-                    swal({
+            API('fn_CalcTotalCost', {
+                _host: room_data.wallet,
+                _roomIndex: room_data._index,
+                _from: sd,
+                _to: ed
+            }, true, function (res) {
+                if (!res.result.result || +res.result.result <= 0) {
+                    return swal({
                         title: 'Ошибка',
                         type: 'error',
                         text: 'Обект не готов принимать гостей в данные числа попробуйте другие  или выбирите другой обект',
@@ -170,16 +179,34 @@ ractiveComponent['reactive-RoomApp'].on('booking', function () {
                         showCancelButton: false
                     });
                 }
-                var txHash = '0xa1b1d9551211755165a677c5e9d4b1041f4b5fd6';
-                swal({
-                    title: 'Успешно!',
-                    type: 'success',
-                    text: "<div style='position: initial; width: 100%; vertical-align: bottom;text-overflow: ellipsis;overflow: hidden;'>Ropsten Ethereum TxHash: <a href='https://ropsten.etherscan.io/tx/" + txHash + "' target='_blank' title='" + txHash + "'>" + txHash + "</a></div>",
-                    confirmButtonText: 'Ок',
-                    showCancelButton: false
-                });
+                API('Booking', {
+                    _roomIndex: room_data._index,
+                    _from: sd,
+                    _to: ed
+                }, function (res) {
+                    console.log(res);
 
-            },true)
+                    if(res.success && res.tx.success) {
+                        var txHash = res.tx.result.tx.hash;
+                        swal({
+                            title: res.room.title+', забронированно!',
+                            type: 'success',
+                            text: "<div style='position: initial; width: 100%; vertical-align: bottom;text-overflow: ellipsis;overflow: hidden;'>Ropsten Ethereum TxHash: <a href='https://ropsten.etherscan.io/tx/" + txHash + "' target='_blank' title='" + txHash + "'>" + txHash + "</a></div>",
+                            confirmButtonText: 'Ок',
+                            showCancelButton: false
+                        });
+                    }else {
+                        return swal({
+                            title: 'Ошибка',
+                            type: 'error',
+                            text: 'Обект не готов принимать гостей',
+                            confirmButtonText: 'Ок',
+                            showCancelButton: false
+                        });
+                    }
+
+                }, true)
+            }, true)
         }
     });
 
