@@ -1,10 +1,63 @@
+
+var map2 = false;
+var geocode =false;
+var marker_home = false;
 var reactiveAddRoom = Ractive.extend({
     oninit: function () {
+        ABAB.map.call_wait_auth(function () {
+            geocode=new google.maps.Geocoder();
+            map2 = new google.maps.Map(document.getElementById('map-canvas2'), {
+                zoom: 1,
+                center: {lat: 20, lng: 20}
+            });
+            marker_home = new google.maps.Marker({
+                position: {lat: 0, lng: -20},
+                map: map2,
+                draggable: true,
+                title: "Drag me!"
+            });
+        });
         console.log('reactiveAddRoom oninit');
     }
 });
 ractiveComponent['reactive-AddRoomApp'].set('photos', []);
+ractiveComponent['reactive-AddRoomApp'].set('lng', false);
+ractiveComponent['reactive-AddRoomApp'].set('lat', false);
 
+ractiveComponent['reactive-AddRoomApp'].on('address', function () {
+    var formarr = $('#AddRoom').serializeArray();
+    var form_obj = {};
+    for (var i in formarr) {
+        if (form_obj[formarr[i].name] && typeof form_obj[formarr[i].name] === 'string') {
+            form_obj[formarr[i].name] = [form_obj[formarr[i].name], formarr[i].value];
+        } else if (form_obj[formarr[i].name] && typeof form_obj[formarr[i].name] === 'object') {
+            form_obj[formarr[i].name].push(formarr[i].value);
+        } else
+            form_obj[formarr[i].name] = formarr[i].value
+    }
+    geocode.geocode({address:form_obj['address_address']+','+form_obj['address_city']+','+form_obj['address_state']+','+form_obj['address_country']}, function(results, status) {
+        console.log(results);
+        // console.log(results[0].geometry.location.lat(),status,form_obj);
+        // console.log(results[0].geometry.location.lng(),status,form_obj);
+        if (status == 'OK') {
+            if(form_obj['address_country']  && form_obj['address_country']!== '')
+                map2.setZoom(4);
+            if(form_obj['address_state']  && form_obj['address_state']!== '')
+                map2.setZoom(6);
+            if(form_obj['address_city']  && form_obj['address_city']!== '')
+                map2.setZoom(8);
+            if(form_obj['address_address']  && form_obj['address_address']!== '')
+                map2.setZoom(11);
+
+
+            ractiveComponent['reactive-AddRoomApp'].set('lng', results[0].geometry.location.lng().toFixed(3));
+            ractiveComponent['reactive-AddRoomApp'].set('lat', results[0].geometry.location.lat().toFixed(3));
+            map2.setCenter({lng:results[0].geometry.location.lng(),lat:results[0].geometry.location.lat()});
+            marker_home.setPosition({lng:results[0].geometry.location.lng(),lat:results[0].geometry.location.lat()});
+        } else {
+            // alert('Geocode was not successful for the following reason: ' + status);
+        }});
+});
 ractiveComponent['reactive-AddRoomApp'].on('submitRoom', function () {
     var formarr = $('#AddRoom').serializeArray();
     var form_obj = {};
@@ -46,6 +99,24 @@ ractiveComponent['reactive-AddRoomApp'].on('submitRoom', function () {
     swal.showLoading();
     API('UpsertRoom', form_obj, false, function (resAPI) {
         console.log(resAPI);
+        if(resAPI.error){
+            if(resAPI.code && resAPI.code ==='auth'){
+                swal({
+                    title: 'Ошибка',
+                    type: 'error',
+                    text: 'Для сохранения обекта вам нужно авторизоватся',
+                    confirmButtonText: 'Ok',
+                    showCancelButton: false
+                });
+            }else
+            swal({
+                title: 'Ошибка',
+                type: 'error',
+                text: resAPI.error.message,
+                confirmButtonText: 'Ok',
+                showCancelButton: false
+            });
+        }
         swal({
             title: ('Отправка транзакции...'),
             closeOnConfirm: false,
@@ -79,7 +150,7 @@ ractiveComponent['reactive-AddRoomApp'].on('submitRoom', function () {
                     if (!resAPI || !resAPI.room || !resAPI.room.txHash)
                         swal({
                             title: 'Ошибка',
-                            type: 'Error',
+                            type: 'error',
                             confirmButtonText: 'Ok',
                             showCancelButton: false
                         });

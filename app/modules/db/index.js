@@ -262,6 +262,10 @@ var schemas = {
             type: String,
             default: null,
         },
+        user: {
+            type: Schema.Types.ObjectId,
+            ref: 'users'
+        },
         title: {
             type: String,
             default: '',

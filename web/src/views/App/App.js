@@ -21,7 +21,104 @@ var reactiveApp = Ractive.extend({
 
 });
 
+ractiveComponent['rootApp'].set('auth_type', 'login');
+ractiveComponent['rootApp'].on('logout', function () {
+    swal({
+        title: 'Подтверждение',
+        type: 'question',
+        confirmButtonText: 'Да',
+        cancelButtonText: 'Нет',
+        showCancelButton: true,
+        text: "Вы действительно хотите выйти?",
+        showLoaderOnConfirm: true,
+        preConfirm: function () {
+            ABAB.auth_action.logout(function () {
+                swal.closeModal();
+            });
+        }
+    });
+});
+ractiveComponent['rootApp'].on('change_type_auth_modal', function () {
 
+    if (ractiveComponent['rootApp'].get('auth_type') === 'reg') ractiveComponent['rootApp'].set('auth_type', 'login');
+    else if (ractiveComponent['rootApp'].get('auth_type') === 'login') ractiveComponent['rootApp'].set('auth_type', 'reg');
+    console.log('register_modal click');
+});
+if (localStorage.getItem('auth')) {
+    try {
+        var loginData = JSON.parse(localStorage.getItem('auth'));
+        API('public_auth_email', loginData, function (res) {
+            console.log(res);
+            if (res.error) {
+                localStorage.removeItem('auth');
+                return swal('Ошибка авторизации', res.error.message, 'error');
+            }
+            if (res.success && res.user) {
+                ABAB.auth(res);
+
+            } else {
+                localStorage.removeItem('auth');
+                return swal('Ошибка авторизации', res.error.message, 'error');
+            }
+        }, true);
+    } catch (e) {
+        console.error('auth storage parse', e);
+        localStorage.removeItem('auth');
+    }
+}
+ractiveComponent['rootApp'].on('location_input_scan', function () {
+    console.log($('#location_input_scan').val());
+});
+ractiveComponent['rootApp'].on('auth_start', function () {
+    console.log('login click');
+    var formarr = $('#auth_form').serializeArray();
+
+    var form_obj = {};
+    for (var i in formarr) {
+        if (form_obj[formarr[i].name] && typeof form_obj[formarr[i].name] === 'string') {
+            form_obj[formarr[i].name] = [form_obj[formarr[i].name], formarr[i].value];
+        } else if (form_obj[formarr[i].name] && typeof form_obj[formarr[i].name] === 'object') {
+            form_obj[formarr[i].name].push(formarr[i].value);
+        } else
+            form_obj[formarr[i].name] = formarr[i].value
+    }
+    console.log(form_obj);
+    if (form_obj.from === 'reg') {
+        API('public_registration_email', {
+            email: form_obj.email,
+            password: form_obj.password,
+            name: form_obj.name,
+            surname: form_obj.surname
+        }, function (res) {
+            if (res.error)
+                return swal('Ошибка авторизации', res.error.message, 'error');
+            swal('Успешно зарегестрированны', 'На вашу почту "' + form_obj.email + '", было отправлено письмо с ссылкой на активацию аккаунта', 'success');
+            if (ractiveComponent['rootApp'].get('auth_type') === 'reg') ractiveComponent['rootApp'].set('auth_type', 'login');
+
+            console.log(res);
+        }, true)
+    }
+    if (form_obj.from === 'login') {
+        localStorage.setItem('auth', JSON.stringify());
+        API('public_auth_email', {email: form_obj.email, password: form_obj.password}, function (res) {
+            console.log(res);
+            if (res.error)
+                return swal('Ошибка авторизации', res.error.message, 'error');
+            if (res.success && res.user) {
+                localStorage.setItem('auth', JSON.stringify({email: form_obj.email, password: form_obj.password}));
+
+                ABAB.auth(res);
+                $('#formModal').modal('hide');
+                return swal('Добро пожаловать на Abab.io', '', 'success');
+
+            } else {
+                return swal('Ошибка авторизации', res.error.message, 'error');
+            }
+
+        }, true)
+
+    }
+});
 window.onpopstate = function (event) {
     if (location.hash.replace('#', '').split('-')[0] && location.hash.replace('#', '').split('-')[0] != '')
         ABAB.setPage(location.hash.replace('#', '').split('-')[0], location.hash.replace('#', '').split('-')[1], true);
@@ -48,7 +145,7 @@ window.onpopstate = function (event) {
 
 init_daterangepicker('#config-demo');
 
-function init_daterangepicker(selector,callback) {
+function init_daterangepicker(selector, callback) {
     var options = {};
 
 
@@ -81,8 +178,92 @@ function init_daterangepicker(selector,callback) {
 
     $(selector).daterangepicker(options, function (start, end, label) {
 
-        callback && callback(start,end,+moment(end).diff(moment(start),'days'));
-        console.log('New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' , count_days: '+moment(end).diff(moment(start),'days')+'(predefined range: ' + label + ')');
+        callback && callback(start, end, +moment(end).diff(moment(start), 'days'));
+        console.log('New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' , count_days: ' + moment(end).diff(moment(start), 'days') + '(predefined range: ' + label + ')');
     });
 
 }
+$('#location_input_scan').flexdatalist({
+    url: '/api/v1/?method=public_geoCode',
+    visibleProperties: ["city", "district", "coutry"],
+    searchDisabled: true,
+    selectionRequired: true,
+    valueProperty: '*',
+    groupBy: 'coutry',
+    textProperty: '{city}',
+
+}).on('change:flexdatalist', function (event, data) {
+    var json;
+    try {
+        json = JSON.parse(data.value)
+    } catch (e) {
+        console.error(e)
+    }
+    var find = {};
+
+
+    if (json && json.city) {
+
+        if(json.city === 'Moscow'){
+            console.error('One and the same city can have several names');
+            json.city  = 'Moskva';
+        }
+        find = {
+            $or: [{
+                "address.city": {
+                    '$regex': json.city,
+                    '$options': 'i'
+                }
+            }, {"address.country": {'$regex': json.city, '$options': 'i'}}]
+        };
+    }
+    API('GetRooms', {page: 1, find: find}, true, function (res) {
+
+        ractiveComponent['reactive-RoomsApp'].set('rooms', res.rooms);
+        ractiveComponent['reactive-RoomsApp'].set('rooms_count', res.count);
+
+        if (window.map && window.geocode && window.geocode) {
+            geocode = res.rooms.map(function (room, i) {
+                if (room.location[0] && room.location[1]) {
+                    var infowindow = new google.maps.InfoWindow({
+                        content: '<div id="content">' +
+                        '<div id="siteNotice">' +
+                        '</div>' +
+                        '<h1 id="firstHeading" class="firstHeading">' + room.title + '</h1>' +
+                        '<div id="bodyContent">' +
+                        '<p><b>' + room.title + '</b></p>' +
+                        '<p>Transaction: <a href="' + ractiveComponent['reactive-RoomsApp'].get('blockchain_url') + 'tx/' + room.txHash + '" target="_blank">' +
+                        room.txHash + '</a>' +
+                        '<br>' +
+                        '(last update ' + room.update_at.split('T')[0] + ').</p>' +
+                        '</div>' +
+                        '</div>',
+                        maxWidth: 250
+                    });
+                    var marker = new google.maps.Marker({
+                        position: {lat: room.location[0] * 1, lng: room.location[1] * 1},
+                        // label: ''
+                        animation: google.maps.Animation.DROP,
+                        map: map
+
+                    });
+                    marker.addListener('click', function () {
+                        infowindow.open(map, marker);
+                    });
+                    return marker;
+                }
+                else return false;
+            });
+            new MarkerClusterer(map, markers,
+                {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
+
+            geocode.geocode({address: json.city + ',' + json.country}, function (results, status) {
+                map.setCenter({lng: results[0].geometry.location.lng(), lat: results[0].geometry.location.lat()});
+                map.setZoom(8);
+            });
+        }
+    });
+
+
+    console.log(data.value);
+});

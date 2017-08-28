@@ -15,10 +15,117 @@ const md5 = require('md5');
 
 const _ = require('lodash');
 const SolidityFunction = require('web3/lib/web3/function');
-var request = require('request');
+const request = require('request');
+const moment = require('moment');
+const async = require('async');
+
 
 module.exports = (API, redis) => {
+
     var rateETHUSD = 0;
+
+    var web3_events = {
+        NewSchedule: function (event, tx, callback) {
+            console.log(event);
+            db.scheduleRoom.update({
+                "tx.hash": event.transactionHash
+            }, {
+                $set: {
+                    "tx.status": 3,
+                    "_scheduleIndex": +(event.args.scheduleIndex.toString()),
+                }
+            }, {}).then(function (docs) {
+                callback(true);
+            }).catch(function () {
+                callback('error db $ db.scheduleRoom.findOneAndUpdate');
+            });
+        },
+        NewRoom: function (event, tx, callback) {
+            console.log(event);
+
+            let _roomDescriptionHash = web3.fromDecimal(event.args._roomDescriptionHash);
+            db.rooms.findOneAndUpdate({
+                txHash: tx.tx.hash,
+                // _hash: _roomDescriptionHash,
+                wallet: event.args.host
+            }, {
+                tx: db.mongoose.Types.ObjectId(tx._id),
+                _index: event.args.roomIndex,
+                status: 3
+            }, {new: true}).populate('user').then(function (document) {
+                if(!document){
+                     console.log('[data]',{txHash: tx.tx.hash, _hash: _roomDescriptionHash, wallet: event.args.host});
+                    return console.error('[Error] EventBlock: '+event.blockNumber);
+                }
+                db.scheduleRoom.find({
+                    room: db.mongoose.Types.ObjectId(document._doc._id),
+                    "tx.status": 1
+                }).then(function (documents) {
+                    async.mapSeries(documents, function (schedule, callback) {
+
+
+                        let param_tx = [
+                            event.args.roomIndex, //_roomIndex
+                            '9999999999',//_scheduleIndex
+                            +(moment.utc(schedule.startDate).unix() / (24 * 60 * 60)).toFixed(0),//_from
+                            +(moment.utc(schedule.endDate).unix() / (24 * 60 * 60)).toFixed(0),//_to
+                            schedule.dayPrice,//_dayPrice
+                            +(schedule.dayPrice - (schedule.dayPrice * schedule.discountWeek / 100)).toFixed(8),//_weekPrice
+                            +(schedule.dayPrice - (schedule.dayPrice * schedule.discountMonth / 100)).toFixed(8),//_monthPrice
+                            0 //_currency (1 abab 2 eth 3 usd 4 rur)
+                        ].join(',');
+
+                        // console.log({
+                        //     from: document.wallet,
+                        //     function: 'UpsertSchedule',
+                        //     param: param_tx
+                        // });
+                        API.emit('requestFunctionContract', document.user, {
+                            from: document.wallet,
+                            function: 'UpsertSchedule',
+                            param: param_tx
+                        }, function (err, res) {
+                            db.scheduleRoom.update({
+                                _id: db.mongoose.Types.ObjectId(schedule._id),
+                                "tx.status": 1
+                            }, {
+                                $set: {
+                                    "tx.status": 2,
+                                    "tx.hash": res.result.tx.hash,
+                                }
+                            }, {}).then(function (docs) {
+                                // console.log(docs);
+                                callback(null, res.result.tx)
+
+                            }).catch(function () {
+                                callback('error db $ db.scheduleRoom.findOneAndUpdate');
+
+                            });
+                        });
+
+
+                    }, function () {
+                        // console.log('scheduleRoom public:', arguments);
+                        callback && callback(true);
+                    })
+
+
+                }).catch(function () {
+                    console.error('db event',arguments)
+                });
+
+
+            });
+
+            // console.log('transactionHash', event.transactionHash);
+            // console.log('host', event.args.host);
+            // console.log('roomIndex', +event.args.roomIndex);
+            // console.log('_roomDescriptionHash', web3.fromDecimal(event.args._roomDescriptionHash));
+
+            // callback && callback();
+        }
+    };
+
     API.on('wallet', (user, param, callback) => {
         param.type = 'ETH';
         if (!web3.isConnected()) {
@@ -559,8 +666,8 @@ module.exports = (API, redis) => {
         }
         let paramContract = param.param;
         console.log(param);
-        paramContract.push(function (error, result) {
-            if (error)
+        paramContract.push(function (err, result) {
+            if (err)
                 return callback && callback(null, {
                         error: error.api('Param type is not array', 'contract', {
                             param: param,
@@ -568,8 +675,9 @@ module.exports = (API, redis) => {
                         }, 2),
                         success: false
                     });
-            callback && callback(null, result);
             console.log('result: ', result, error);
+            if (typeof result === 'boolean') result = [result];
+            callback && callback(null, result);
         });
         contract[param.function].apply(null, paramContract);
 
@@ -605,99 +713,45 @@ module.exports = (API, redis) => {
             {name: 'latency_ms', type: "int(11)", title: 'Processing time of the request in ms', default: '122'}
         ]
     });
-};
 
-var web3_events = {
-    NewRoom: function (event, tx, callback) {
-        // console.log(event);
-        let _roomDescriptionHash = web3.fromDecimal(event.args._roomDescriptionHash);
-        db.rooms.findOneAndUpdate({txHash: tx.tx.hash, _hash: _roomDescriptionHash, wallet: event.args.host}, {
-            tx: db.mongoose.Types.ObjectId(tx._id),
-            _index: event.args.roomIndex,
-            status: 3
-        }, {new: true}).then(function (document) {
-            // if (document.dateRanges) {
-            //     for (let i in document.dateRanges) {
-            //         if (document.dateRanges.hasOwnProperty(i)) {
-            //             if (document.dateRanges[i].txStatus === 1) {
-            //                 let param_tx = [
-            //                     event.args.roomIndex, //_roomIndex
-            //                     '9999999999',//_scheduleIndex
-            //                     document.dateRanges[i].startDate,//_from
-            //                     document.dateRanges[i].endDate,//_to
-            //                     +document.dateRanges[i].priceDay,//_dayPrice
-            //                     +(document.dateRanges[i].priceDay-(document.dateRanges[i].priceDay*document.dateRanges[i].discountWeek/100)).toFixed(8),//_weekPrice
-            //                     +(document.dateRanges[i].priceDay-(document.dateRanges[i].priceDay*document.dateRanges[i].discountMonth/100)).toFixed(8),//_monthPrice
-            //                     "USD" //_currency
-            //                 ].join(',');
-            //                 API.emit('requestFunctionContract', user, {
-            //                     from: document.wallet,
-            //                     function: 'UpsertSchedule',
-            //                     param: param_tx
-            //                 }, function (err, res) {
-            //                     db.rooms.findOneAndUpdate({
-            //                         _id: db.mongoose.Types.ObjectId(document._id),
-            //                     }, {
-            //                         tx: db.mongoose.Types.ObjectId(tx._id),
-            //                         _index: event.args.roomIndex,
-            //                         status: 3
-            //                     }, {new: true});
-            //                 });
-            //
-            //
-            //             }
-            //         }
-            //     }
-            // }
-            callback && callback(true);
+    if (web3.isConnected()) {
+        // config.set('geth:lastBlockNumber', 1376000);
+        console.log("Web3 connected!\n\tStart synchronization... \n\t Last block:" + config.get('geth:lastBlockNumber'));
+        var contract = web3.eth.contract(sol_config._abi).at(sol_config._address);
+
+        var events = contract.allEvents({fromBlock: config.get('geth:lastBlockNumber'), toBlock: 'latest'});
+        events.watch(function (error, result) {
+            if (result && result.event) {
+                if (!web3_events[result.event]) {
+                    return console.error('EVENT Error #web3_events not found:\n', result, '\n\t\t- - - - - - -\n');
+                }
+                console.log('Synchronization block number:', result.blockNumber);
+                db.tx.findOne({"tx.hash": result.transactionHash}).then(function (res) {
+                    if (res) {
+                        web3_events[result.event](result, res, function () {
+                            config.set('geth:lastBlockNumber', result.blockNumber);
+                            console.log('[Success] Synchronization(' + result.event + ') block number:', result.blockNumber);
+
+                        });
+                        if (res.callback_url && res.callback_url !== '')
+                            request.post(res.callback_url, {
+                                form: {event: result},
+                                timeout: 500
+                            }, function (error, response,) {
+                                console.log('statusCode:', response && response.statusCode);
+                            });
+                    }
+
+                }).catch(function (err) {
+                    return callback && callback(null, {
+                            error: error.api(err.message, 'db', err, 3),
+                            success: false
+                        });
+
+                });
+            }
+
         });
 
-        console.log('blockNumber', event.blockNumber);
-        // console.log('transactionHash', event.transactionHash);
-        // console.log('host', event.args.host);
-        // console.log('roomIndex', +event.args.roomIndex);
-        // console.log('_roomDescriptionHash', web3.fromDecimal(event.args._roomDescriptionHash));
-
-        callback && callback();
     }
 };
-
-if (web3.isConnected()) {
-    // config.set('geth:lastBlockNumber', 1376000);
-    console.log("Web3 connected!\n\tStart synchronization... \n\t Last block:" + config.get('geth:lastBlockNumber'));
-    var contract = web3.eth.contract(sol_config._abi).at(sol_config._address);
-
-    var events = contract.allEvents({fromBlock: config.get('geth:lastBlockNumber'), toBlock: 'latest'});
-    events.watch(function (error, result) {
-        if (result && result.event) {
-            if (!web3_events[result.event]) {
-                return console.error('EVENT Error #web3_events not found:\n', result, '\n\t\t- - - - - - -\n');
-            }
-            db.tx.findOne({"tx.hash": result.transactionHash}).then(function (res) {
-                if (res) {
-                    console.log(res);
-
-                    web3_events[result.event](result, res, function () {
-                        config.set('geth:lastBlockNumber', result.blockNumber);
-                    });
-                    if (res.callback_url && res.callback_url !== '')
-                        request.post(res.callback_url, {
-                            form: {event: result},
-                            timeout: 500
-                        }, function (error, response,) {
-                            console.log('statusCode:', response && response.statusCode);
-                        });
-                }
-
-            }).catch(function (err) {
-                return callback && callback(null, {
-                        error: error.api(err.message, 'db', err, 3),
-                        success: false
-                    });
-
-            });
-        }
-
-    });
-
-}

@@ -100,9 +100,13 @@ function API(method, param, _public, cb, reset_cb) {
             }
         }
     } else {
+        var auth__ = '';
+        if(ABAB.auth_action.user){
+            auth__ = '&api_key='+ABAB.auth_action.user.api.key;
+        }
         if(_public) method = 'public_'+method;
         $.ajax({
-            url: "http://localhost:8000/api/v1/?method="+method+"&api_key=DJUQU-PkRT1Upz-SNgol-Y4gdX-dD7OC3-1500657341036",
+            url: "/api/v1/?method="+method+""+auth__,
             type: "get", //send it through get method
             data: param,
             success: function (response) {
@@ -232,7 +236,24 @@ function updatePlugins() {
 
     });
 }
+function initMap() {
+    ABAB.map.fn(true);
+    ABAB.map.init=true;
+
+}
 var ABAB = {
+    map:{
+        init:false,
+        cb_function_arr: [],
+        call_wait_auth: function (fn) {
+            if (!ABAB.map.init) {
+                ABAB.map.cb_function_arr.push(fn);
+            } else {
+                fn();
+            }
+        },
+        fn:function(){}
+    },
     event: {},
     page: null,
     pageObj: {
@@ -308,6 +329,7 @@ var ABAB = {
     },
     auth_action: {
         status: false,
+        user: null,
         cb_function_arr: [],
         call_wait_auth: function (fn) {
             if (!ABAB.auth_action.status) {
@@ -315,6 +337,12 @@ var ABAB = {
             } else {
                 fn();
             }
+        },
+        logout: function (callback) {
+            ABAB.auth_action.user = null;
+            ractiveComponent['rootApp'].set('user', false);
+            localStorage.removeItem('auth');
+            callback && callback();
         },
         auth_emit: function () {
             if (!ABAB.auth_action.status) {
@@ -328,7 +356,9 @@ var ABAB = {
     },
     auth: function (data) {
 
-        if (data.status && data.status == 'success') {
+        if (data.success && data.success === true) {
+            ABAB.auth_action.user = data.user;
+            ractiveComponent['rootApp'].set('user',ABAB.auth_action.user );
             ABAB.auth_action.auth_emit();
         } else {
 
@@ -345,14 +375,9 @@ var ABAB = {
                 confirmButtonText: _chat_e('Logout'),
                 showLoaderOnConfirm: true,
                 preConfirm: function () {
-
-
-                    return new Promise(function (resolve, reject) {
-                        var t = setTimeout(function () {
-                            reject(_chat_e('Error! Server unavailable.'));
-                        }, 10000);
-
-                    })
+                    localStorage.clear();
+                    location.reload();
+                    swal.closeModal();
                 },
                 allowOutsideClick: false
             }).then(function () {

@@ -4,7 +4,7 @@ const error = require('../modules/error/api');
 
 module.exports = (API, redis) => {
 
-    let contractFn = _.filter(sol_config._abi, {type: 'function', statemutability: 'view'});
+    let contractFn = _.filter(sol_config._abi, {type: 'function'});
     if (contractFn && typeof contractFn === 'object' && contractFn.length > 0) {
         for (let key in contractFn) {
             let docs = {

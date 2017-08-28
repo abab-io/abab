@@ -67,7 +67,7 @@ module.exports = (API, redis) => {
                     key: random.key(5, 5, 5, 8) + '-' + (new Date().getTime()),
                     secret: random.str(20, 25),
                     white_ip: '*.*.*.*',
-                    status: false
+                    status: true // secure  default false
                 },
                 activate_hash: random.key(4, 6, 6, 8) + '-' + (new Date().getTime()),
 
@@ -188,6 +188,7 @@ module.exports = (API, redis) => {
             return callback && callback(null, {
                     user: filterObject(document._doc, [
                         '_id',
+                        'api', // secure delete this param in result
                         'name',
                         'surname',
                         'birthday',

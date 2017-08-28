@@ -1,38 +1,38 @@
-<div class="nblsv page-content-Room"><div class="section-block lkbv tops">
+<div class="nblsv page-content-Room">
+    <div class="section-block lkbv tops">
 
 
-    <div class="col-lg-10 col-md-10">
-        <div class="slider slider-for">
-            {{#room.photo}}
-            <div>
-                <div class="slt-sl">
+        <div class="col-lg-10 col-md-10">
+            <div class="slider slider-for">
+                {{#room.photo}}
+                <div>
+                    <div class="slt-sl">
 
-                    <img data-toggle="modal" data-target="#img-room-{{.}}"
-                         src="{{fileUrl}}{{.}}.jpeg" alt="">
-                    <div data-toggle="modal" data-target="#img-room-{{.}}" class="zoom-s"></div>
+                        <img data-toggle="modal" data-target="#img-room-{{.}}"
+                             src="{{fileUrl}}{{.}}.jpeg" alt="">
+                        <div data-toggle="modal" data-target="#img-room-{{.}}" class="zoom-s"></div>
+                    </div>
                 </div>
+                {{/}}
             </div>
-            {{/}}
         </div>
-    </div>
 
-    <div class="col-lg-2 col-md-2">
-        <div class="slider slider-nav">
+        <div class="col-lg-2 col-md-2">
+            <div class="slider slider-nav">
 
-            {{#room.photo}}
-            <div>
-                <div class="slt-slg">
-                    <img src="{{fileUrl}}{{.}}.jpeg" alt=""></div>
+                {{#room.photo}}
+                <div>
+                    <div class="slt-slg">
+                        <img src="{{fileUrl}}{{.}}.jpeg" alt=""></div>
+                </div>
+                {{/}}
+
             </div>
-            {{/}}
-
         </div>
+        <div class="clearfix"></div>
     </div>
-    <div class="clearfix"></div>
-</div>
 </div>
 <div class="nblsv page-content-Room">
-
 
 
     <div class="fll-l">
@@ -204,13 +204,13 @@
                         <div class="l-cols">
                             <p>
                                 Период ({{intervalDate}} дней):<br>
-                                <strong>{{startDate}} - {{endDate}}</strong>
+                                <strong>{{startDate.split('T')[0]}} - {{endDate.split('T')[0]}}</strong>
                             </p>
                             <p>
                                 Стоимость за <strong>1 ночь</strong>:
                                 <br>
                                 <br>
-                                <strong style="font-size: 25px;padding: 10px;">${{priceDay}}</strong>
+                                <strong style="font-size: 25px;padding: 10px;"> {{dayPrice}} ABA</strong>
                             </p>
 
 
@@ -222,16 +222,18 @@
                                 <br>
                                 <br>
                                 Неделя:
-                                <strong>{{discountWeek}}% (~{{(priceDay-(priceDay/100*discountWeek)).toFixed(0)}} день)</strong>
+                                <strong>{{discountWeek}}% (~{{+(weekPrice).toFixed(0)}} ABA
+                                    день)</strong>
                                 <br>
                                 <br>
                                 Месяц:
-                                <strong>{{discountMonth}}% (~{{(priceDay-(priceDay/100*discountMonth)).toFixed(0)}} день)</strong>
+                                <strong>{{discountMonth}}% (~{{+(monthPrice).toFixed(2)}} ABA
+                                    день)</strong>
                             </p>
 
                         </div>
                         <div class="txt-l-block" style="max-width: 400px;width: 100%">
-                        <hr>
+                            <hr>
                         </div>
                         {{/}}
                         <div class="txt-l-block" style="max-width: 390px;">
@@ -421,45 +423,57 @@
     <div class="fll-r">
         <div class="block-lb" style="overflow: hidden;">
             <div class="lorem-sl">
+                {{#if !loadingCost}}
+                {{#if intervalDate}}
+                {{#if cost && +cost !== 0 }}
+                {{cost}} ABA за {{intervalDate}} ночей
+                {{else}}
+                Обект в данные дни не готов принимать гостей!
+                {{/if}}
+                {{else}}
                 от
-                <span>${{minimalPriceDay}}</span>
+                <span>{{minimalPriceDay}} ABA</span>
                 в сутки
+                {{/if}}
+                {{else}}
+                Расчет стоимости...
+                {{/if}}
             </div>
             <div class="row">
                 <div class="col-sm-12">
                     <div class="input-area">
-                        <label class="text-center" for="">Прибытие-Выезд</label>
+                        <label class="text-center" for="">Прибытие-Выезд </label>
                         <input type="text" id="period-input-date-booking"></div>
                 </div>
 
             </div>
 
-            <div class="row">
-                <div class="col-sm-12">
-                    <div class="input-area">
-                        <label class="text-center" for="">Кол-во гостей</label>
+            <!--<div class="row">-->
+            <!--<div class="col-sm-12">-->
+            <!--<div class="input-area">-->
+            <!--<label class="text-center" for="">Кол-во гостей</label>-->
 
-                        <div class="quantity bvcs">
-                            <input type="number" min="1" max="9" step="1" value="1">
-                            <div class="quantity-nav">
-                                <div class="quantity-button quantity-up">+</div>
-                                <div class="quantity-button quantity-down">-</div>
-                            </div>
-                        </div>
+            <!--<div class="quantity bvcs">-->
+            <!--<input type="number" min="1" max="9" step="1" value="1">-->
+            <!--<div class="quantity-nav">-->
+            <!--<div class="quantity-button quantity-up">+</div>-->
+            <!--<div class="quantity-button quantity-down">-</div>-->
+            <!--</div>-->
+            <!--</div>-->
 
 
-                        <div class="section-block lkbv-n">
+            <!--<div class="section-block lkbv-n">-->
 
-                        </div>
-                    </div>
-                </div>
+            <!--</div>-->
+            <!--</div>-->
+            <!--</div>-->
 
-            </div>
+            <!--</div>-->
             <br>
 
             <div class="row">
                 <div class="col-sm-12">
-                    <button type="submit" class="button_mods" aria-busy="false">
+                    <button type="button" class="button_mods" aria-busy="false" on-click="booking">
             <span class="text_cvk">
               <span>Запросить бронирование</span>
             </span>
@@ -472,7 +486,7 @@
             <hr>
 
             <div class="txtl-a">
-                <p>За прошлую неделю объявление посмотрели 1300 раз</p>
+                <p>За прошлую неделю объявление посмотрели 13 раз</p>
 
                 <img src="data:image/svg+xml;utf8;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pgo8IS0tIEdlbmVyYXRvcjogQWRvYmUgSWxsdXN0cmF0b3IgMTYuMC4wLCBTVkcgRXhwb3J0IFBsdWctSW4gLiBTVkcgVmVyc2lvbjogNi4wMCBCdWlsZCAwKSAgLS0+CjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0iQ2FwYV8xIiB4PSIwcHgiIHk9IjBweCIgd2lkdGg9IjMycHgiIGhlaWdodD0iMzJweCIgdmlld0JveD0iMCAwIDU0LjMwOCA1NC4zMDgiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDU0LjMwOCA1NC4zMDg7IiB4bWw6c3BhY2U9InByZXNlcnZlIj4KPGc+Cgk8cGF0aCBkPSJNNTMuNTgzLDI1LjkwMWMtNS40NDgtOS40MTItMTUuNTc1LTE1LjI1OS0yNi40MjktMTUuMjU5UzYuMTczLDE2LjQ4OSwwLjcyNSwyNS45MDJMMCwyNy4xNTRsMC43MjUsMS4yNTEgICBjNS40NDgsOS40MTMsMTUuNTc1LDE1LjI2LDI2LjQyOSwxNS4yNnMyMC45ODEtNS44NDksMjYuNDI5LTE1LjI2bDAuNzI1LTEuMjUzTDUzLjU4MywyNS45MDF6IE0yNy43NTMsMzYuODMgICBjLTUuMzQyLDAtOS42ODgtNC4zNDctOS42ODgtOS42ODhzNC4zNDYtOS42ODgsOS42ODgtOS42ODhjMi4zMDEsMCw0LjQ2MSwwLjc5OSw2LjE2OCwyLjIyMmMtMi40NjgsMS41NzItNC4wNjcsNC4zMjctNC4wNjcsNy40NjYgICBjMCwzLjE0MSwxLjYsNS44OTUsNC4wNjgsNy40NjZDMzIuMjE0LDM2LjAzMSwzMC4wNTMsMzYuODMsMjcuNzUzLDM2LjgzeiBNNS44MjcsMjcuMTU0YzIuNTg3LTMuOTI3LDYuMTg5LTcuMDEyLDEwLjMzMy04Ljk5OCAgIGMtMS45MzIsMi40ODctMy4wOTUsNS42LTMuMDk1LDguOTg2YzAsMy40MDIsMS4xNzMsNi41MywzLjEyMyw5LjAyM0MxMi4wMzIsMzQuMTgsOC40MiwzMS4wOSw1LjgyNywyNy4xNTR6IE00MC4wNTIsMzUuMTM0ICAgYzAuMDc5LTAuMTIxLDAuMTYxLTAuMjM5LDAuMjM3LTAuMzYzbDIuMDk5LTMuNDQxbC00LjAxOS0wLjM1Yy0xLjk3MS0wLjE3Mi0zLjUxNi0xLjg1Ny0zLjUxNi0zLjgzOCAgIGMwLTEuOTgxLDEuNTQ1LTMuNjY2LDMuNTE2LTMuODM3bDQuMDItMC4zNDlsLTIuMS0zLjQ0M2MtMC4wNjgtMC4xMTEtMC4xNDMtMC4yMTUtMC4yMTMtMC4zMjRjMy4zMywxLjk2LDYuMjI5LDQuNjYyLDguNDA0LDcuOTY1ICAgQzQ2LjI5OSwzMC40NjUsNDMuMzkzLDMzLjE3Miw0MC4wNTIsMzUuMTM0eiIgZmlsbD0iI2U2YTgxNyIvPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+Cjwvc3ZnPgo=">
 
@@ -496,263 +510,13 @@
 
             <hr>
 
-            <div id="map-canvas"
-                 style="height: 200px; margin-bottom: 10px; width: 100% !important; position: relative; overflow: hidden;">
-                <div style="height: 100%; width: 100%; position: absolute; top: 0px; left: 0px; background-color: rgb(229, 227, 223);">
-                    <div class="gm-style"
-                         style="position: absolute; z-index: 0; left: 0px; top: 0px; height: 100%; width: 100%; padding: 0px; border-width: 0px; margin: 0px;">
-                        <div tabindex="0"
-                             style="position: absolute; z-index: 0; left: 0px; top: 0px; height: 100%; width: 100%; padding: 0px; border-width: 0px; margin: 0px; cursor: url(&quot;https://maps.gstatic.com/mapfiles/openhand_8_8.cur&quot;) 8 8, default;">
-                            <div style="z-index: 1; position: absolute; top: 0px; left: 0px; width: 100%; transform-origin: 0px 0px 0px; transform: matrix(1, 0, 0, 1, 0, 0);">
-                                <div style="position: absolute; left: 0px; top: 0px; z-index: 100; width: 100%;">
-                                    <div style="position: absolute; left: 0px; top: 0px; z-index: 0;">
-                                        <div aria-hidden="true"
-                                             style="position: absolute; left: 0px; top: 0px; z-index: 1; visibility: inherit;">
-                                            <div style="width: 256px; height: 256px; position: absolute; left: -8px; top: -105px;"></div>
-                                            <div style="width: 256px; height: 256px; position: absolute; left: -8px; top: 151px;"></div>
-                                            <div style="width: 256px; height: 256px; position: absolute; left: 248px; top: -105px;"></div>
-                                            <div style="width: 256px; height: 256px; position: absolute; left: 248px; top: 151px;"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div style="position: absolute; left: 0px; top: 0px; z-index: 101; width: 100%;"></div>
-                                <div style="position: absolute; left: 0px; top: 0px; z-index: 102; width: 100%;"></div>
-                                <div style="position: absolute; left: 0px; top: 0px; z-index: 103; width: 100%;">
-                                    <div style="position: absolute; left: 0px; top: 0px; z-index: -1;">
-                                        <div aria-hidden="true"
-                                             style="position: absolute; left: 0px; top: 0px; z-index: 1; visibility: inherit;">
-                                            <div style="width: 256px; height: 256px; overflow: hidden; position: absolute; left: -8px; top: -105px;"></div>
-                                            <div style="width: 256px; height: 256px; overflow: hidden; position: absolute; left: -8px; top: 151px;"></div>
-                                            <div style="width: 256px; height: 256px; overflow: hidden; position: absolute; left: 248px; top: -105px;"></div>
-                                            <div style="width: 256px; height: 256px; overflow: hidden; position: absolute; left: 248px; top: 151px;"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div style="position: absolute; z-index: 0; left: 0px; top: 0px;">
-                                    <div style="overflow: hidden; width: 258px; height: 200px;"><img
-                                            src="https://maps.googleapis.com/maps/api/js/StaticMapService.GetMapImage?1m2&amp;1i2253064&amp;2i1375337&amp;2e1&amp;3u14&amp;4m2&amp;1u258&amp;2u200&amp;5m5&amp;1e0&amp;5sru-RU&amp;6sus&amp;10b1&amp;12b1&amp;token=92515"
-                                            style="width: 258px; height: 200px;"></div>
-                                </div>
-                                <div style="position: absolute; left: 0px; top: 0px; z-index: 0;">
-                                    <div aria-hidden="true"
-                                         style="position: absolute; left: 0px; top: 0px; z-index: 1; visibility: inherit;">
-                                        <div style="position: absolute; left: -8px; top: -105px; transition: opacity 200ms ease-out;">
-                                            <img src="https://maps.googleapis.com/maps/vt?pb=!1m5!1m4!1i14!2i8801!3i5372!4i256!2m3!1e0!2sm!3i387083316!3m9!2sru-RU!3sUS!5e18!12m1!1e68!12m3!1e37!2m1!1ssmartmaps!4e0!5m1!5f2&amp;token=61964"
-                                                 draggable="false" alt=""
-                                                 style="width: 256px; height: 256px; user-select: none; border: 0px; padding: 0px; margin: 0px; max-width: none;">
-                                        </div>
-                                        <div style="position: absolute; left: 248px; top: -105px; transition: opacity 200ms ease-out;">
-                                            <img src="https://maps.googleapis.com/maps/vt?pb=!1m5!1m4!1i14!2i8802!3i5372!4i256!2m3!1e0!2sm!3i387083316!3m9!2sru-RU!3sUS!5e18!12m1!1e68!12m3!1e37!2m1!1ssmartmaps!4e0!5m1!5f2&amp;token=59574"
-                                                 draggable="false" alt=""
-                                                 style="width: 256px; height: 256px; user-select: none; border: 0px; padding: 0px; margin: 0px; max-width: none;">
-                                        </div>
-                                        <div style="position: absolute; left: 248px; top: 151px; transition: opacity 200ms ease-out;">
-                                            <img src="https://maps.googleapis.com/maps/vt?pb=!1m5!1m4!1i14!2i8802!3i5373!4i256!2m3!1e0!2sm!3i387083316!3m9!2sru-RU!3sUS!5e18!12m1!1e68!12m3!1e37!2m1!1ssmartmaps!4e0!5m1!5f2&amp;token=19853"
-                                                 draggable="false" alt=""
-                                                 style="width: 256px; height: 256px; user-select: none; border: 0px; padding: 0px; margin: 0px; max-width: none;">
-                                        </div>
-                                        <div style="position: absolute; left: -8px; top: 151px; transition: opacity 200ms ease-out;">
-                                            <img src="https://maps.googleapis.com/maps/vt?pb=!1m5!1m4!1i14!2i8801!3i5373!4i256!2m3!1e0!2sm!3i387083316!3m9!2sru-RU!3sUS!5e18!12m1!1e68!12m3!1e37!2m1!1ssmartmaps!4e0!5m1!5f2&amp;token=22243"
-                                                 draggable="false" alt=""
-                                                 style="width: 256px; height: 256px; user-select: none; border: 0px; padding: 0px; margin: 0px; max-width: none;">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="gm-style-pbc"
-                                 style="z-index: 2; position: absolute; height: 100%; width: 100%; padding: 0px; border-width: 0px; margin: 0px; left: 0px; top: 0px; opacity: 0; transition-duration: 0.8s;">
-                                <p class="gm-style-pbt">Use ⌘ + scroll to zoom the map</p></div>
-                            <div style="z-index: 3; position: absolute; height: 100%; width: 100%; padding: 0px; border-width: 0px; margin: 0px; left: 0px; top: 0px;">
-                                <div style="z-index: 1; position: absolute; height: 100%; width: 100%; padding: 0px; border-width: 0px; margin: 0px; left: 0px; top: 0px;"></div>
-                            </div>
-                            <div style="z-index: 4; position: absolute; top: 0px; left: 0px; width: 100%; transform-origin: 0px 0px 0px; transform: matrix(1, 0, 0, 1, 0, 0);">
-                                <div style="position: absolute; left: 0px; top: 0px; z-index: 104; width: 100%;"></div>
-                                <div style="position: absolute; left: 0px; top: 0px; z-index: 105; width: 100%;"></div>
-                                <div style="position: absolute; left: 0px; top: 0px; z-index: 106; width: 100%;"></div>
-                                <div style="position: absolute; left: 0px; top: 0px; z-index: 107; width: 100%;"></div>
-                            </div>
-                        </div>
-                        <div style="margin-left: 5px; margin-right: 5px; z-index: 1000000; position: absolute; left: 0px; bottom: 0px;">
-                            <a target="_blank"
-                               href="https://maps.google.com/maps?ll=52.525595,13.393257&amp;z=14&amp;t=m&amp;hl=ru-RU&amp;gl=US&amp;mapclient=apiv3"
-                               title="Нажмите, чтобы отобразить эту область в Картах Google"
-                               style="position: static; overflow: visible; float: none; display: inline;">
-                                <div style="width: 66px; height: 26px; cursor: pointer;"><img
-                                        src="https://maps.gstatic.com/mapfiles/api-3/images/google4_hdpi.png"
-                                        draggable="false"
-                                        style="position: absolute; left: 0px; top: 0px; width: 66px; height: 26px; user-select: none; border: 0px; padding: 0px; margin: 0px;">
-                                </div>
-                            </a></div>
-                        <div style="background-color: white; padding: 15px 21px; border: 1px solid rgb(171, 171, 171); font-family: Roboto, Arial, sans-serif; color: rgb(34, 34, 34); box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 16px; z-index: 10000002; display: none; width: 208px; height: 148px; position: absolute; left: 5px; top: 10px;">
-                            <div style="padding: 0px 0px 10px; font-size: 16px;">Картографические данные</div>
-                            <div style="font-size: 13px;">Картографические данные © 2017 GeoBasis-DE/BKG (©2009),
-                                Google
-                            </div>
-                            <div style="width: 13px; height: 13px; overflow: hidden; position: absolute; opacity: 0.7; right: 12px; top: 12px; z-index: 10000; cursor: pointer;">
-                                <img src="https://maps.gstatic.com/mapfiles/api-3/images/mapcnt6.png" draggable="false"
-                                     style="position: absolute; left: -2px; top: -336px; width: 59px; height: 492px; user-select: none; border: 0px; padding: 0px; margin: 0px; max-width: none;">
-                            </div>
-                        </div>
-                        <div class="gmnoprint"
-                             style="z-index: 1000001; position: absolute; right: 147px; bottom: 0px; width: 162px;">
-                            <div draggable="false" class="gm-style-cc"
-                                 style="user-select: none; height: 14px; line-height: 14px;">
-                                <div style="opacity: 0.7; width: 100%; height: 100%; position: absolute;">
-                                    <div style="width: 1px;"></div>
-                                    <div style="background-color: rgb(245, 245, 245); width: auto; height: 100%; margin-left: 1px;"></div>
-                                </div>
-                                <div style="position: relative; padding-right: 6px; padding-left: 6px; font-family: Roboto, Arial, sans-serif; font-size: 10px; color: rgb(68, 68, 68); white-space: nowrap; direction: ltr; text-align: right; vertical-align: middle; display: inline-block;">
-                                    <a style="color: rgb(68, 68, 68); text-decoration: none; cursor: pointer;">Картографические
-                                        данные</a><span style="display: none;">Картографические данные © 2017 GeoBasis-DE/BKG (©2009), Google</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="gmnoscreen" style="position: absolute; right: 0px; bottom: 0px;">
-                            <div style="font-family: Roboto, Arial, sans-serif; font-size: 11px; color: rgb(68, 68, 68); direction: ltr; text-align: right; background-color: rgb(245, 245, 245);">
-                                Картографические данные © 2017 GeoBasis-DE/BKG (©2009), Google
-                            </div>
-                        </div>
-                        <div class="gmnoprint gm-style-cc" draggable="false"
-                             style="z-index: 1000001; user-select: none; height: 14px; line-height: 14px; position: absolute; right: 0px; bottom: 0px;">
-                            <div style="opacity: 0.7; width: 100%; height: 100%; position: absolute;">
-                                <div style="width: 1px;"></div>
-                                <div style="background-color: rgb(245, 245, 245); width: auto; height: 100%; margin-left: 1px;"></div>
-                            </div>
-                            <div style="position: relative; padding-right: 6px; padding-left: 6px; font-family: Roboto, Arial, sans-serif; font-size: 10px; color: rgb(68, 68, 68); white-space: nowrap; direction: ltr; text-align: right; vertical-align: middle; display: inline-block;">
-                                <a href="https://www.google.com/intl/ru-RU_US/help/terms_maps.html" target="_blank"
-                                   style="text-decoration: none; cursor: pointer; color: rgb(68, 68, 68);">Условия
-                                    использования</a></div>
-                        </div>
-                        <div style="cursor: pointer; width: 25px; height: 25px; overflow: hidden; margin: 10px 14px; position: absolute; top: 0px; right: 0px;">
-                            <img src="https://maps.gstatic.com/mapfiles/api-3/images/sv9.png" draggable="false"
-                                 class="gm-fullscreen-control"
-                                 style="position: absolute; left: -52px; top: -86px; width: 164px; height: 175px; user-select: none; border: 0px; padding: 0px; margin: 0px;">
-                        </div>
-                        <div draggable="false" class="gm-style-cc"
-                             style="user-select: none; height: 14px; line-height: 14px; display: none; position: absolute; right: 0px; bottom: 0px;">
-                            <div style="opacity: 0.7; width: 100%; height: 100%; position: absolute;">
-                                <div style="width: 1px;"></div>
-                                <div style="background-color: rgb(245, 245, 245); width: auto; height: 100%; margin-left: 1px;"></div>
-                            </div>
-                            <div style="position: relative; padding-right: 6px; padding-left: 6px; font-family: Roboto, Arial, sans-serif; font-size: 10px; color: rgb(68, 68, 68); white-space: nowrap; direction: ltr; text-align: right; vertical-align: middle; display: inline-block;">
-                                <a target="_new" title="Сообщить об ошибке на карте или снимке"
-                                   href="https://www.google.com/maps/@52.525595,13.3932567,14z/data=!10m1!1e1!12b1?source=apiv3&amp;rapsrc=apiv3"
-                                   style="font-family: Roboto, Arial, sans-serif; font-size: 10px; color: rgb(68, 68, 68); text-decoration: none; position: relative;">Сообщить
-                                    об ошибке на карте</a></div>
-                        </div>
-                        <div class="gmnoprint gm-bundled-control gm-bundled-control-on-bottom" draggable="false"
-                             controlwidth="28" controlheight="93"
-                             style="margin: 10px; user-select: none; position: absolute; bottom: 107px; right: 28px;">
-                            <div class="gmnoprint" controlwidth="28" controlheight="55"
-                                 style="position: absolute; left: 0px; top: 38px;">
-                                <div draggable="false"
-                                     style="user-select: none; box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 4px -1px; border-radius: 2px; cursor: pointer; background-color: rgb(255, 255, 255); width: 28px; height: 55px;">
-                                    <div title="Увеличить" aria-label="Увеличить" tabindex="0"
-                                         style="position: relative; width: 28px; height: 27px; left: 0px; top: 0px;">
-                                        <div style="overflow: hidden; position: absolute; width: 15px; height: 15px; left: 7px; top: 6px;">
-                                            <img src="https://maps.gstatic.com/mapfiles/api-3/images/tmapctrl_hdpi.png"
-                                                 draggable="false"
-                                                 style="position: absolute; left: 0px; top: 0px; user-select: none; border: 0px; padding: 0px; margin: 0px; max-width: none; width: 120px; height: 54px;">
-                                        </div>
-                                    </div>
-                                    <div style="position: relative; overflow: hidden; width: 67%; height: 1px; left: 16%; background-color: rgb(230, 230, 230); top: 0px;"></div>
-                                    <div title="Уменьшить" aria-label="Уменьшить" tabindex="0"
-                                         style="position: relative; width: 28px; height: 27px; left: 0px; top: 0px;">
-                                        <div style="overflow: hidden; position: absolute; width: 15px; height: 15px; left: 7px; top: 6px;">
-                                            <img src="https://maps.gstatic.com/mapfiles/api-3/images/tmapctrl_hdpi.png"
-                                                 draggable="false"
-                                                 style="position: absolute; left: 0px; top: -15px; user-select: none; border: 0px; padding: 0px; margin: 0px; max-width: none; width: 120px; height: 54px;">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="gm-svpc" controlwidth="28" controlheight="28"
-                                 style="background-color: rgb(255, 255, 255); box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 4px -1px; border-radius: 2px; width: 28px; height: 28px; cursor: url(&quot;https://maps.gstatic.com/mapfiles/openhand_8_8.cur&quot;) 8 8, default; position: absolute; left: 0px; top: 0px;">
-                                <div style="position: absolute; left: 1px; top: 1px;"></div>
-                                <div style="position: absolute; left: 1px; top: 1px;">
-                                    <div aria-label="Перейти в режим просмотра улиц"
-                                         style="width: 26px; height: 26px; overflow: hidden; position: absolute; left: 0px; top: 0px;">
-                                        <img src="https://maps.gstatic.com/mapfiles/api-3/images/cb_scout5_hdpi.png"
-                                             draggable="false"
-                                             style="position: absolute; left: -147px; top: -26px; width: 215px; height: 835px; user-select: none; border: 0px; padding: 0px; margin: 0px; max-width: none;">
-                                    </div>
-                                    <div aria-label="Человечек находится над картой"
-                                         style="width: 26px; height: 26px; overflow: hidden; position: absolute; left: 0px; top: 0px; visibility: hidden;">
-                                        <img src="https://maps.gstatic.com/mapfiles/api-3/images/cb_scout5_hdpi.png"
-                                             draggable="false"
-                                             style="position: absolute; left: -147px; top: -52px; width: 215px; height: 835px; user-select: none; border: 0px; padding: 0px; margin: 0px; max-width: none;">
-                                    </div>
-                                    <div aria-label="Перейти в режим просмотра улиц"
-                                         style="width: 26px; height: 26px; overflow: hidden; position: absolute; left: 0px; top: 0px; visibility: hidden;">
-                                        <img src="https://maps.gstatic.com/mapfiles/api-3/images/cb_scout5_hdpi.png"
-                                             draggable="false"
-                                             style="position: absolute; left: -147px; top: -78px; width: 215px; height: 835px; user-select: none; border: 0px; padding: 0px; margin: 0px; max-width: none;">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="gmnoprint" controlwidth="28" controlheight="0"
-                                 style="display: none; position: absolute;">
-                                <div title="Повернуть карту на 90&nbsp;градусов"
-                                     style="width: 28px; height: 28px; overflow: hidden; position: absolute; border-radius: 2px; box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 4px -1px; cursor: pointer; background-color: rgb(255, 255, 255); display: none;">
-                                    <img src="https://maps.gstatic.com/mapfiles/api-3/images/tmapctrl4_hdpi.png"
-                                         draggable="false"
-                                         style="position: absolute; left: -141px; top: 6px; width: 170px; height: 54px; user-select: none; border: 0px; padding: 0px; margin: 0px; max-width: none;">
-                                </div>
-                                <div class="gm-tilt"
-                                     style="width: 28px; height: 28px; overflow: hidden; position: absolute; border-radius: 2px; box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 4px -1px; top: 0px; cursor: pointer; background-color: rgb(255, 255, 255);">
-                                    <img src="https://maps.gstatic.com/mapfiles/api-3/images/tmapctrl4_hdpi.png"
-                                         draggable="false"
-                                         style="position: absolute; left: -141px; top: -13px; width: 170px; height: 54px; user-select: none; border: 0px; padding: 0px; margin: 0px; max-width: none;">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="gmnoprint"
-                             style="margin: 10px; z-index: 0; position: absolute; cursor: pointer; left: 0px; top: 0px;">
-                            <div class="gm-style-mtc" style="float: left;">
-                                <div draggable="false" title="Показать карту с названиями объектов"
-                                     style="direction: ltr; overflow: hidden; text-align: center; position: relative; color: rgb(0, 0, 0); font-family: Roboto, Arial, sans-serif; user-select: none; font-size: 11px; background-color: rgb(255, 255, 255); padding: 8px; border-bottom-left-radius: 2px; border-top-left-radius: 2px; -webkit-background-clip: padding-box; background-clip: padding-box; box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 4px -1px; min-width: 35px; font-weight: 500;">
-                                    Карта
-                                </div>
-                                <div style="background-color: white; z-index: -1; padding: 2px; border-bottom-left-radius: 2px; border-bottom-right-radius: 2px; box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 4px -1px; position: absolute; left: 0px; top: 29px; text-align: left; display: none;">
-                                    <div draggable="false" title="Показать карту рельефа с названиями объектов"
-                                         style="color: rgb(0, 0, 0); font-family: Roboto, Arial, sans-serif; user-select: none; font-size: 11px; background-color: rgb(255, 255, 255); padding: 6px 8px 6px 6px; direction: ltr; text-align: left; white-space: nowrap;">
-                                        <span role="checkbox"
-                                              style="box-sizing: border-box; position: relative; line-height: 0; font-size: 0px; margin: 0px 5px 0px 0px; display: inline-block; background-color: rgb(255, 255, 255); border: 1px solid rgb(198, 198, 198); border-radius: 1px; width: 13px; height: 13px; vertical-align: middle;"><div
-                                                style="position: absolute; left: 1px; top: -2px; width: 13px; height: 11px; overflow: hidden; display: none;"><img
-                                                src="https://maps.gstatic.com/mapfiles/mv/imgs8.png" draggable="false"
-                                                style="position: absolute; left: -52px; top: -44px; user-select: none; border: 0px; padding: 0px; margin: 0px; max-width: none; width: 68px; height: 67px;"></div></span><label
-                                            style="vertical-align: middle; cursor: pointer;">Рельеф</label></div>
-                                </div>
-                            </div>
-                            <div class="gm-style-mtc" style="float: left;">
-                                <div draggable="false" title="Показать спутниковую карту"
-                                     style="direction: ltr; overflow: hidden; text-align: center; position: relative; color: rgb(86, 86, 86); font-family: Roboto, Arial, sans-serif; user-select: none; font-size: 11px; background-color: rgb(255, 255, 255); padding: 8px; border-bottom-right-radius: 2px; border-top-right-radius: 2px; -webkit-background-clip: padding-box; background-clip: padding-box; box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 4px -1px; border-left: 0px; min-width: 50px;">
-                                    Спутник
-                                </div>
-                                <div style="background-color: white; z-index: -1; padding: 2px; border-bottom-left-radius: 2px; border-bottom-right-radius: 2px; box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 4px -1px; position: absolute; right: 0px; top: 29px; text-align: left; display: none;">
-                                    <div draggable="false" title="Показать спутниковую карту с названиями объектов"
-                                         style="color: rgb(0, 0, 0); font-family: Roboto, Arial, sans-serif; user-select: none; font-size: 11px; background-color: rgb(255, 255, 255); padding: 6px 8px 6px 6px; direction: ltr; text-align: left; white-space: nowrap;">
-                                        <span role="checkbox"
-                                              style="box-sizing: border-box; position: relative; line-height: 0; font-size: 0px; margin: 0px 5px 0px 0px; display: inline-block; background-color: rgb(255, 255, 255); border: 1px solid rgb(198, 198, 198); border-radius: 1px; width: 13px; height: 13px; vertical-align: middle;"><div
-                                                style="position: absolute; left: 1px; top: -2px; width: 13px; height: 11px; overflow: hidden;"><img
-                                                src="https://maps.gstatic.com/mapfiles/mv/imgs8.png" draggable="false"
-                                                style="position: absolute; left: -52px; top: -44px; user-select: none; border: 0px; padding: 0px; margin: 0px; max-width: none; width: 68px; height: 67px;"></div></span><label
-                                            style="vertical-align: middle; cursor: pointer;">Названия объектов</label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&amp;sensor=false"
-                    type="text/javascript"></script>
+            <div id="map-canvas3" style="height: 200px; margin-bottom: 10px; width: 100% !important; position: relative; overflow: hidden;"></div>
 
 
-            <p class="flags">
-                <i class="fa fa-flag" aria-hidden="true"></i>
-                Пожаловаться на объявление
-            </p>
+            <!--<p class="flags">-->
+                <!--<i class="fa fa-flag" aria-hidden="true"></i>-->
+                <!--Пожаловаться на объявление-->
+            <!--</p>-->
 
 
         </div>

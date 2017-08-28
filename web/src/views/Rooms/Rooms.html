@@ -320,11 +320,11 @@
                                     <div class="sectionContainer_atr">
                                         <div class="cardGrid_o1rkka">
                                             {{#rooms}}
-                                            <div class="container_grd" >
+                                            <div class="container_grd">
                                                 <div class="cardContainer_bn">
                                                     <div>
 
-                                                        <div class="listingCardWrapper_xs" >
+                                                        <div class="listingCardWrapper_xs">
                                                             <div class="comment">
                                                                 <a href="#Room-{{_id}}"><span>Подробнее</span></a>
                                                             </div>
@@ -346,7 +346,7 @@
                                                                                 <div class="container_brx"
                                                                                      style="width: 100%; height: 100%;">
                                                                                     <div class="image_asq"
-                                                                                         style="width: 100%; height: 100%; background-image: url(&quot;https://a0.muscache.com/im/pictures/6722906/b4bc6418_original.jpg?aki_policy=large&quot;);"></div>
+                                                                                         style="width: 100%; height: 100%; background-image: url('{{fileUrl}}{{photo[0]}}.jpeg');"></div>
                                                                                 </div>
 
                                                                             </div>
@@ -373,7 +373,7 @@
                                                   <span class="accessible_mlk">
                                                     <span>Цена</span>
                                                   </span>
-                                                  <span>$ {{dateRanges[0].price}}</span>
+                                                  <span>{{dateRanges[0].dayPrice}} ABA</span>
                                                 </span>
                                               </span>
                                             </span>
@@ -468,33 +468,18 @@
                       <div>
                         <ul data-id="SearchResultsPagination" class="buttonList_vc">
                           <li class="buttonContainer_lbv">
-                            <a href="#1" class="link_page-active">
+                            <a class="link_page-active pointer" on-click="pageset:1">
                               <div class="numberContainer_btx-o">1</div>
                             </a>
                           </li>
-                          <li class="buttonContainer_arm">
-                            <a href="#3" class="link_page">
-                              <div class="numberContainer_btx">2</div>
+                            <li class="buttonContainer_arm-ox">
+                                <a class="link_page pointer" on-click="pageset:2">
+                                    <div class="numberContainer_btx-o">2</div>
                             </a>
                           </li>
-                          <li class="buttonContainer_arm">
-                                                        <a href="#3" class="link_page">
 
-                              <div class="numberContainer_btx">3</div>
-                            </a>
-                          </li>
-                          <li class="buttonContainer_arm">
-                            <div class="more-page_main">
-                              <div class="more-page_">…</div>
-                            </div>
-                          </li>
-                          <li class="buttonContainer_arm">
-                            <a href="#17" class="link_page">
-                              <div class="numberContainer_btx">17</div>
-                            </a>
-                          </li>
                           <li class="buttonContainer_arm-ox">
-                            <a href="#next" class="link_page">
+                            <a href="" class="link_page pointer">
                               <div class="chevronButton_x">
                                 <div class="chevronContainer_xb">
                                   <svg viewBox="0 0 18 18" role="img" focusable="false"
@@ -512,14 +497,14 @@
                                     </nav>
                                     <div style="margin-top: 8px;">
                     <span>
-                      <span>1</span>
+                      <span>{{+(rooms_count.skip+1)}}</span>
                        –
-                      <span>19</span>
+                      <span>{{+(rooms_count.skip+rooms.length)}}</span>
 
                       из
 
                       <span>
-                        <span>0+ вариантов </span>
+                        <span>{{rooms_count.room}} вариантов </span>
                       </span>
                     </span>
                                     </div>
@@ -627,41 +612,23 @@
                                                                 <div style="margin-top: 16px;">
                                                                     <ul class="listLayout_nb">
                                                                         <li class="item_xca">
-                                                                            <a href="/about/about-us"
+                                                                            <a href="#about"
                                                                                class="component_auto"
                                                                                aria-disabled="false" aria-busy="false">
                                                                                 <span>О нас</span>
                                                                             </a>
                                                                         </li>
                                                                         <li class="item_xca">
-                                                                            <a href="/careers" class="component_auto"
-                                                                               aria-disabled="false" aria-busy="false">
-                                                                                <span>Карьера</span>
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="item_xca">
-                                                                            <a href="/press/news" class="component_auto"
-                                                                               aria-disabled="false" aria-busy="false">
-                                                                                <span>Мы в прессе</span>
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="item_xca">
-                                                                            <a href="/policies" class="component_auto"
+                                                                            <a href="#policies" class="component_auto"
                                                                                aria-disabled="false" aria-busy="false">
                                                                                 <span>Правила</span>
                                                                             </a>
                                                                         </li>
                                                                         <li class="item_xca">
-                                                                            <a href="/help?from=footer"
+                                                                            <a href="#help"
                                                                                class="component_auto"
                                                                                aria-disabled="false" aria-busy="false">
                                                                                 <span>Помощь</span>
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="item_xca">
-                                                                            <a href="/diversity" class="component_auto"
-                                                                               aria-disabled="false" aria-busy="false">
-                                                                                <span>Принадлежность, этнокультурные и другие различия</span>
                                                                             </a>
                                                                         </li>
                                                                     </ul>
@@ -680,43 +647,10 @@
                                                                 <div style="margin-top: 16px;">
                                                                     <ul class="listLayout_nb">
                                                                         <li class="item_xca">
-                                                                            <a href="/trust" class="component_auto"
+                                                                            <a href="#page-development"
+                                                                               class="component_auto"
                                                                                aria-disabled="false" aria-busy="false">
                                                                                 <span>Доверие и безопасность</span>
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="item_xca">
-                                                                            <a href="/invite?r=6" class="component_auto"
-                                                                               aria-disabled="false" aria-busy="false">Бонус
-                                                                                на путешествие</a>
-                                                                        </li>
-                                                                        <li class="item_xca">
-                                                                            <a href="https://www.Abab.iocitizen.com?utm_source=Abab.io&amp;utm_medium=footer&amp;utm_campaign=product"
-                                                                               target="_blank" rel="noopener noreferer"
-                                                                               class="component_auto"
-                                                                               aria-disabled="false" aria-busy="false">
-                                                                                <span>Abab.io Citizen</span>
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="item_xca">
-                                                                            <a href="/work?s=footer"
-                                                                               class="component_auto"
-                                                                               aria-disabled="false" aria-busy="false">
-                                                                                <span>Деловые поездки</span>
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="item_xca">
-                                                                            <a href="/things-to-do"
-                                                                               class="component_auto"
-                                                                               aria-disabled="false" aria-busy="false">
-                                                                                <span>Путеводители</span>
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="item_xca">
-                                                                            <a href="https://Abab.iomag.com"
-                                                                               class="component_auto"
-                                                                               aria-disabled="false" aria-busy="false">
-                                                                                <span>Abab.iomag</span>
                                                                             </a>
                                                                         </li>
                                                                     </ul>
@@ -735,23 +669,13 @@
                                                                 <div style="margin-top: 16px;">
                                                                     <ul class="listLayout_nb">
                                                                         <li class="item_xca">
-                                                                            <a href="#Create-Room" style="cursor: pointer"
+                                                                            <a href="#Create-Room"
+                                                                               style="cursor: pointer"
                                                                                class="component_auto">
-                                                                                <span >+ Добавить свой обект</span>
+                                                                                <span>+ Добавить свой обект</span>
                                                                             </a>
                                                                         </li>
-                                                                        <li class="item_xca">
-                                                                            <a href="#hospitality"
-                                                                               class="component_auto">
-                                                                                <span>Гостеприимство</span>
-                                                                            </a>
-                                                                        </li>
-                                                                        <li class="item_xca">
-                                                                            <a href="#help/responsible-hosting"
-                                                                               class="component_auto">
-                                                                                <span>Как стать ответственным хозяином</span>
-                                                                            </a>
-                                                                        </li>
+
                                                                     </ul>
                                                                 </div>
                                                             </section>
@@ -781,30 +705,17 @@
                                                     </div>
                                                     <div class="column_aba">
                                                         <ul class="ul_ababd">
-                                                            <link itemprop="url" href="https://www.Abab.io.ru">
-                                                            <meta itemprop="logo"
-                                                                  content="https://a0.muscache.com/Abab.io/static/logos/belo-200x200-4d851c5b28f61931bf1df28dd15e60ef.png">
+
                                                             <li class="item_abab">
-                                                                <a href="/terms" class="component_auto"
-                                                                   aria-disabled="false" aria-busy="false">
-                                                                    <span>Уcловия</span>
-                                                                </a>
-                                                            </li>
-                                                            <li class="item_abab">
-                                                                <a href="/terms/privacy_policy" class="component_auto"
+                                                                <a href="#privacy_policy" class="component_auto"
                                                                    aria-disabled="false" aria-busy="false">
                                                                     <span>Конфиденциальность</span>
                                                                 </a>
                                                             </li>
-                                                            <li class="item_abab">
-                                                                <a href="/sitemaps" class="component_auto"
-                                                                   aria-disabled="false" aria-busy="false">
-                                                                    <span>Карта сайта</span>
-                                                                </a>
-                                                            </li>
+
                                                             <li class="socialListItems_ks">
                             <span class="container_trg">
-                              <a href="https://www.facebook.com/Abab.ioRussia" target="_blank" rel="noopener noreferer"
+                              <a href="https://www.facebook.com/Abab.io" target="_blank" rel="noopener noreferer"
                                  class="container_rpsx" aria-expanded="false" aria-busy="false" itemprop="sameAs"
                                  style="padding: 0px;">
                                 <svg viewBox="0 0 32 32" role="img" aria-label="Facebook" focusable="false"
