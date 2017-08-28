@@ -44,7 +44,11 @@ module.exports = (API, redis) => {
             console.log(event);
 
             let _roomDescriptionHash = web3.fromDecimal(event.args._roomDescriptionHash);
-            db.rooms.findOneAndUpdate({txHash: tx.tx.hash, _hash: _roomDescriptionHash, wallet: event.args.host}, {
+            db.rooms.findOneAndUpdate({
+                txHash: tx.tx.hash,
+                // _hash: _roomDescriptionHash,
+                wallet: event.args.host
+            }, {
                 tx: db.mongoose.Types.ObjectId(tx._id),
                 _index: event.args.roomIndex,
                 status: 3
