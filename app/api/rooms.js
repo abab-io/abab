@@ -556,9 +556,9 @@ module.exports = (API, redis) => {
 
     API.on('Booking', (user, param, callback) => {
         let findPram = {};
-        if (!findPram._id) {
+        if (param._id) findPram._id = param._id;
+        if (param._roomIndex) findPram._index = param._roomIndex;
 
-        }
         if (findPram._id) findPram._id = db.mongoose.Types.ObjectId(findPram._id);
 
         try {
