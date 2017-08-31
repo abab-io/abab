@@ -63,7 +63,7 @@ function readFile(fileName) {
 }
 function compile(pragma, inputFileName) {
     let source = '';
-    source += 'pragma solidity '+pragma+';';
+    source += 'pragma solidity ' + pragma + ';';
     source += readFile(inputFileName);
     return source;
 }
@@ -77,20 +77,7 @@ function deploy(source, cb) {
         var output = solcSnapshot.compile(source, 1);
 
         var browser_untitled_sol_ababContract = web3.eth.contract(JSON.parse(output.contracts[':Abab'].interface));
-        console.log(source);
 
-        console.log(output.contracts[':Abab'].bytecode);
-        // var browser_untitled_sol_abab = browser_untitled_sol_ababContract.new(
-        //     {
-        //         from: web3.eth.accounts[0] || account_address,
-        //         data: '0x' + output.contracts[':Abab'].bytecode,
-        //         gas: '4300000'
-        //     }, function (e, contract) {
-        //         console.log(e, contract);
-        //         if (typeof contract.address !== 'undefined') {
-        //             console.log('Contract mined! address: ' + contract.address + ' transactionHash: ' + contract.transactionHash);
-        //         }
-        //     });
 
         let nonce = web3.eth.getTransactionCount(account_address);
         let privateKey = new Buffer(account_private, 'hex');
@@ -123,7 +110,7 @@ function deploy(source, cb) {
                     console.log('Tx check.');
                     return false;
                 }
-                cb && cb(txData);
+                cb && cb(txData, output.contracts[':Abab'].interface, output.contracts[':Abab'].bytecode,source, solcSnapshot.version());
                 clearInterval(checkTx);
 
 
@@ -132,8 +119,17 @@ function deploy(source, cb) {
         });
     });
 }
-deploy(source, function (tx) {
-    console.log('Deploy Contract Success:\n\tAddress: ' + tx.contractAddress + '\n\tBlockHash: '+ tx.blockHash + '\n\tblockNumber: '+ tx.blockNumber )
+deploy(source, function (tx, _interface, _bytecode, source,solc_version) {
+    fs.writeFile("./source.sol", source);
+    fs.writeFile("./config.sol.js", 'const _address = "' + tx.contractAddress + '"; // smart contract address\n' +
+        'const _contract_fixed = 100000000;\n' +
+        'const _name = "Abab";\n' +
+        'const _symbol = "ABC";\n' +
+        'const _abi = ' + _interface + ';\n' +
+        'const _bytecode = "' + _bytecode + '";\n' +
+        'const _version = "' + solc_version + '";\n' +
+        'module.exports = {_address: _address,_contract_fixed: _contract_fixed,_name: _name,_symbol: _symbol,_abi: _abi,_bytecode:_bytecode,_version:_version};');
+    console.log('Deploy Contract Success:\n\tAddress: ' + tx.contractAddress + '\n\tBlockHash: ' + tx.blockHash + '\n\tblockNumber: ' + tx.blockNumber)
 });
 // console.log(output.contracts[':Abab'].bytecode);
 // console.log(output.contracts[':Abab'].interface);
