@@ -242,18 +242,7 @@ function initMap() {
 
 }
 var ABAB = {
-    map:{
-        init:false,
-        cb_function_arr: [],
-        call_wait_auth: function (fn) {
-            if (!ABAB.map.init) {
-                ABAB.map.cb_function_arr.push(fn);
-            } else {
-                fn();
-            }
-        },
-        fn:function(){}
-    },
+
     event: {},
     page: null,
     pageObj: {
