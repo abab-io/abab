@@ -120,8 +120,9 @@ function deploy(source, cb) {
     });
 }
 deploy(source, function (tx, _interface, _bytecode, source,solc_version) {
-    fs.writeFile("./source.sol", source);
-    fs.writeFile("./config.sol.js", 'const _address = "' + tx.contractAddress + '"; // smart contract address\n' +
+    console.log('Updating config.sol.js and source.sol ....');
+    fs.writeFileSync("./source.sol", source);
+    fs.writeFileSync("./config.sol.js", 'const _address = "' + tx.contractAddress + '"; // smart contract address\n' +
         'const _contract_fixed = 100000000;\n' +
         'const _name = "Abab";\n' +
         'const _symbol = "ABC";\n' +
@@ -129,7 +130,9 @@ deploy(source, function (tx, _interface, _bytecode, source,solc_version) {
         'const _bytecode = "' + _bytecode + '";\n' +
         'const _version = "' + solc_version + '";\n' +
         'module.exports = {_address: _address,_contract_fixed: _contract_fixed,_name: _name,_symbol: _symbol,_abi: _abi,_bytecode:_bytecode,_version:_version};');
-    console.log('Deploy Contract Success:\n\tAddress: ' + tx.contractAddress + '\n\tBlockHash: ' + tx.blockHash + '\n\tblockNumber: ' + tx.blockNumber)
+    console.log('Deploy Contract Success:\n\tAddress: ' + tx.contractAddress + '\n\tBlockHash: ' + tx.blockHash + '\n\tblockNumber: ' + tx.blockNumber);
+    console.log('== END ==');
+    process.exit(0);
 });
 // console.log(output.contracts[':Abab'].bytecode);
 // console.log(output.contracts[':Abab'].interface);
