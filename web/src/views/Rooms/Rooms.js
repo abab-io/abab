@@ -2,6 +2,8 @@ var map = false;
 var markers = [];
 var reactiveRooms = Ractive.extend({
     oninit: function () {
+        console.log('reactiveRooms oninit');
+
         ABAB.map.call_wait_auth(function () {
             geocode = new google.maps.Geocoder();
             map = new google.maps.Map(document.getElementById('map-canvas'), {
@@ -12,7 +14,6 @@ var reactiveRooms = Ractive.extend({
             procent = 0.25;
         });
 
-        console.log('reactiveRooms oninit');
 
     }
 });

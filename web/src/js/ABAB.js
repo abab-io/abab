@@ -237,8 +237,10 @@ function updatePlugins() {
     });
 }
 function initMap() {
+    console.log('[google maps] init;');
     ABAB.map.fn(true);
     ABAB.map.init=true;
+
 
 }
 var ABAB = {
@@ -252,7 +254,9 @@ var ABAB = {
                 fn();
             }
         },
-        fn:function(){}
+        fn:function(){
+            for(var i_f in ABAB.map.cb_function_arr) ABAB.map.cb_function_arr[i_f]();
+        }
     },
     event: {},
     page: null,
@@ -279,7 +283,8 @@ var ABAB = {
         ABAB.pageObj.page = page;
         ABAB.pageObj.tab_page = tabPage;
         ractiveComponent.rootApp.set('pageActive', 'contentApplication');
-        if ('Rooms' == page) {
+        console.log('Start page:',page);
+        if ('Rooms' === page) {
             if (!tabPage) tabPage = 'all';
             requireElement({name: 'Rooms', ver: '1.1.0', element: '#content_block'}, {
                 cnt: 0,

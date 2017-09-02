@@ -1,5 +1,4 @@
-
-var geocode =false;
+var geocode = false;
 var reactiveApp = Ractive.extend({
     oninit: function () {
 
@@ -7,7 +6,7 @@ var reactiveApp = Ractive.extend({
         procent = 0.23;
         if (location.hash.replace('#', '').split('-')[0] && location.hash.replace('#', '').split('-')[0] != '') {
             ABAB.setPage(location.hash.replace('#', '').split('-')[0], location.hash.replace('#', '').split('-')[1], true);
-            procent = 0.30;
+            if (location.hash.replace('#', '').split('-')[0] !== 'Rooms') procent = 0.30;
         }
         else
             ABAB.setPage('Rooms');
@@ -71,8 +70,8 @@ if (localStorage.getItem('auth')) {
         localStorage.removeItem('auth');
     }
 }
-ractiveComponent['rootApp'].on('update_filter', function (e,id) {
-    var formarr = $('#'+id).serializeArray();
+ractiveComponent['rootApp'].on('update_filter', function (e, id) {
+    var formarr = $('#' + id).serializeArray();
     var form_obj = {};
     for (var i in formarr) {
         if (form_obj[formarr[i].name] && typeof form_obj[formarr[i].name] === 'string') {
@@ -82,9 +81,9 @@ ractiveComponent['rootApp'].on('update_filter', function (e,id) {
         } else
             form_obj[formarr[i].name] = formarr[i].value
     }
-    form_obj.people_count = {$gte:form_obj.people_count};
-    form_obj.children_count = {$gte:form_obj.children_count};
-    ABAB.event['update_filter'](form_obj,true);
+    form_obj.people_count = {$gte: form_obj.people_count};
+    form_obj.children_count = {$gte: form_obj.children_count};
+    ABAB.event['update_filter'](form_obj, true);
 });
 ractiveComponent['rootApp'].on('location_input_scan', function () {
 
@@ -225,9 +224,9 @@ $('#location_input_scan').flexdatalist({
 
     if (json && json.city) {
 
-        if(json.city === 'Moscow'){
+        if (json.city === 'Moscow') {
             console.error('One and the same city can have several names');
-            json.city  = 'Moskva';
+            json.city = 'Moskva';
         }
         find = {
             $or: [{
@@ -238,16 +237,16 @@ $('#location_input_scan').flexdatalist({
             }, {"address.country": {'$regex': json.city, '$options': 'i'}}]
         };
     }
-    if(json && json.city && json.city === 'Russia') json.city = 'Москва';
+    if (json && json.city && json.city === 'Russia') json.city = 'Москва';
     geocode.geocode({address: (json.city || '') + ',' + (json.country || '')}, function (results, status) {
         console.log(results);
-        if(results.length >0) {
+        if (results.length > 0) {
             map.setCenter({lng: results[0].geometry.location.lng(), lat: results[0].geometry.location.lat()});
             map.setZoom(8);
-        }else{
-            console.warn('[map geocode] address not fount:',json)
+        } else {
+            console.warn('[map geocode] address not fount:', json)
         }
     });
-    ABAB.event['update_filter'](find,true);
+    ABAB.event['update_filter'](find, true);
 
 });
