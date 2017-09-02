@@ -1,6 +1,5 @@
 
 var map2 = false;
-var geocode =false;
 var marker_home = false;
 var reactiveAddRoom = Ractive.extend({
     oninit: function () {

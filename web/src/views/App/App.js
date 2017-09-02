@@ -1,9 +1,14 @@
+
+var geocode =false;
 var reactiveApp = Ractive.extend({
     oninit: function () {
+
         console.log('reactiveApp oninit');
-        procent = 0.30;
-        if (location.hash.replace('#', '').split('-')[0] && location.hash.replace('#', '').split('-')[0] != '')
+        procent = 0.23;
+        if (location.hash.replace('#', '').split('-')[0] && location.hash.replace('#', '').split('-')[0] != '') {
             ABAB.setPage(location.hash.replace('#', '').split('-')[0], location.hash.replace('#', '').split('-')[1], true);
+            procent = 0.30;
+        }
         else
             ABAB.setPage('Rooms');
 
@@ -66,7 +71,23 @@ if (localStorage.getItem('auth')) {
         localStorage.removeItem('auth');
     }
 }
+ractiveComponent['rootApp'].on('update_filter', function (e,id) {
+    var formarr = $('#'+id).serializeArray();
+    var form_obj = {};
+    for (var i in formarr) {
+        if (form_obj[formarr[i].name] && typeof form_obj[formarr[i].name] === 'string') {
+            form_obj[formarr[i].name] = [form_obj[formarr[i].name], formarr[i].value];
+        } else if (form_obj[formarr[i].name] && typeof form_obj[formarr[i].name] === 'object') {
+            form_obj[formarr[i].name].push(formarr[i].value);
+        } else
+            form_obj[formarr[i].name] = formarr[i].value
+    }
+    form_obj.people_count = {$gte:form_obj.people_count};
+    form_obj.children_count = {$gte:form_obj.children_count};
+    ABAB.event['update_filter'](form_obj,true);
+});
 ractiveComponent['rootApp'].on('location_input_scan', function () {
+
     console.log($('#location_input_scan').val());
 });
 ractiveComponent['rootApp'].on('auth_start', function () {
@@ -217,53 +238,16 @@ $('#location_input_scan').flexdatalist({
             }, {"address.country": {'$regex': json.city, '$options': 'i'}}]
         };
     }
-    API('GetRooms', {page: 1, find: find}, true, function (res) {
-
-        ractiveComponent['reactive-RoomsApp'].set('rooms', res.rooms);
-        ractiveComponent['reactive-RoomsApp'].set('rooms_count', res.count);
-
-        if (window.map && window.geocode && window.geocode) {
-            geocode = res.rooms.map(function (room, i) {
-                if (room.location[0] && room.location[1]) {
-                    var infowindow = new google.maps.InfoWindow({
-                        content: '<div id="content">' +
-                        '<div id="siteNotice">' +
-                        '</div>' +
-                        '<h1 id="firstHeading" class="firstHeading">' + room.title + '</h1>' +
-                        '<div id="bodyContent">' +
-                        '<p><b>' + room.title + '</b></p>' +
-                        '<p>Transaction: <a href="' + ractiveComponent['reactive-RoomsApp'].get('blockchain_url') + 'tx/' + room.txHash + '" target="_blank">' +
-                        room.txHash + '</a>' +
-                        '<br>' +
-                        '(last update ' + room.update_at.split('T')[0] + ').</p>' +
-                        '</div>' +
-                        '</div>',
-                        maxWidth: 250
-                    });
-                    var marker = new google.maps.Marker({
-                        position: {lat: room.location[0] * 1, lng: room.location[1] * 1},
-                        // label: ''
-                        animation: google.maps.Animation.DROP,
-                        map: map
-
-                    });
-                    marker.addListener('click', function () {
-                        infowindow.open(map, marker);
-                    });
-                    return marker;
-                }
-                else return false;
-            });
-            new MarkerClusterer(map, markers,
-                {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
-
-            geocode.geocode({address: json.city + ',' + json.country}, function (results, status) {
-                map.setCenter({lng: results[0].geometry.location.lng(), lat: results[0].geometry.location.lat()});
-                map.setZoom(8);
-            });
+    if(json && json.city && json.city === 'Russia') json.city = 'Москва';
+    geocode.geocode({address: (json.city || '') + ',' + (json.country || '')}, function (results, status) {
+        console.log(results);
+        if(results.length >0) {
+            map.setCenter({lng: results[0].geometry.location.lng(), lat: results[0].geometry.location.lat()});
+            map.setZoom(8);
+        }else{
+            console.warn('[map geocode] address not fount:',json)
         }
     });
+    ABAB.event['update_filter'](find,true);
 
-
-    console.log(data.value);
 });

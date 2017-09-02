@@ -456,23 +456,19 @@
 
                       <div role="menu" class="block-tbx dropdown-menu">
 
-                        <form>
+                        <form id="сount_guest" action="#" onsubmit="return false;">
 
                           <div class="txls">Взрослые</div>
                           <div class="quantity">
-                            <input type="number" min="1" max="9" step="1" value="1"></div>
+                            <input type="number" name="people_count" min="1" max="9" step="1" value="1"></div>
 
-                          <div class="txls">Дети (2-12 лет)</div>
+                          <div class="txls">Дети</div>
                           <div class="quantity">
-                            <input type="number" min="1" max="9" step="1" value="1"></div>
-
-                          <div class="txls">Младенцы</div>
-                          <div class="quantity">
-                            <input type="number" min="1" max="9" step="1" value="1"></div>
+                            <input type="number" name="children_count" min="0" max="9" step="1" value="0"></div>
 
                           <div class="otx">
-                            <a class="fll" href="#">Отменить</a>
-                            <a class="flr" href="#">Применить</a>
+                            <a class="fll">Отменить</a>
+                            <a class="flr pointer" on-click="update_filter:сount_guest">Применить</a>
                           </div>
 
                         </form>

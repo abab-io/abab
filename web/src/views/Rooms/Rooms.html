@@ -14,6 +14,24 @@
                                 </button>
                                 <ul class="dropdown-menu">
                                     <li>
+                                        <div class="clk-area">
+
+                                            <div class="klt">Комнаты и кровати</div>
+
+                                            <div class="txls">Спальни</div>
+                                            <div class="quantity">
+                                                <input type="number" min="1" max="9" step="1" value="1"></div>
+
+                                            <div class="txls">Кровати</div>
+                                            <div class="quantity">
+                                                <input type="number" min="1" max="9" step="1" value="1"></div>
+
+                                            <div class="txls">Ванные комнаты</div>
+                                            <div class="quantity">
+                                                <input type="number" min="0" max="9" step="1" value="1"></div>
+
+                                        </div>
+
                                         <div class="cbx-area">
                                             <div class="checkbox">
                                                 <label>
@@ -135,7 +153,7 @@
 
                             <div class="dropdown noclose">
                                 <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
-                                    Другие фильтры
+                                    Удобства
                                     <span class="caret"></span>
                                 </button>
                                 <ul class="dropdown-menu">
@@ -143,149 +161,296 @@
 
                                         <div class="klx-area">
 
-                                            <div class="clk-area">
-
-                                                <div class="klt">Комнаты и кровати</div>
-
-                                                <div class="txls">Спальни</div>
-                                                <div class="quantity">
-                                                    <input type="number" min="1" max="9" step="1" value="1"></div>
-
-                                                <div class="txls">Кровати</div>
-                                                <div class="quantity">
-                                                    <input type="number" min="1" max="9" step="1" value="1"></div>
-
-                                                <div class="txls">Ванные комнаты</div>
-                                                <div class="quantity">
-                                                    <input type="number" min="1" max="9" step="1" value="1"></div>
-
-                                            </div>
-
-
-                                            <div class="clk-area">
-
-                                                <div class="klt no-plr">Другие варианты</div>
-
-                                                <div class="cbx-area">
-                                                    <div class="checkbox">
-                                                        <label>
-                                                            <input type="checkbox" value="" checked="checked">
-                                                            <span class="cr">
-                            <i class="cr-icon glyphicon glyphicon-ok"></i>
-                          </span>
-                                                            <strong class="strs">Superhost</strong>
-                                                        </label>
+                                            <form id="facilities_filter" action="#" onsubmit="return false;">
+                                                <div class="clk-area">
+                                                    <input type="hidden" name="facilities" value="Object"> <input
+                                                        type="hidden" name="facilities" value="CheckIn"> <input
+                                                        type="hidden" name="facilities" value="Abab.io">
+                                                    <div class="klt no-plr">Предметы
+                                                        первой необходимости
                                                     </div>
-
-                                                    <div class="slise">
-                                                        Останавливайтесь у самых гостеприимных хозяев <a href="#">Подробнее</a>
+                                                    <div class="cbx-area2">
+                                                        <div class="checkbox"><label><input type="checkbox"
+                                                                                            name="facilities"
+                                                                                            value="Soap">
+                                                            <span class="cr"><i
+                                                                    class="cr-icon glyphicon glyphicon-ok"></i></span>
+                                                            <strong class="strs">Мыло и туалетная
+                                                                бумага</strong></label>
+                                                        </div>
                                                     </div>
-                                                </div>
-
-                                            </div>
-
-
-                                            <div class="clk-area">
-
-                                                <div class="klt no-plr">Удобства</div>
-
-                                                <div class="cbx-area">
-                                                    <div class="checkbox">
-                                                        <label>
-                                                            <input type="checkbox" value="" checked="checked">
-                                                            <span class="cr">
-                            <i class="cr-icon glyphicon glyphicon-ok"></i>
-                          </span>
-                                                            <strong class="strs">Название пункта</strong>
-                                                        </label>
+                                                    <div class="cbx-area2">
+                                                        <div class="checkbox"><label><input type="checkbox"
+                                                                                            name="facilities"
+                                                                                            value="Shampoo"> <span
+                                                                class="cr"><i
+                                                                class="cr-icon glyphicon glyphicon-ok"></i></span>
+                                                            <strong
+                                                                    class="strs">Шампунь</strong></label></div>
                                                     </div>
-
-
-                                                    <div class="checkbox">
-                                                        <label>
-                                                            <input type="checkbox" value="" checked="checked">
-                                                            <span class="cr">
-                            <i class="cr-icon glyphicon glyphicon-ok"></i>
-                          </span>
-                                                            <strong class="strs">Название пункта в несколько
-                                                                строк</strong>
-                                                        </label>
+                                                    <div class="cbx-area2">
+                                                        <div class="checkbox"><label><input type="checkbox"
+                                                                                            name="facilities"
+                                                                                            value="Towel">
+                                                            <span class="cr"><i
+                                                                    class="cr-icon glyphicon glyphicon-ok"></i></span>
+                                                            <strong class="strs">Полотенца</strong></label></div>
                                                     </div>
-
-
-                                                    <div class="checkbox">
-                                                        <label>
-                                                            <input type="checkbox" value="" checked="checked">
-                                                            <span class="cr">
-                            <i class="cr-icon glyphicon glyphicon-ok"></i>
-                          </span>
-                                                            <strong class="strs">Название пункта</strong>
-                                                        </label>
+                                                    <div class="cbx-area2">
+                                                        <div class="checkbox"><label><input type="checkbox"
+                                                                                            name="facilities"
+                                                                                            value="Bedsheet"> <span
+                                                                class="cr"><i
+                                                                class="cr-icon glyphicon glyphicon-ok"></i></span>
+                                                            <strong
+                                                                    class="strs">Простыни</strong></label></div>
                                                     </div>
-
-
+                                                    <div class="klt no-plr">Электроника и мебель</div>
+                                                    <div class="cbx-area2">
+                                                        <div class="checkbox"><label><input type="checkbox"
+                                                                                            name="facilities"
+                                                                                            value="Wifi">
+                                                            <span class="cr"><i
+                                                                    class="cr-icon glyphicon glyphicon-ok"></i></span>
+                                                            <strong class="strs">Wifi</strong></label></div>
+                                                    </div>
+                                                    <div class="cbx-area2">
+                                                        <div class="checkbox"><label><input type="checkbox"
+                                                                                            name="facilities"
+                                                                                            value="TV">
+                                                            <span class="cr"><i
+                                                                    class="cr-icon glyphicon glyphicon-ok"></i></span>
+                                                            <strong class="strs">Телевизор</strong></label></div>
+                                                    </div>
+                                                    <div class="cbx-area2">
+                                                        <div class="checkbox"><label><input type="checkbox"
+                                                                                            name="facilities"
+                                                                                            value="AirConditioning">
+                                                            <span
+                                                                    class="cr"><i
+                                                                    class="cr-icon glyphicon glyphicon-ok"></i></span>
+                                                            <strong
+                                                                    class="strs">Кондиционер</strong></label></div>
+                                                    </div>
                                                     <button data-toggle="collapse" class="showsl" data-target="#demo">
                                                         Показать еще <i class="fa fa-angle-down" aria-hidden="true"></i>
                                                     </button>
 
                                                     <div id="demo" class="collapse">
-
-                                                        <div class="checkbox">
-                                                            <label>
-                                                                <input type="checkbox" value="" checked="checked">
-                                                                <span class="cr">
-                            <i class="cr-icon glyphicon glyphicon-ok"></i>
-                          </span>
-                                                                <strong class="strs">Название пункта в несколько
-                                                                    строк</strong>
-                                                            </label>
+                                                        <div class="cbx-area2">
+                                                            <div class="checkbox"><label><input type="checkbox"
+                                                                                                name="facilities"
+                                                                                                value="Fridge"> <span
+                                                                    class="cr"><i
+                                                                    class="cr-icon glyphicon glyphicon-ok"></i></span>
+                                                                <strong
+                                                                        class="strs">Холодильник</strong></label></div>
                                                         </div>
-
-                                                        <div class="checkbox">
-                                                            <label>
-                                                                <input type="checkbox" value="" checked="checked">
-                                                                <span class="cr">
-                            <i class="cr-icon glyphicon glyphicon-ok"></i>
-                          </span>
-                                                                <strong class="strs">Название пункта</strong>
-                                                            </label>
+                                                        <div class="cbx-area2">
+                                                            <div class="checkbox"><label><input type="checkbox"
+                                                                                                name="facilities"
+                                                                                                value="Heating"> <span
+                                                                    class="cr"><i
+                                                                    class="cr-icon glyphicon glyphicon-ok"></i></span>
+                                                                <strong
+                                                                        class="strs">Отопление</strong></label></div>
                                                         </div>
-
-                                                        <div class="checkbox">
-                                                            <label>
-                                                                <input type="checkbox" value="" checked="checked">
-                                                                <span class="cr">
-                            <i class="cr-icon glyphicon glyphicon-ok"></i>
-                          </span>
-                                                                <strong class="strs">Название пункта</strong>
-                                                            </label>
+                                                        <div class="cbx-area2">
+                                                            <div class="checkbox"><label><input type="checkbox"
+                                                                                                name="facilities"
+                                                                                                value="Hairdryer"> <span
+                                                                    class="cr"><i
+                                                                    class="cr-icon glyphicon glyphicon-ok"></i></span>
+                                                                <strong
+                                                                        class="strs">Фен</strong></label></div>
                                                         </div>
-
-
-                                                        <div class="checkbox">
-                                                            <label>
-                                                                <input type="checkbox" value="" checked="checked">
-                                                                <span class="cr">
-                            <i class="cr-icon glyphicon glyphicon-ok"></i>
-                          </span>
-                                                                <strong class="strs">Название пункта</strong>
-                                                            </label>
+                                                        <div class="cbx-area2">
+                                                            <div class="checkbox"><label><input type="checkbox"
+                                                                                                name="facilities"
+                                                                                                value="Iron">
+                                                                <span class="cr"><i
+                                                                        class="cr-icon glyphicon glyphicon-ok"></i></span>
+                                                                <strong class="strs">Утюг</strong></label></div>
                                                         </div>
-
-
+                                                        <div class="cbx-area2">
+                                                            <div class="checkbox"><label><input type="checkbox"
+                                                                                                name="facilities"
+                                                                                                value="Cupboard"> <span
+                                                                    class="cr"><i
+                                                                    class="cr-icon glyphicon glyphicon-ok"></i></span>
+                                                                <strong
+                                                                        class="strs">Шкаф/комод</strong></label></div>
+                                                        </div>
+                                                        <div class="cbx-area2">
+                                                            <div class="checkbox"><label><input type="checkbox"
+                                                                                                name="facilities"
+                                                                                                value="Workplace"> <span
+                                                                    class="cr"><i
+                                                                    class="cr-icon glyphicon glyphicon-ok"></i></span>
+                                                                <strong
+                                                                        class="strs">Стол/рабочее место</strong></label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="klt no-plr">Услуги</div>
+                                                        <div class="slise">Предоставляются за отдельную плату</div>
+                                                        <div class="cbx-area2">
+                                                            <div class="checkbox"><label><input type="checkbox"
+                                                                                                name="facilities"
+                                                                                                value="Breakfast"> <span
+                                                                    class="cr"><i
+                                                                    class="cr-icon glyphicon glyphicon-ok"></i></span>
+                                                                <strong
+                                                                        class="strs">Завтрак, кофе, чай</strong></label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="cbx-area2">
+                                                            <div class="checkbox"><label><input type="checkbox"
+                                                                                                name="facilities"
+                                                                                                value="Parking"> <span
+                                                                    class="cr"><i
+                                                                    class="cr-icon glyphicon glyphicon-ok"></i></span>
+                                                                <strong
+                                                                        class="strs">Парковка</strong></label></div>
+                                                        </div>
+                                                        <div class="cbx-area2">
+                                                            <div class="checkbox"><label><input type="checkbox"
+                                                                                                name="facilities"
+                                                                                                value="Massage"> <span
+                                                                    class="cr"><i
+                                                                    class="cr-icon glyphicon glyphicon-ok"></i></span>
+                                                                <strong
+                                                                        class="strs">Массаж</strong></label></div>
+                                                        </div>
+                                                        <div class="cbx-area2">
+                                                            <div class="checkbox"><label><input type="checkbox"
+                                                                                                name="facilities"
+                                                                                                value="ClearRoom"> <span
+                                                                    class="cr"><i
+                                                                    class="cr-icon glyphicon glyphicon-ok"></i></span>
+                                                                <strong
+                                                                        class="strs">Ежедневная уборка
+                                                                    номера</strong></label></div>
+                                                        </div>
+                                                        <div class="cbx-area2">
+                                                            <div class="checkbox"><label><input type="checkbox"
+                                                                                                name="facilities"
+                                                                                                value="SPA">
+                                                                <span class="cr"><i
+                                                                        class="cr-icon glyphicon glyphicon-ok"></i></span>
+                                                                <strong class="strs">Спа и оздоровительный
+                                                                    центр</strong></label></div>
+                                                        </div>
+                                                        <div class="cbx-area2">
+                                                            <div class="checkbox"><label><input type="checkbox"
+                                                                                                name="facilities"
+                                                                                                value="Sauna">
+                                                                <span class="cr"><i
+                                                                        class="cr-icon glyphicon glyphicon-ok"></i></span>
+                                                                <strong class="strs">Сауна</strong></label></div>
+                                                        </div>
+                                                        <div class="klt no-plr">Оборудование для безопасности</div>
+                                                        <div class="cbx-area2">
+                                                            <div class="checkbox"><label><input type="checkbox"
+                                                                                                name="facilities"
+                                                                                                value="FirstAidKit">
+                                                                <span
+                                                                        class="cr"><i
+                                                                        class="cr-icon glyphicon glyphicon-ok"></i></span>
+                                                                <strong
+                                                                        class="strs">Аптечка первой
+                                                                    помощи</strong></label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="cbx-area2">
+                                                            <div class="checkbox"><label><input type="checkbox"
+                                                                                                name="facilities"
+                                                                                                value="SafetyDataSheet">
+                                                                <span
+                                                                        class="cr"><i
+                                                                        class="cr-icon glyphicon glyphicon-ok"></i></span>
+                                                                <strong
+                                                                        class="strs">Памятка
+                                                                    безопасности</strong></label>
+                                                            </div>
+                                                            <div class="slise">Список телефонов экстренных служб,
+                                                                запасных
+                                                                выходов и др.
+                                                            </div>
+                                                        </div>
+                                                        <div class="cbx-area2">
+                                                            <div class="checkbox"><label><input type="checkbox"
+                                                                                                name="facilities"
+                                                                                                value="Extinguisher">
+                                                                <span
+                                                                        class="cr"><i
+                                                                        class="cr-icon glyphicon glyphicon-ok"></i></span>
+                                                                <strong
+                                                                        class="strs">Огнетушитель</strong></label></div>
+                                                        </div>
+                                                        <div class="cbx-area2">
+                                                            <div class="checkbox"><label><input type="checkbox"
+                                                                                                name="facilities"
+                                                                                                value="Safe">
+                                                                <span class="cr"><i
+                                                                        class="cr-icon glyphicon glyphicon-ok"></i></span>
+                                                                <strong class="strs">Сейф</strong></label></div>
+                                                        </div>
+                                                        <div class="cbx-area2">
+                                                            <div class="checkbox"><label><input type="checkbox"
+                                                                                                name="facilities"
+                                                                                                value="ProtectionOfPersonalSpace">
+                                                                <span class="cr"><i
+                                                                        class="cr-icon glyphicon glyphicon-ok"></i></span>
+                                                                <strong class="strs">Дверь спальни
+                                                                    запирается</strong></label>
+                                                            </div>
+                                                            <div class="slise">Отдельную комнату можно запереть из
+                                                                соображений
+                                                                безопасности и защиты личного пространства.
+                                                            </div>
+                                                        </div>
+                                                        <div class="klt no-plr">Прочие удобства</div>
+                                                        <div class="cbx-area2">
+                                                            <div class="checkbox"><label><input type="checkbox"
+                                                                                                name="facilities"
+                                                                                                value="SeparateEntrance">
+                                                                <span
+                                                                        class="cr"><i
+                                                                        class="cr-icon glyphicon glyphicon-ok"></i></span>
+                                                                <strong
+                                                                        class="strs">Отдельный вход</strong></label>
+                                                            </div>
+                                                        </div>
                                                     </div>
-
-
                                                 </div>
 
+
+                                                <!--<div class="clk-area">-->
+
+                                                <!--<div class="klt no-plr">Другие варианты</div>-->
+
+                                                <!--<div class="cbx-area">-->
+                                                <!--<div class="checkbox">-->
+                                                <!--<label>-->
+                                                <!--<input type="checkbox" value="" checked="checked">-->
+                                                <!--<span class="cr">-->
+                                                <!--<i class="cr-icon glyphicon glyphicon-ok"></i>-->
+                                                <!--</span>-->
+                                                <!--<strong class="strs">Superhost</strong>-->
+                                                <!--</label>-->
+                                                <!--</div>-->
+
+                                                <!--<div class="slise">-->
+                                                <!--Останавливайтесь у самых гостеприимных хозяев <a href="#">Подробнее</a>-->
+                                                <!--</div>-->
+                                                <!--</div>-->
+
+                                                <!--</div>-->
                                                 <div class="otx">
-                                                    <a class="fll" href="#">Отменить</a>
-                                                    <a class="flr" href="#">Применить</a>
+                                                    <a class="fll">Отменить</a>
+                                                    <a class="flr pointer" on-click="update_filter:facilities_filter">Применить</a>
                                                 </div>
-
-
-                                            </div>
-
+                                            </form>
 
                                         </div>
 

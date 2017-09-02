@@ -271,16 +271,16 @@ var schemas = {
             default: '',
         },
         limit_time_min: {
-            type: String,
-            default: '',
+            type: Number,
+            default: 0,
         },
         limit_time_max: {
-            type: String,
-            default: '',
+            type: Number,
+            default: 0,
         },
         people_count: {
-            type: String,
-            default: '',
+            type: Number,
+            default: 0,
         },
         startTimeCheckIn: {
             type: String,
@@ -299,24 +299,24 @@ var schemas = {
             default: '',
         },
         children_count: {
-            type: String,
-            default: '',
+            type: Number,
+            default: 0,
         },
         bedroom_count: {
-            type: String,
-            default: '',
+            type: Number,
+            default: 0,
         },
         bed_count: {
-            type: String,
-            default: '',
+            type: Number,
+            default: 0,
         },
         bathroom_count: {
-            type: String,
-            default: '',
+            type: Number,
+            default: 0,
         },
         bathroom: {
-            type: String,
-            default: '',
+            type: Number,
+            default: 0,
         },
         description: {
             type: String,

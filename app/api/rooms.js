@@ -85,7 +85,7 @@ module.exports = (API, redis) => {
         if (param.page && !isNaN(param.page) && +param.page > 0) {
             skip = limit * (param.page - 1)
         }
-
+        console.log(findPram);
         async.parallel({
             count: function (count_callback) {
                 db.rooms.count(findPram).then(function (count) {

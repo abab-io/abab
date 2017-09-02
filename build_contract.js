@@ -134,6 +134,7 @@ deploy(source, function (tx, _interface, _bytecode, source, solc_version) {
         'module.exports = {_address: _address,_contract_fixed: _contract_fixed,_name: _name,_symbol: _symbol,_abi: _abi,_bytecode:_bytecode,_version:_version};');
     console.log('Deploy Contract Success:\n\tAddress: ' + tx.contractAddress + '\n\tBlockHash: ' + tx.blockHash + '\n\tblockNumber: ' + tx.blockNumber);
     console.log('== END ==');
+    console.info('[info] Please verify source https://ropsten.etherscan.io/verifyContract2?a=' + tx.contractAddress );
 
     process.exit(0);
 });
