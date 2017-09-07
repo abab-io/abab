@@ -26,7 +26,61 @@ module.exports = (API, redis) => {
 
     var web3_events = {
         NewSchedule: function (event, tx, callback) {
-            console.log(event);
+            // console.log(event);
+
+            db.rooms.findOne({
+                wallet: event.args.host,
+                _index: event.args.roomIndex.toString()
+            }, '_id').then(function (res) {
+                db.scheduleRoom.find({room: db.mongoose.Types.ObjectId(res._id)}, 'startDate endDate').then(function (schedules) {
+
+
+                    console.log('=========');
+
+                    let _sort = [];
+
+                    function filter_schedules(schedules_) {
+
+                        let _unsort = [];
+                        let startDate, endDate;
+                        schedules = schedules_.sort(function (a, b) {
+                            return a.startDate >= b.startDate;
+                        });
+                        startDate = schedules[0].startDate;
+                        endDate = schedules[0].endDate;
+
+                        for (let i in  schedules) {
+                            if (schedules.hasOwnProperty(i)) {
+                                if (schedules[i].startDate <= endDate) {
+                                    endDate = schedules[i].endDate;
+                                    // schedules.splice(i, 1);
+                                } else {
+                                    _unsort.push(schedules[i])
+                                }
+
+                            }
+                        }
+
+                        _sort.push({from: startDate, to: endDate});
+                        if (_unsort.length !== 0)
+                            filter_schedules(_unsort);
+                        else {
+                            console.log({
+                                _id: 'db.mongoose.Types.ObjectId('+res._id+')'
+                            }, {
+                                schedule:_sort
+                            });
+                            db.rooms.findOneAndUpdate({
+                                _id: db.mongoose.Types.ObjectId(res._id)
+                            }, {$set:{
+                                schedule: _sort
+                            }}, {new: true}).then()
+                        }
+
+                    }
+                    filter_schedules(schedules);
+                });
+            });
             db.scheduleRoom.update({
                 "tx.hash": event.transactionHash
             }, {
@@ -52,10 +106,12 @@ module.exports = (API, redis) => {
                 tx: db.mongoose.Types.ObjectId(tx._id),
                 _index: event.args.roomIndex,
                 status: 3
-            }, {new: true}).populate('user').then(function (document) {
-                if(!document){
-                     console.log('[data]',{txHash: tx.tx.hash, _hash: _roomDescriptionHash, wallet: event.args.host});
-                    return console.error('[Error] EventBlock: '+event.blockNumber);
+            }, {new: true})
+            // .select('_id user wallet')
+                .populate('user').then(function (document) {
+                if (!document) {
+                    console.log('[data]', {txHash: tx.tx.hash, _hash: _roomDescriptionHash, wallet: event.args.host});
+                    return console.error('[Error] EventBlock: ' + event.blockNumber);
                 }
                 db.scheduleRoom.find({
                     room: db.mongoose.Types.ObjectId(document._doc._id),
@@ -111,7 +167,7 @@ module.exports = (API, redis) => {
 
 
                 }).catch(function () {
-                    console.error('db event',arguments)
+                    console.error('db event', arguments)
                 });
 
 
@@ -453,7 +509,7 @@ module.exports = (API, redis) => {
                 "wallet": response_s.wallet.address,
                 "currency": sol_config._symbol,
             }).then(function (res) {
-                let nonce = web3.eth.getTransactionCount(response_s.wallet.address);
+                let nonce = web3.eth.getTransactionCount(response_s.wallet.address, 'pending');
                 for (let k in res) {
                     if (res.hasOwnProperty(k) && nonce < res[k].nonce && +((+new Date().getTime()) - 1000 * 60 ) < +res[k].create_at.getTime())
                         nonce = res[k].nonce;
@@ -475,7 +531,7 @@ module.exports = (API, redis) => {
 
 
                 let gasPriceHex = util.bufferToHex(21000000000);
-                let gasLimitHex = util.bufferToHex(400000);
+                let gasLimitHex = util.bufferToHex(4000000);
                 let nonceHex = util.bufferToHex(nonce);
                 let tx = new Tx({
                     nonce: nonceHex,

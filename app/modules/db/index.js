@@ -236,7 +236,7 @@ var schemas = {
         tx: {
             status: {
                 type: Number,
-                default:0,
+                default: 0,
             },
             hash: {
                 type: String,
@@ -326,6 +326,7 @@ var schemas = {
             type: Array,
             default: [],
         },
+        schedule: Array,
         facilities: {
             type: Array,
             default: [],
@@ -338,7 +339,7 @@ var schemas = {
             type: String,
             default: '0x',
         },
-        tx:{
+        tx: {
             type: Schema.Types.ObjectId,
             ref: 'tx'
         },
